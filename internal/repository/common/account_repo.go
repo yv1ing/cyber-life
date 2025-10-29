@@ -32,9 +32,11 @@ func UpdateAccount(account *commonmodel.Account) error {
 }
 
 // FindAccounts 查询账号记录
-func FindAccounts(keyword string) ([]commonmodel.Account, error) {
+func FindAccounts(keyword string, page, size int) ([]commonmodel.Account, error) {
 	var accounts []commonmodel.Account
-	err := repository.Repo.DB.Where("platform LIKE ? OR username LIKE ?", "%"+keyword+"%", "%"+keyword+"%").Find(&accounts).Error
+
+	offset := (page - 1) * size
+	err := repository.Repo.DB.Where("platform LIKE ? OR username LIKE ?", "%"+keyword+"%", "%"+keyword+"%").Offset(offset).Limit(size).Find(&accounts).Error
 	if err != nil {
 		return nil, err
 	}

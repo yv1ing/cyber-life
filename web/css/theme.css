@@ -1,0 +1,144 @@
+/* Material Design 3 主题变量 */
+:root {
+    /* 亮色主题 - 参考 Material Design 3 配色系统 */
+    --primary: #1976d2;
+    --primary-variant: #1565c0;
+    --primary-light: #e3f2fd;
+    --on-primary: #ffffff;
+
+    --secondary: #0288d1;
+    --secondary-variant: #0277bd;
+    --on-secondary: #ffffff;
+
+    --surface: #ffffff;
+    --surface-1: #f5f5f5;
+    --surface-2: #eeeeee;
+    --surface-3: #e0e0e0;
+    --surface-variant: #fafafa;
+    --on-surface: #1a1c1e;
+    --on-surface-variant: #44474e;
+
+    --background: #fafafa;
+    --on-background: #1a1c1e;
+
+    --error: #ba1a1a;
+    --error-container: #ffdad6;
+    --on-error: #ffffff;
+    --on-error-container: #410002;
+
+    --success: #2e7d32;
+    --success-container: #c8e6c9;
+    --on-success: #ffffff;
+
+    --warning: #f57c00;
+    --warning-container: #ffe0b2;
+    --on-warning: #ffffff;
+
+    --outline: #73777f;
+    --outline-variant: #c4c7cf;
+    --scrim: rgba(0, 0, 0, 0.32);
+
+    /* 阴影 - Material Design 3 */
+    --elevation-0: none;
+    --elevation-1: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+    --elevation-2: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
+    --elevation-3: 0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.3);
+    --elevation-4: 0 6px 10px 4px rgba(0, 0, 0, 0.15), 0 2px 3px rgba(0, 0, 0, 0.3);
+    --elevation-5: 0 8px 12px 6px rgba(0, 0, 0, 0.15), 0 4px 4px rgba(0, 0, 0, 0.3);
+
+    /* 圆角 */
+    --radius-xs: 4px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-full: 9999px;
+
+    /* 间距 */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+    --spacing-2xl: 32px;
+
+    /* 字体大小 - 针对 PC 端优化 */
+    --text-xs: 11px;
+    --text-sm: 12px;
+    --text-base: 13px;
+    --text-md: 14px;
+    --text-lg: 16px;
+    --text-xl: 18px;
+    --text-2xl: 22px;
+    --text-3xl: 28px;
+
+    /* 动画 */
+    --duration-short: 150ms;
+    --duration-medium: 250ms;
+    --duration-long: 350ms;
+    --easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+    --easing-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
+    --easing-accelerate: cubic-bezier(0.4, 0.0, 1, 1);
+}
+
+/* 深色主题 - Material Design 3 */
+[data-theme="dark"] {
+    --primary: #90caf9;
+    --primary-variant: #64b5f6;
+    --primary-light: #1e3a5f;
+    --on-primary: #003258;
+
+    --secondary: #81d4fa;
+    --secondary-variant: #4fc3f7;
+    --on-secondary: #003548;
+
+    --surface: #1a1c1e;
+    --surface-1: #2d2f31;
+    --surface-2: #323437;
+    --surface-3: #37393c;
+    --surface-variant: #212326;
+    --on-surface: #e2e2e5;
+    --on-surface-variant: #c4c6cf;
+
+    --background: #1a1c1e;
+    --on-background: #e2e2e5;
+
+    --error: #ffb4ab;
+    --error-container: #93000a;
+    --on-error: #690005;
+    --on-error-container: #ffdad6;
+
+    --success: #81c784;
+    --success-container: #1b5e20;
+    --on-success: #003909;
+
+    --warning: #ffb74d;
+    --warning-container: #e65100;
+    --on-warning: #4a2800;
+
+    --outline: #8d9199;
+    --outline-variant: #43474e;
+    --scrim: rgba(0, 0, 0, 0.8);
+
+    /* 深色模式阴影更深 */
+    --elevation-1: 0 1px 3px 1px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.8);
+    --elevation-2: 0 2px 6px 2px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.8);
+    --elevation-3: 0 4px 8px 3px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.8);
+    --elevation-4: 0 6px 10px 4px rgba(0, 0, 0, 0.5), 0 2px 3px rgba(0, 0, 0, 0.8);
+    --elevation-5: 0 8px 12px 6px rgba(0, 0, 0, 0.5), 0 4px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* 平滑的主题切换动画 */
+*,
+*::before,
+*::after {
+    transition: background-color var(--duration-medium) var(--easing-standard),
+                color var(--duration-medium) var(--easing-standard),
+                border-color var(--duration-medium) var(--easing-standard),
+                box-shadow var(--duration-medium) var(--easing-standard);
+}
+
+/* 取消某些元素的主题切换动画 */
+input, select, textarea, button {
+    transition-property: none;
+}

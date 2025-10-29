@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - Cyber Life</title>
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+    <div class="theme-toggle-wrapper">
+        <button class="theme-toggle-btn" id="lang-toggle" title="切换语言">
+            <span class="icon" id="lang-icon">中</span>
+        </button>
+        <button class="theme-toggle-btn" id="theme-toggle" title="切换主题">
+            <span class="icon"></span>
+        </button>
+    </div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">
+                    <span class="icon" id="logo-icon"></span>
+                </div>
+                <h1 class="login-title" data-i18n="app.name">赛博人生</h1>
+                <p class="login-subtitle" data-i18n="login.subtitle">欢迎回来，请登录您的账号</p>
+            </div>
+
+            <div class="login-body">
+                <form class="login-form" id="login-form">
+                    <div class="input-group">
+                        <label class="input-label" for="username" data-i18n="login.account">账号</label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            class="input-field"
+                            data-i18n-placeholder="login.accountPlaceholder"
+                            placeholder="请输入账号"
+                            required
+                            autocomplete="username"
+                        />
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label" for="password" data-i18n="login.password">密码</label>
+                        <div class="password-toggle">
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="input-field"
+                                data-i18n-placeholder="login.passwordPlaceholder"
+                                placeholder="请输入密码"
+                                required
+                                autocomplete="current-password"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="login-actions">
+                        <button type="submit" class="btn btn-primary login-btn" id="login-btn" data-i18n="login.submit">
+                            登录
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="login-footer">
+                <p data-i18n="login.footer">&copy; 2025 Cyber Life. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/icons.js"></script>
+    <script src="/js/lang.js"></script>
+    <script src="/js/theme.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/login.js"></script>
+</body>
+</html>

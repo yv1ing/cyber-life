@@ -18,6 +18,18 @@ var whitelist = []string{
 }
 
 func InitRouter(eng *gin.Engine) {
+	// 静态文件服务
+	eng.Static("/css", "./web/css")
+	eng.Static("/js", "./web/js")
+	eng.Static("/lib", "./web/lib")
+	eng.Static("/assets", "./web/assets")
+
+	// HTML 页面路由
+	eng.StaticFile("/", "./web/index.html")
+	eng.StaticFile("/index.html", "./web/index.html")
+	eng.StaticFile("/login.html", "./web/login.html")
+	eng.StaticFile("/admin.html", "./web/admin.html")
+
 	// 全局中间件
 	eng.Use(middleware.JwtAuthMiddleware(whitelist))
 

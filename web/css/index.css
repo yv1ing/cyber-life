@@ -1,0 +1,213 @@
+/* 首页样式 - Material Design 3 */
+.index-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--background);
+}
+
+.index-header {
+    padding: var(--spacing-lg);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.btn-icon #lang-icon {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--on-primary);
+    font-weight: 500;
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: transform var(--duration-short) var(--easing-standard);
+}
+
+.user-avatar:hover {
+    transform: scale(1.1);
+}
+
+.index-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 var(--spacing-xl);
+}
+
+.search-section {
+    width: 100%;
+    max-width: 584px;
+    margin-bottom: 15vh;
+}
+
+.logo-section {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.logo-text {
+    font-size: 92px;
+    font-weight: 300;
+    color: var(--on-background);
+    letter-spacing: -0.5px;
+}
+
+.logo-text .highlight {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 400;
+}
+
+.search-box {
+    position: relative;
+    width: 100%;
+}
+
+.search-input-wrapper {
+    position: relative;
+    width: 100%;
+    box-shadow: var(--elevation-1);
+    border-radius: var(--radius-full);
+    transition: box-shadow var(--duration-medium) var(--easing-standard);
+}
+
+.search-input-wrapper:hover {
+    box-shadow: var(--elevation-2);
+}
+
+.search-input-wrapper:focus-within {
+    box-shadow: var(--elevation-3);
+}
+
+.search-input {
+    width: 100%;
+    padding: 14px 24px;
+    padding-right: 52px;
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-full);
+    font-size: 16px;
+    background-color: var(--surface);
+    color: var(--on-surface);
+    transition: all var(--duration-short) var(--easing-standard);
+    height: 46px;
+}
+
+.search-input:hover {
+    border-color: var(--outline);
+    box-shadow: var(--elevation-1);
+}
+
+.search-input:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.search-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background-color: transparent;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--duration-short) var(--easing-standard);
+    font-size: 18px;
+}
+
+.search-btn:hover {
+    background-color: var(--primary-light);
+}
+
+.search-suggestions {
+    position: absolute;
+    top: calc(100% + var(--spacing-sm));
+    left: 0;
+    right: 0;
+    background-color: var(--surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--elevation-3);
+    overflow: hidden;
+    max-height: 400px;
+    overflow-y: auto;
+    display: none;
+}
+
+.search-suggestions.show {
+    display: block;
+}
+
+.suggestion-item {
+    padding: var(--spacing-md) var(--spacing-lg);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    transition: background-color var(--duration-short) var(--easing-standard);
+}
+
+.suggestion-item:hover {
+    background-color: var(--surface-1);
+}
+
+.suggestion-icon {
+    color: var(--on-surface-variant);
+}
+
+.suggestion-text {
+    flex: 1;
+    color: var(--on-surface);
+    font-size: var(--text-sm);
+}
+
+.index-footer {
+    padding: var(--spacing-xl);
+    text-align: center;
+    color: var(--on-surface-variant);
+    font-size: var(--text-xs);
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .logo-text {
+        font-size: 60px;
+    }
+
+    .search-section {
+        margin-bottom: 10vh;
+        max-width: 90%;
+    }
+
+    .search-input {
+        font-size: 14px;
+        height: 42px;
+        padding: 12px 20px;
+        padding-right: 48px;
+    }
+
+    .search-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+}

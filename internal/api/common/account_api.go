@@ -50,10 +50,10 @@ func CreateAccountHandler(ctx *gin.Context) {
 	})
 }
 
-// DeleteAccountHandler 删除账号记录
+// DeleteAccountHandler 删除账号记录（支持单个删除和批量删除）
 func DeleteAccountHandler(ctx *gin.Context) {
 	type reqType struct {
-		AccountID uint `json:"account_id" binding:"required"`
+		AccountIDs []uint `json:"account_ids" binding:"required,min=1"`
 	}
 
 	var req reqType
@@ -66,11 +66,19 @@ func DeleteAccountHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = commonservice.DeleteAccount(req.AccountID, false)
-	if err != nil {
+	// 批量删除账号
+	var failedCount int
+	for _, id := range req.AccountIDs {
+		err = commonservice.DeleteAccount(id, false)
+		if err != nil {
+			failedCount++
+		}
+	}
+
+	if failedCount > 0 {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
-			Info: "系统内部错误",
+			Info: "部分删除失败",
 		})
 		return
 	}
@@ -120,9 +128,32 @@ func UpdateAccountHandler(ctx *gin.Context) {
 
 // FindAccountsHandler 搜索账号记录
 func FindAccountsHandler(ctx *gin.Context) {
-	keyword := ctx.DefaultQuery("keyword", "")
+	var (
+		err     error
+		page    int
+		size    int
+		keyword string
+	)
 
-	accounts, err := commonservice.FindAccounts(keyword)
+	keyword = ctx.DefaultQuery("keyword", "")
+	page, err = strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
+			Code: http.StatusBadRequest,
+			Info: "请求参数非法",
+		})
+		return
+	}
+	size, err = strconv.Atoi(ctx.DefaultQuery("size", "15"))
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
+			Code: http.StatusBadRequest,
+			Info: "请求参数非法",
+		})
+		return
+	}
+
+	accounts, err := commonservice.FindAccounts(keyword, page, size)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,

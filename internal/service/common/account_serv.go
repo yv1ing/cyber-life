@@ -56,6 +56,6 @@ func FindAccountsList(page, size int) ([]commonmodel.Account, int64, error) {
 }
 
 // FindAccounts 搜索账号记录
-func FindAccounts(keyword string) ([]commonmodel.Account, error) {
-	return commonrepository.FindAccounts(keyword)
+func FindAccounts(keyword string, page, size int) ([]commonmodel.Account, error) {
+	return commonrepository.FindAccounts(keyword, page, size)
 }

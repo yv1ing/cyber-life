@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理面板 - Cyber Life</title>
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 头部 -->
+        <header class="admin-header">
+            <div class="header-left">
+                <button class="btn-icon mobile-menu-btn" id="mobile-menu-btn">
+                    <span class="icon" id="mobile-menu-icon"></span>
+                </button>
+                <a href="/" class="header-logo">
+                    <span class="logo-icon icon" id="header-logo-icon"></span>
+                    <span class="logo-name" data-i18n="app.name">赛博人生</span>
+                </a>
+            </div>
+
+            <div class="header-right">
+                <button class="btn-icon" id="lang-toggle" title="Switch Language">
+                    <span class="icon" id="lang-icon">中</span>
+                </button>
+
+                <button class="btn-icon" id="theme-toggle" title="切换主题">
+                    <span class="icon"></span>
+                </button>
+
+                <div class="user-menu-wrapper">
+                    <div class="user-menu" id="user-menu">
+                        <div class="user-info">
+                            <span class="user-name" id="user-name">Admin</span>
+                            <span class="user-role" data-i18n="admin.administrator">管理员</span>
+                        </div>
+                        <div class="user-avatar-admin" id="user-avatar-admin">
+                            <span id="user-initial-admin">A</span>
+                        </div>
+                    </div>
+
+                    <div class="user-dropdown" id="user-dropdown">
+                        <div class="dropdown-item" id="edit-profile-btn">
+                            <span class="icon" id="edit-profile-icon"></span>
+                            <span data-i18n="admin.editProfile">编辑资料</span>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item" id="logout-btn">
+                            <span class="icon" id="logout-icon"></span>
+                            <span data-i18n="admin.logout">退出登录</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主体 -->
+        <div class="admin-body">
+            <!-- 侧边栏遮罩 -->
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <!-- 侧边栏 -->
+            <aside class="admin-sidebar" id="admin-sidebar">
+                <nav class="sidebar-nav">
+                    <div class="nav-section">
+                        <div class="nav-item active" data-page="accounts">
+                            <span class="nav-icon" id="nav-icon-accounts"></span>
+                            <span class="nav-label" data-i18n="nav.accounts">账号记录</span>
+                        </div>
+                        <div class="nav-item" data-page="hosts">
+                            <span class="nav-icon" id="nav-icon-hosts"></span>
+                            <span class="nav-label" data-i18n="nav.hosts">主机信息</span>
+                        </div>
+                        <div class="nav-item" data-page="subscriptions">
+                            <span class="nav-icon" id="nav-icon-subscriptions"></span>
+                            <span class="nav-label" data-i18n="nav.subscriptions">订阅信息</span>
+                        </div>
+                        <div class="nav-item" data-page="sites">
+                            <span class="nav-icon" id="nav-icon-sites"></span>
+                            <span class="nav-label" data-i18n="nav.sites">站点信息</span>
+                        </div>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- 主内容区 -->
+            <main class="admin-content">
+                <div class="content-header">
+                    <div class="content-actions">
+                        <button class="btn btn-primary" id="create-btn">
+                            <span class="icon" id="create-icon"></span>
+                            <span data-i18n="common.create">新建</span>
+                        </button>
+                        <button class="btn btn-secondary" id="batch-delete-btn" style="display: none;">
+                            <span class="icon" id="batch-delete-icon"></span>
+                            <span data-i18n="common.batchDelete">批量删除</span>
+                        </button>
+                    </div>
+                    <div class="search-box-wrapper">
+                        <input type="text" class="search-box-input" id="search-input" data-i18n-placeholder="common.searchPlaceholder" placeholder="搜索..." />
+                        <button class="btn-icon search-box-btn" id="search-btn">
+                            <span class="icon" id="search-btn-icon"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="content-body" id="content-body">
+                    <!-- 动态内容将在这里插入 -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 编辑/新建模态框 -->
+    <div class="modal-overlay" id="edit-modal-overlay">
+        <div class="modal" style="width: 600px; max-width: 90%;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="edit-modal-title">新建账号记录</h3>
+                <button class="btn-icon" id="edit-modal-close">
+                    <span class="icon" id="close-icon"></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-form">
+                    <input type="hidden" id="edit-id" />
+                    <div id="form-fields">
+                        <!-- 表单字段将动态插入 -->
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="edit-modal-cancel" data-i18n="common.cancel">取消</button>
+                <button class="btn btn-primary" id="edit-modal-save">
+                    <span class="icon" id="save-icon"></span>
+                    <span data-i18n="common.save">保存</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑用户资料模态框 -->
+    <div class="modal-overlay" id="profile-modal-overlay">
+        <div class="modal" style="width: 500px; max-width: 90%;">
+            <div class="modal-header">
+                <h3 class="modal-title" data-i18n="profile.title">编辑资料</h3>
+                <button class="btn-icon" id="profile-modal-close">
+                    <span class="icon" id="profile-close-icon"></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="profile-form">
+                    <input type="hidden" id="profile-user-id" />
+
+                    <div class="input-group">
+                        <label class="input-label" data-i18n="profile.account">账号</label>
+                        <input type="text" class="input-field" id="profile-username" data-i18n-placeholder="profile.accountPlaceholder" placeholder="请输入账号" required />
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label" data-i18n="profile.password">密码</label>
+                        <input type="password" class="input-field" id="profile-password" data-i18n-placeholder="profile.passwordPlaceholder" placeholder="留空则不修改密码" />
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label" data-i18n="profile.name">姓名</label>
+                        <input type="text" class="input-field" id="profile-name" data-i18n-placeholder="profile.namePlaceholder" placeholder="请输入姓名" />
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label" data-i18n="profile.email">邮箱</label>
+                        <input type="email" class="input-field" id="profile-email" data-i18n-placeholder="profile.emailPlaceholder" placeholder="请输入邮箱" />
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label" data-i18n="profile.phone">电话</label>
+                        <input type="tel" class="input-field" id="profile-phone" data-i18n-placeholder="profile.phonePlaceholder" placeholder="请输入电话" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="profile-modal-cancel" data-i18n="common.cancel">取消</button>
+                <button class="btn btn-primary" id="profile-modal-save">
+                    <span class="icon" id="profile-save-icon"></span>
+                    <span data-i18n="common.save">保存</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/icons.js"></script>
+    <script src="/js/lang.js"></script>
+    <script src="/js/theme.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Life</title>
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/index.css">
+</head>
+<body>
+    <div class="index-container">
+        <header class="index-header">
+            <button class="btn-icon" id="lang-toggle" title="Switch Language">
+                <span class="icon" id="lang-icon">中</span>
+            </button>
+            <button class="btn-icon" id="theme-toggle" title="切换主题">
+                <span class="icon"></span>
+            </button>
+            <div class="user-avatar" id="user-avatar" title="管理面板">
+                <span id="user-initial">?</span>
+            </div>
+        </header>
+
+        <main class="index-main">
+            <div class="search-section">
+                <div class="logo-section">
+                    <h1 class="logo-text" id="logo-text">
+                        <span class="highlight">赛博</span>人生
+                    </h1>
+                </div>
+
+                <div class="search-box">
+                    <div class="search-input-wrapper">
+                        <input
+                            type="text"
+                            class="search-input"
+                            id="search-input"
+                            data-i18n-placeholder="index.searchPlaceholder"
+                            placeholder="搜索 Google 或输入网址"
+                            autocomplete="off"
+                        />
+                        <button class="search-btn" id="search-btn" title="搜索">
+                            <span class="icon" id="search-icon"></span>
+                        </button>
+                    </div>
+
+                    <div class="search-suggestions" id="search-suggestions">
+                        <!-- 搜索建议将动态插入这里 -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="index-footer">
+            <p data-i18n="index.footer">&copy; 2025 Cyber Life. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="/js/icons.js"></script>
+    <script src="/js/lang.js"></script>
+    <script src="/js/theme.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/index.js"></script>
+</body>
+</html>
