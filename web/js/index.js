@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 初始化图标
     document.getElementById('search-icon').innerHTML = Icons.search;
 
-    // 更新 Logo 文本
+    // 更新 Logo 文本（固定为英文）
     updateLogoText();
 
     // 语言切换
@@ -13,11 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
             langManager.toggle();
         });
     }
-
-    // 监听语言变化事件
-    window.addEventListener('languagechange', () => {
-        updateLogoText();
-    });
 
     // 主题切换
     const themeToggle = document.getElementById('theme-toggle');
@@ -174,11 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // 更新 Logo 文本
 function updateLogoText() {
     const logoText = document.getElementById('logo-text');
-    const currentLang = langManager.getCurrentLanguage();
-
-    if (currentLang === 'zh') {
-        logoText.innerHTML = '<span class="highlight">赛博</span>人生';
-    } else {
-        logoText.innerHTML = '<span class="highlight">Cyber</span> Life';
-    }
+    // 主标题始终保持英文 Cyber Life
+    logoText.innerHTML = '<span class="highlight">Cyber</span> Life';
 }

@@ -34,7 +34,6 @@ const translations = {
         'login.password': '密码',
         'login.passwordPlaceholder': '请输入密码',
         'login.submit': '登录',
-        'login.footer': '© 2025 赛博人生。保留所有权利。',
         'login.loggingIn': '登录中...',
         'login.success': '登录成功',
         'login.error': '登录失败，请检查账号和密码',
@@ -44,7 +43,6 @@ const translations = {
         // 首页
         'index.title': 'Cyber Life',
         'index.searchPlaceholder': '搜索...',
-        'index.footer': '© 2025 赛博人生。保留所有权利。',
 
         // 管理页面
         'admin.title': '管理面板',
@@ -139,7 +137,6 @@ const translations = {
         'login.password': 'Password',
         'login.passwordPlaceholder': 'Enter your password',
         'login.submit': 'Sign In',
-        'login.footer': '© 2025 Cyber Life. All rights reserved.',
         'login.loggingIn': 'Logging in...',
         'login.success': 'Login successful',
         'login.error': 'Login failed, please check your account and password',
@@ -149,7 +146,6 @@ const translations = {
         // Index Page
         'index.title': 'Cyber Life',
         'index.searchPlaceholder': 'Search...',
-        'index.footer': '© 2025 Cyber Life. All rights reserved.',
 
         // Admin Page
         'admin.title': 'Admin Panel',
