@@ -4,6 +4,7 @@ import (
 	"cyber-life/internal/middleware"
 	"github.com/gin-gonic/gin"
 
+	commonapi "cyber-life/internal/api/common"
 	systemapi "cyber-life/internal/api/system"
 )
 
@@ -34,4 +35,10 @@ func InitRouter(eng *gin.Engine) {
 	sys.GET("/users/list", systemapi.ListUserHandler)
 
 	// 实际业务路由
+	// 账号记录管理
+	api.POST("/accounts/create", commonapi.CreateAccountHandler)
+	api.DELETE("/accounts/delete", commonapi.DeleteAccountHandler)
+	api.PUT("/accounts/update", commonapi.UpdateAccountHandler)
+	api.GET("/accounts/find", commonapi.FindAccountsHandler)
+	api.GET("/accounts/list", commonapi.FindAccountsListHandler)
 }

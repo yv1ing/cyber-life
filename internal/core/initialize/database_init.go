@@ -12,6 +12,7 @@ import (
 	"os"
 	"time"
 
+	commonmodel "cyber-life/internal/model/common"
 	systemmodel "cyber-life/internal/model/system"
 )
 
@@ -77,6 +78,7 @@ func InitDatabase() (*gorm.DB, error) {
 	err = recreateTables(
 		db,
 		&systemmodel.User{},
+		&commonmodel.Account{},
 	)
 
 	return db, nil
