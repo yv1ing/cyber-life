@@ -95,7 +95,16 @@
                             <span class="icon" id="create-icon"></span>
                             <span data-i18n="common.create">新建</span>
                         </button>
-                        <button class="btn btn-secondary" id="batch-delete-btn" style="display: none;">
+                        <button class="btn btn-secondary" id="import-csv-btn" style="display: none;">
+                            <span class="icon" id="import-csv-icon"></span>
+                            <span data-i18n="common.importCSV">导入CSV</span>
+                        </button>
+                        <button class="btn btn-secondary" id="export-csv-btn" style="display: none;">
+                            <span class="icon" id="export-csv-icon"></span>
+                            <span data-i18n="common.exportCSV">导出CSV</span>
+                        </button>
+                        <input type="file" id="import-csv-file-input" accept=".csv" style="display: none;" />
+                        <button class="btn btn-danger" id="batch-delete-btn" style="display: none;">
                             <span class="icon" id="batch-delete-icon"></span>
                             <span data-i18n="common.batchDelete">批量删除</span>
                         </button>

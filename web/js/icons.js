@@ -18,6 +18,8 @@ const Icons = {
     edit: '<i class="fas fa-edit"></i>',
     delete: '<i class="fas fa-trash-alt"></i>',
     save: '<i class="fas fa-save"></i>',
+    download: '<i class="fas fa-download"></i>',
+    upload: '<i class="fas fa-upload"></i>',
 
     // 导航图标
     dashboard: '<i class="fas fa-th-large"></i>',

@@ -3,6 +3,8 @@ package common
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 
 	systemmodel "cyber-life/internal/model/system"
@@ -144,7 +146,7 @@ func FindAccountsHandler(ctx *gin.Context) {
 		})
 		return
 	}
-	size, err = strconv.Atoi(ctx.DefaultQuery("size", "15"))
+	size, err = strconv.Atoi(ctx.DefaultQuery("size", "10"))
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
 			Code: http.StatusBadRequest,
@@ -188,7 +190,7 @@ func FindAccountsListHandler(ctx *gin.Context) {
 		})
 		return
 	}
-	size, err = strconv.Atoi(ctx.DefaultQuery("size", "15"))
+	size, err = strconv.Atoi(ctx.DefaultQuery("size", "10"))
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
 			Code: http.StatusBadRequest,
@@ -212,6 +214,86 @@ func FindAccountsListHandler(ctx *gin.Context) {
 		Data: gin.H{
 			"list":  accounts,
 			"total": total,
+		},
+	})
+}
+
+// ExportAccountsCSVHandler 导出账号记录为CSV文件
+func ExportAccountsCSVHandler(ctx *gin.Context) {
+	filePath, err := commonservice.ExportAccountsCSV()
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
+			Code: http.StatusInternalServerError,
+			Info: "导出CSV失败",
+		})
+		return
+	}
+	defer os.Remove(filePath)
+
+	filename := filepath.Base(filePath)
+	ctx.Header("Content-Description", "File Transfer")
+	ctx.Header("Content-Transfer-Encoding", "binary")
+	ctx.Header("Content-Disposition", "attachment; filename="+filename)
+	ctx.Header("Content-Type", "text/csv; charset=utf-8")
+
+	ctx.File(filePath)
+}
+
+// ImportAccountsCSVHandler 从CSV文件导入账号记录
+func ImportAccountsCSVHandler(ctx *gin.Context) {
+	file, err := ctx.FormFile("file")
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
+			Code: http.StatusBadRequest,
+			Info: "请求参数非法",
+		})
+		return
+	}
+
+	ext := filepath.Ext(file.Filename)
+	if ext != ".csv" {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
+			Code: http.StatusBadRequest,
+			Info: "请求参数非法",
+		})
+		return
+	}
+
+	tempDir := "temp"
+	if err := os.MkdirAll(tempDir, 0755); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
+			Code: http.StatusInternalServerError,
+			Info: "系统内部错误",
+		})
+		return
+	}
+
+	tempFilePath := filepath.Join(tempDir, file.Filename)
+	err = ctx.SaveUploadedFile(file, tempFilePath)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
+			Code: http.StatusInternalServerError,
+			Info: "系统内部错误",
+		})
+		return
+	}
+
+	defer os.Remove(tempFilePath)
+
+	importedCount, err := commonservice.ImportAccountsCSV(tempFilePath)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
+			Code: http.StatusInternalServerError,
+			Info: "导入CSV失败",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, systemmodel.Response{
+		Code: http.StatusOK,
+		Info: "导入CSV成功",
+		Data: gin.H{
+			"imported_count": importedCount,
 		},
 	})
 }

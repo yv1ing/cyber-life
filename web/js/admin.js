@@ -1,7 +1,7 @@
 // 管理页面逻辑
 let currentPage = 'accounts';
 let currentPageNum = 1;
-const pageSize = 15;
+const pageSize = 10;
 let isLoading = false;
 let selectedIds = new Set(); // 存储选中的ID
 let currentKeyword = ''; // 当前搜索关键词
@@ -128,6 +128,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // 新建按钮
     document.getElementById('create-btn').addEventListener('click', () => openEditModal());
 
+    // 导出CSV按钮
+    document.getElementById('export-csv-btn').addEventListener('click', handleExportCSV);
+
+    // 导入CSV按钮
+    document.getElementById('import-csv-btn').addEventListener('click', () => {
+        document.getElementById('import-csv-file-input').click();
+    });
+
+    // 文件选择处理
+    document.getElementById('import-csv-file-input').addEventListener('change', handleImportCSV);
+
     // 加载默认页面
     loadPage(currentPage);
 });
@@ -138,6 +149,8 @@ function initIcons() {
     document.getElementById('mobile-menu-icon').innerHTML = Icons.menu;
     document.getElementById('logout-icon').innerHTML = Icons.logout;
     document.getElementById('create-icon').innerHTML = Icons.add;
+    document.getElementById('export-csv-icon').innerHTML = Icons.download;
+    document.getElementById('import-csv-icon').innerHTML = Icons.upload;
     document.getElementById('batch-delete-icon').innerHTML = Icons.delete;
     document.getElementById('search-btn-icon').innerHTML = Icons.search;
     document.getElementById('close-icon').innerHTML = Icons.close;
@@ -243,6 +256,18 @@ async function loadPage(page) {
     if (!config) {
         Toast.error('页面配置不存在');
         return;
+    }
+
+    // 控制导入导出按钮的显示（仅在账号记录页面显示）
+    const exportBtn = document.getElementById('export-csv-btn');
+    const importBtn = document.getElementById('import-csv-btn');
+
+    if (page === 'accounts') {
+        exportBtn.style.display = '';
+        importBtn.style.display = '';
+    } else {
+        exportBtn.style.display = 'none';
+        importBtn.style.display = 'none';
     }
 
     // 加载数据
@@ -871,4 +896,68 @@ function initSearch() {
             loadData(currentPage, currentPageNum, currentKeyword);
         }
     }, 500));
+}
+
+// 导出CSV处理函数
+async function handleExportCSV() {
+    try {
+        if (currentPage === 'accounts') {
+            Toast.info('正在导出CSV文件...');
+            await AccountAPI.exportCSV();
+            Toast.success('导出成功');
+        } else {
+            Toast.warning('当前页面不支持CSV导出');
+        }
+    } catch (error) {
+        Toast.error('导出失败: ' + (error.message || '未知错误'));
+        console.error(error);
+    }
+}
+
+// 导入CSV处理函数
+async function handleImportCSV(event) {
+    const file = event.target.files[0];
+
+    // 清空input的值，以便下次可以选择同一个文件
+    event.target.value = '';
+
+    if (!file) {
+        return;
+    }
+
+    // 验证文件类型
+    if (!file.name.endsWith('.csv')) {
+        Toast.error('请选择CSV文件');
+        return;
+    }
+
+    // 验证文件大小（限制为10MB）
+    if (file.size > 10 * 1024 * 1024) {
+        Toast.error('文件大小不能超过10MB');
+        return;
+    }
+
+    try {
+        if (currentPage === 'accounts') {
+            Toast.info('正在导入CSV文件...');
+
+            const response = await AccountAPI.importCSV(file);
+
+            if (response && response.data) {
+                const importedCount = response.data.imported_count || 0;
+                Toast.success(`成功导入 ${importedCount} 条记录`);
+
+                // 重新加载数据
+                loadData(currentPage, currentPageNum, currentKeyword);
+            } else {
+                Toast.success('导入完成');
+                loadData(currentPage, currentPageNum, currentKeyword);
+            }
+        } else {
+            Toast.warning('当前页面不支持CSV导入');
+        }
+    } catch (error) {
+        Toast.error('导入失败: ' + (error.message || '未知错误'));
+        console.error(error);
+    }
 }

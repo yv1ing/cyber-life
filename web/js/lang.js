@@ -25,6 +25,8 @@ const translations = {
         'common.success': '成功',
         'common.error': '错误',
         'common.warning': '警告',
+        'common.exportCSV': '导出CSV',
+        'common.importCSV': '导入CSV',
 
         // 登录页面
         'login.title': '登录',
@@ -128,6 +130,8 @@ const translations = {
         'common.success': 'Success',
         'common.error': 'Error',
         'common.warning': 'Warning',
+        'common.exportCSV': 'Export CSV',
+        'common.importCSV': 'Import CSV',
 
         // Login Page
         'login.title': 'Login',

@@ -49,7 +49,7 @@ func FindAccountsList(page, size int) ([]commonmodel.Account, int64, error) {
 		page = 1
 	}
 	if size < 1 {
-		size = 15
+		size = 10
 	}
 
 	var accounts []commonmodel.Account

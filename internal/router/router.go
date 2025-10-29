@@ -53,4 +53,6 @@ func InitRouter(eng *gin.Engine) {
 	api.PUT("/accounts/update", commonapi.UpdateAccountHandler)
 	api.GET("/accounts/find", commonapi.FindAccountsHandler)
 	api.GET("/accounts/list", commonapi.FindAccountsListHandler)
+	api.GET("/accounts/export", commonapi.ExportAccountsCSVHandler)
+	api.POST("/accounts/import", commonapi.ImportAccountsCSVHandler)
 }

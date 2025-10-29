@@ -105,13 +105,79 @@ const AccountAPI = {
     },
 
     // 查找账号记录
-    find(keyword = '', page = 1, pageSize = 15) {
+    find(keyword = '', page = 1, pageSize = 10) {
         return HTTP.get(`${API_BASE_URL}/accounts/find`, { keyword, page, size: pageSize });
     },
 
     // 账号记录列表
-    list(page = 1, pageSize = 15, keyword = '') {
+    list(page = 1, pageSize = 10, keyword = '') {
         return HTTP.get(`${API_BASE_URL}/accounts/list`, { page, size: pageSize });
+    },
+
+    // 导出CSV
+    async exportCSV() {
+        const token = Storage.get('token');
+        const response = await fetch(`${API_BASE_URL}/accounts/export`, {
+            method: 'GET',
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+
+        if (response.status === 401) {
+            Toast.error('登录已过期，请重新登录');
+            logout();
+            throw new Error('Unauthorized');
+        }
+
+        if (!response.ok) throw new Error('导出失败');
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `accounts_${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+    },
+
+    // 导入CSV
+    async importCSV(file) {
+        const token = Storage.get('token');
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch(`${API_BASE_URL}/accounts/import`, {
+            method: 'POST',
+            headers: {
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+            },
+            body: formData
+        });
+
+        // 检查Content-Type是否为JSON
+        const contentType = response.headers.get('content-type');
+        const isJson = contentType && contentType.includes('application/json');
+
+        let data;
+        if (isJson) {
+            data = await response.json();
+        } else {
+            const text = await response.text();
+            data = { info: text || `请求失败 (${response.status})` };
+        }
+
+        // 处理未授权
+        if (response.status === 401) {
+            Toast.error('登录已过期，请重新登录');
+            logout();
+            throw new Error('Unauthorized');
+        }
+
+        // 处理其他错误
+        if (!response.ok) {
+            throw new Error(data.info || data.message || data.error || '请求失败');
+        }
+
+        return data;
     }
 };
 
