@@ -1,0 +1,12 @@
+Mode        =   "release"                                   # 运行模式，可选：debug/release
+SecretKey   =   "cyber_life_yv1ing_s3cret"
+ListenAddr  =   "0.0.0.0"
+ListenPort  =   8888
+
+[Database]
+Type        =   "sqlite"                                    # 数据库类型，可选sqlite/mysql
+Addr        =   "127.0.0.1"
+Port        =   3306
+User        =   "root"
+Pass        =   "123456"
+Name        =   "cyber_life"
