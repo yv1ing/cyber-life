@@ -421,6 +421,23 @@
     user-select: none;
 }
 
+.platform-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--duration-short) var(--easing-standard);
+    cursor: pointer;
+}
+
+.platform-link:hover {
+    color: var(--secondary);
+    text-decoration: underline;
+}
+
+.platform-link:active {
+    opacity: 0.8;
+}
+
 .action-btn {
     width: 32px;
     height: 32px;

@@ -14,6 +14,7 @@ const pageConfigs = {
         api: AccountAPI,
         fields: [
             { key: 'platform', label: 'accounts.platform', type: 'text', required: true },
+            { key: 'platform_url', label: 'accounts.platformURL', type: 'url', required: true },
             { key: 'username', label: 'accounts.username', type: 'text', required: true },
             { key: 'password', label: 'accounts.password', type: 'password', required: true },
             { key: 'security_email', label: 'accounts.securityEmail', type: 'email', required: false },
@@ -22,7 +23,7 @@ const pageConfigs = {
         ],
         columns: [
             { key: 'ID', label: 'common.id', width: '80px' },
-            { key: 'platform', label: 'accounts.platform', width: '120px' },
+            { key: 'platform', label: 'accounts.platform', width: '120px', format: 'platformLink', urlKey: 'platform_url' },
             { key: 'username', label: 'accounts.username', width: '150px' },
             { key: 'password', label: 'accounts.password', width: '200px', format: 'password' },
             { key: 'security_email', label: 'accounts.securityEmail', width: '180px' },
@@ -373,7 +374,7 @@ function renderTable(config, items, pageNum, total) {
                                     <input type="checkbox" class="row-checkbox table-checkbox" data-id="${rowId}" />
                                 </td>
                                 ${config.columns.map(col => `
-                                    <td>${formatCellValue(item[col.key], col.format, rowId)}</td>
+                                    <td>${formatCellValue(item[col.key], col.format, rowId, item, col)}</td>
                                 `).join('')}
                                 <td>
                                     <div class="table-actions">
@@ -415,7 +416,7 @@ function renderTable(config, items, pageNum, total) {
 }
 
 // 格式化单元格值
-function formatCellValue(value, format, rowId) {
+function formatCellValue(value, format, rowId, item, col) {
     if (value === null || value === undefined || value === '') return '-';
 
     switch (format) {
@@ -434,6 +435,14 @@ function formatCellValue(value, format, rowId) {
                     </button>
                 </div>
             `;
+        case 'platformLink':
+            const url = item && col && col.urlKey ? item[col.urlKey] : '';
+            const platformName = escapeHtml(String(value));
+            if (url && url !== '') {
+                const escapedUrl = escapeHtml(String(url));
+                return `<a href="${escapedUrl}" target="_blank" rel="noopener noreferrer" class="platform-link">${platformName}</a>`;
+            }
+            return platformName;
         default:
             return escapeHtml(String(value));
     }

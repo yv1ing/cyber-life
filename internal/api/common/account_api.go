@@ -21,6 +21,7 @@ import (
 func CreateAccountHandler(ctx *gin.Context) {
 	type reqType struct {
 		Platform      string `json:"platform" binding:"required"`
+		PlatformURL   string `json:"platform_url" binding:"required"`
 		Username      string `json:"username" binding:"required"`
 		Password      string `json:"password" binding:"required"`
 		SecurityEmail string `json:"security_email"`
@@ -38,7 +39,7 @@ func CreateAccountHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = commonservice.CreateAccount(req.Platform, req.Username, req.Password, req.SecurityEmail, req.SecurityPhone, req.Remark)
+	err = commonservice.CreateAccount(req.Platform, req.PlatformURL, req.Username, req.Password, req.SecurityEmail, req.SecurityPhone, req.Remark)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
@@ -97,6 +98,7 @@ func UpdateAccountHandler(ctx *gin.Context) {
 	type reqType struct {
 		AccountID     uint   `json:"account_id" binding:"required"`
 		Platform      string `json:"platform" binding:"required"`
+		PlatformURL   string `json:"platform_url" binding:"required"`
 		Username      string `json:"username" binding:"required"`
 		Password      string `json:"password" binding:"required"`
 		SecurityEmail string `json:"security_email"`
@@ -114,7 +116,7 @@ func UpdateAccountHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = commonservice.UpdateAccount(req.AccountID, req.Platform, req.Username, req.Password, req.SecurityEmail, req.SecurityPhone, req.Remark)
+	err = commonservice.UpdateAccount(req.AccountID, req.Platform, req.PlatformURL, req.Username, req.Password, req.SecurityEmail, req.SecurityPhone, req.Remark)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,

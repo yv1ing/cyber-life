@@ -11,6 +11,7 @@ type Account struct {
 	gorm.Model
 
 	Platform      string `json:"platform" gorm:"index" binding:"required"`
+	PlatformURL   string `json:"platform_url" gorm:"index" binding:"required"`
 	Username      string `json:"username" gorm:"index" binding:"required"`
 	Password      string `json:"password" binding:"required"`
 	SecurityEmail string `json:"security_email"`
