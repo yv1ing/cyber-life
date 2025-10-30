@@ -181,26 +181,36 @@ const AccountAPI = {
     }
 };
 
-// 主机信息 API（预留）
+// 主机信息 API
 const HostAPI = {
+    // 创建主机记录
     create(hostData) {
         return HTTP.post(`${API_BASE_URL}/hosts/create`, hostData);
     },
 
-    delete(id) {
-        return HTTP.delete(`${API_BASE_URL}/hosts/delete`, { id });
+    // 删除主机记录
+    delete(ids) {
+        // 如果传入的是单个ID，转换为数组
+        const hostIds = Array.isArray(ids) ? ids : [ids];
+        return HTTP.request(`${API_BASE_URL}/hosts/delete`, {
+            method: 'DELETE',
+            body: JSON.stringify({ host_ids: hostIds })
+        });
     },
 
+    // 更新主机记录
     update(id, hostData) {
-        return HTTP.put(`${API_BASE_URL}/hosts/update`, { id, ...hostData });
+        return HTTP.put(`${API_BASE_URL}/hosts/update`, { host_id: parseInt(id), ...hostData });
     },
 
-    find(id) {
-        return HTTP.get(`${API_BASE_URL}/hosts/find`, { id });
+    // 查找主机记录
+    find(keyword = '', page = 1, pageSize = 10) {
+        return HTTP.get(`${API_BASE_URL}/hosts/find`, { keyword, page, size: pageSize });
     },
 
-    list(page = 1, pageSize = 10, keyword = '') {
-        return HTTP.get(`${API_BASE_URL}/hosts/list`, { page, page_size: pageSize, keyword });
+    // 主机记录列表
+    list(page = 1, pageSize = 10) {
+        return HTTP.get(`${API_BASE_URL}/hosts/list`, { page, size: pageSize });
     }
 };
 

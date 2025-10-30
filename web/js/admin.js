@@ -34,22 +34,42 @@ const pageConfigs = {
         ]
     },
     hosts: {
-        title: '主机信息',
+        title: 'hosts.title',
         icon: Icons.host,
         api: HostAPI,
         fields: [
-            { key: 'hostname', label: '主机名', type: 'text', required: true },
-            { key: 'ip', label: 'IP地址', type: 'text', required: true },
-            { key: 'port', label: '端口', type: 'number', required: false },
-            { key: 'os', label: '操作系统', type: 'text', required: false },
-            { key: 'note', label: '备注', type: 'textarea', required: false }
+            { key: 'provider', label: 'hosts.provider', type: 'text', required: true },
+            { key: 'provider_url', label: 'hosts.providerURL', type: 'url', required: true },
+            { key: 'address', label: 'hosts.address', type: 'text', required: true },
+            { key: 'ports', label: 'hosts.ports', type: 'portlist', required: true },
+            { key: 'username', label: 'hosts.username', type: 'text', required: true },
+            { key: 'password', label: 'hosts.password', type: 'password', required: true },
+            // 主机名称和操作系统放在同一行
+            { key: 'hostname_os_group', type: 'group', fields: [
+                { key: 'hostname', label: 'hosts.hostname', type: 'text', required: true },
+                { key: 'os', label: 'hosts.os', type: 'text', required: false }
+            ]},
+            // CPU、内存、磁盘放在同一行
+            { key: 'capacity_group', type: 'group', fields: [
+                { key: 'cpu_num', label: 'hosts.cpuCapacity', type: 'capacity', unit: 'cores', placeholder: 'hosts.cpuPlaceholder', required: false },
+                { key: 'ram_size', label: 'hosts.ramCapacity', type: 'capacity', unit: 'storage', placeholder: 'hosts.ramPlaceholder', required: false },
+                { key: 'disk_size', label: 'hosts.diskCapacity', type: 'capacity', unit: 'storage', placeholder: 'hosts.diskPlaceholder', required: false }
+            ]}
         ],
         columns: [
-            { key: 'id', label: 'common.id', width: '80px' },
-            { key: 'hostname', label: '主机名' },
-            { key: 'ip', label: 'IP地址' },
-            { key: 'os', label: '操作系统' },
-            { key: 'created_at', label: '创建时间', format: 'datetime' }
+            { key: 'ID', label: 'common.id', width: '80px' },
+            { key: 'provider', label: 'hosts.provider', width: '120px', format: 'platformLink', urlKey: 'provider_url' },
+            { key: 'hostname', label: 'hosts.hostname', width: '150px' },
+            { key: 'address', label: 'hosts.address', width: '150px' },
+            { key: 'ports', label: 'hosts.ports', width: '150px', format: 'json' },
+            { key: 'username', label: 'hosts.username', width: '120px' },
+            { key: 'password', label: 'hosts.password', width: '150px', format: 'password' },
+            { key: 'os', label: 'hosts.os', width: '120px' },
+            { key: 'cpu_num', label: 'hosts.cpuNum', width: '80px' },
+            { key: 'ram_size', label: 'hosts.ramSize', width: '100px', format: 'storage' },
+            { key: 'disk_size', label: 'hosts.diskSize', width: '100px', format: 'storage' },
+            { key: 'CreatedAt', label: 'hosts.createdAt', width: '160px', format: 'datetime' },
+            { key: 'UpdatedAt', label: 'hosts.updatedAt', width: '160px', format: 'datetime' }
         ]
     },
     subscriptions: {
@@ -443,9 +463,38 @@ function formatCellValue(value, format, rowId, item, col) {
                 return `<a href="${escapedUrl}" target="_blank" rel="noopener noreferrer" class="platform-link">${platformName}</a>`;
             }
             return platformName;
+        case 'json':
+            if (typeof value === 'object') {
+                // 如果是对象，转换为易读的格式
+                const entries = Object.entries(value);
+                if (entries.length === 0) return '-';
+                return entries.map(([k, v]) => `${k}:${v}`).join(', ');
+            }
+            return escapeHtml(String(value));
+        case 'storage':
+            // 格式化存储容量（输入单位为MB）
+            return formatStorage(value);
         default:
             return escapeHtml(String(value));
     }
+}
+
+// 格式化存储容量（MB -> GB/TB/PB）
+function formatStorage(mb) {
+    if (!mb || mb === 0) return '-';
+
+    const units = ['MB', 'GB', 'TB', 'PB'];
+    let size = mb;
+    let unitIndex = 0;
+
+    // 自动转换到合适的单位
+    while (size >= 1024 && unitIndex < units.length - 1) {
+        size = size / 1024;
+        unitIndex++;
+    }
+
+    // 保留两位小数，去除末尾的0
+    return `${parseFloat(size.toFixed(2))} ${units[unitIndex]}`;
 }
 
 // 生成页码
@@ -514,6 +563,115 @@ function initModal() {
     document.getElementById('edit-modal-save').addEventListener('click', handleSave);
 }
 
+// 生成单个字段的HTML
+function generateFieldHTML(field, item) {
+    let value = item ? (item[field.key] || '') : '';
+
+    // 处理端口列表类型
+    if (field.type === 'portlist') {
+        return `
+            <div class="input-group">
+                <label class="input-label">
+                    ${langManager.t(field.label)}${field.required ? ' *' : ''}
+                </label>
+                <div id="ports-list" class="ports-list"></div>
+                <button type="button" class="btn-secondary add-port-btn" onclick="addPortMapping('#ports-list', '', '')" style="margin-top: 8px;">
+                    <i class="fas fa-plus"></i> ${langManager.t('hosts.addPort')}
+                </button>
+            </div>
+        `;
+    }
+
+    // 处理容量类型（CPU、内存、磁盘）
+    if (field.type === 'capacity') {
+        let numValue = '';
+        let unitValue = '';
+
+        if (value) {
+            if (field.unit === 'cores') {
+                // CPU核心数，直接显示数字
+                numValue = value;
+                unitValue = 'cores';
+            } else if (field.unit === 'storage') {
+                // 存储容量，需要转换单位（后端存储的是MB）
+                const mb = parseInt(value) || 0;
+                if (mb >= 1024 * 1024) {
+                    // >= 1TB
+                    numValue = (mb / (1024 * 1024)).toFixed(2).replace(/\.?0+$/, '');
+                    unitValue = 'TB';
+                } else if (mb >= 1024) {
+                    // >= 1GB
+                    numValue = (mb / 1024).toFixed(2).replace(/\.?0+$/, '');
+                    unitValue = 'GB';
+                } else {
+                    numValue = mb;
+                    unitValue = 'MB';
+                }
+            }
+        }
+
+        const placeholderText = field.placeholder ? langManager.t(field.placeholder) : '';
+
+        return `
+            <div class="input-group">
+                <label class="input-label">
+                    ${langManager.t(field.label)}${field.required ? ' *' : ''}
+                </label>
+                <div class="capacity-input-group">
+                    <input
+                        type="number"
+                        id="field-${field.key}-value"
+                        class="input-field capacity-value"
+                        value="${escapeHtml(numValue)}"
+                        min="0"
+                        step="${field.unit === 'cores' ? '1' : '0.01'}"
+                        placeholder="${placeholderText}"
+                    />
+                    <select id="field-${field.key}-unit" class="input-field capacity-unit">
+                        ${field.unit === 'cores' ? `
+                            <option value="cores" ${unitValue === 'cores' ? 'selected' : ''}>核心</option>
+                        ` : `
+                            <option value="MB" ${unitValue === 'MB' ? 'selected' : ''}>MB</option>
+                            <option value="GB" ${unitValue === 'GB' ? 'selected' : ''}>GB</option>
+                            <option value="TB" ${unitValue === 'TB' ? 'selected' : ''}>TB</option>
+                        `}
+                    </select>
+                </div>
+            </div>
+        `;
+    }
+
+    // 处理 JSON 类型字段
+    if (field.type === 'json' && value && typeof value === 'object') {
+        value = JSON.stringify(value, null, 2);
+    }
+
+    return `
+        <div class="input-group">
+            <label class="input-label" for="field-${field.key}">
+                ${langManager.t(field.label)}${field.required ? ' *' : ''}
+            </label>
+            ${field.type === 'textarea' || field.type === 'json' ? `
+                <textarea
+                    id="field-${field.key}"
+                    class="input-field"
+                    rows="${field.type === 'json' ? '5' : '3'}"
+                    ${field.required ? 'required' : ''}
+                    ${field.type === 'json' ? 'placeholder=\'{"22": "ssh", "80": "http"}\'' : ''}
+                >${escapeHtml(value)}</textarea>
+            ` : `
+                <input
+                    type="${field.type}"
+                    id="field-${field.key}"
+                    class="input-field"
+                    value="${escapeHtml(value)}"
+                    ${field.required ? 'required' : ''}
+                />
+            `}
+        </div>
+    `;
+}
+
 // 打开编辑模态框
 function openEditModal(item = null) {
     const config = pageConfigs[currentPage];
@@ -531,31 +689,25 @@ function openEditModal(item = null) {
     // 生成表单字段
     const formFields = document.getElementById('form-fields');
     formFields.innerHTML = config.fields.map(field => {
-        const value = item ? (item[field.key] || '') : '';
-        return `
-            <div class="input-group">
-                <label class="input-label" for="field-${field.key}">
-                    ${langManager.t(field.label)}${field.required ? ' *' : ''}
-                </label>
-                ${field.type === 'textarea' ? `
-                    <textarea
-                        id="field-${field.key}"
-                        class="input-field"
-                        rows="3"
-                        ${field.required ? 'required' : ''}
-                    >${escapeHtml(value)}</textarea>
-                ` : `
-                    <input
-                        type="${field.type}"
-                        id="field-${field.key}"
-                        class="input-field"
-                        value="${escapeHtml(value)}"
-                        ${field.required ? 'required' : ''}
-                    />
-                `}
-            </div>
-        `;
+        // 处理分组字段（同一行显示多个字段）
+        if (field.type === 'group') {
+            const groupFieldsHTML = field.fields.map(f => generateFieldHTML(f, item)).join('');
+            return `<div class="form-row">${groupFieldsHTML}</div>`;
+        }
+
+        // 处理普通字段
+        return generateFieldHTML(field, item);
     }).join('');
+
+    // 如果是编辑模式且有端口数据，填充端口列表
+    if (item && item.ports && typeof item.ports === 'object') {
+        // 需要在 DOM 渲染后执行
+        setTimeout(() => {
+            Object.entries(item.ports).forEach(([port, service]) => {
+                addPortMapping('#ports-list', port, service);
+            });
+        }, 0);
+    }
 
     modal.show();
 }
@@ -572,11 +724,80 @@ async function handleSave() {
     const id = document.getElementById('edit-id').value;
     const data = {};
 
-    config.fields.forEach(field => {
-        const value = document.getElementById(`field-${field.key}`).value.trim();
+    // 递归获取所有字段（包括group内的字段）
+    const getAllFields = (fields) => {
+        const result = [];
+        fields.forEach(field => {
+            if (field.type === 'group') {
+                result.push(...getAllFields(field.fields));
+            } else {
+                result.push(field);
+            }
+        });
+        return result;
+    };
+
+    const allFields = getAllFields(config.fields);
+
+    allFields.forEach(field => {
+        // 处理端口列表类型
+        if (field.type === 'portlist') {
+            const ports = getPortMappings('#ports-list');
+            if (field.required && Object.keys(ports).length === 0) {
+                Toast.error(`${langManager.t(field.label)} 是必填项，请至少添加一个端口映射`);
+                throw new Error('Port list is required');
+            }
+            data[field.key] = ports;
+            return;
+        }
+
+        // 处理容量类型
+        if (field.type === 'capacity') {
+            const valueInput = document.getElementById(`field-${field.key}-value`);
+            const unitSelect = document.getElementById(`field-${field.key}-unit`);
+
+            if (valueInput && unitSelect) {
+                const numValue = parseFloat(valueInput.value) || 0;
+                const unit = unitSelect.value;
+
+                if (field.unit === 'cores') {
+                    // CPU核心数，直接存储数字
+                    data[field.key] = Math.floor(numValue);
+                } else if (field.unit === 'storage') {
+                    // 存储容量，统一转换为MB存储
+                    let mbValue = numValue;
+                    if (unit === 'GB') {
+                        mbValue = numValue * 1024;
+                    } else if (unit === 'TB') {
+                        mbValue = numValue * 1024 * 1024;
+                    }
+                    data[field.key] = Math.floor(mbValue);
+                }
+            }
+            return;
+        }
+
+        const fieldElement = document.getElementById(`field-${field.key}`);
+        if (!fieldElement) return;
+
+        const value = fieldElement.value.trim();
+
         // 必填字段必须有值，可选字段只在有值时添加
         if (field.required || value) {
-            data[field.key] = value;
+            // 处理 JSON 类型字段
+            if (field.type === 'json') {
+                try {
+                    data[field.key] = value ? JSON.parse(value) : {};
+                } catch (e) {
+                    Toast.error(`${langManager.t(field.label)} 格式错误，请输入有效的 JSON`);
+                    throw new Error('Invalid JSON format');
+                }
+            } else if (field.type === 'number') {
+                // 处理数字类型
+                data[field.key] = value ? parseInt(value, 10) : 0;
+            } else {
+                data[field.key] = value;
+            }
         }
     });
 
@@ -972,3 +1193,55 @@ async function handleImportCSV(event) {
         console.error(error);
     }
 }
+
+// ==================== 端口映射管理 ====================
+
+// 添加端口映射项
+function addPortMapping(containerSelector = '#ports-list', port = '', service = '') {
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+
+    const portItem = document.createElement('div');
+    portItem.className = 'port-item';
+    portItem.innerHTML = `
+        <input type="number" class="input-field port-number" placeholder="${langManager.t('hosts.portNumber')}" value="${escapeHtml(port)}" min="1" max="65535" />
+        <input type="text" class="input-field port-service" placeholder="${langManager.t('hosts.portService')}" value="${escapeHtml(service)}" />
+        <button type="button" class="btn-icon delete-port" onclick="removePortMapping(this)" title="${langManager.t('common.delete')}">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    container.appendChild(portItem);
+}
+
+// 删除端口映射项
+function removePortMapping(button) {
+    const portItem = button.closest('.port-item');
+    if (portItem) {
+        portItem.remove();
+    }
+}
+
+// 获取所有端口映射数据
+function getPortMappings(containerSelector = '#ports-list') {
+    const container = document.querySelector(containerSelector);
+    if (!container) return {};
+
+    const portItems = container.querySelectorAll('.port-item');
+    const ports = {};
+
+    portItems.forEach(item => {
+        const portNumber = item.querySelector('.port-number').value.trim();
+        const portService = item.querySelector('.port-service').value.trim();
+
+        if (portNumber && portService) {
+            ports[parseInt(portNumber)] = portService;
+        }
+    });
+
+    return ports;
+}
+
+// 暴露全局函数
+window.addPortMapping = addPortMapping;
+window.removePortMapping = removePortMapping;
+

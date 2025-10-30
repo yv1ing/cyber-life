@@ -55,4 +55,11 @@ func InitRouter(eng *gin.Engine) {
 	api.GET("/accounts/list", commonapi.FindAccountsListHandler)
 	api.GET("/accounts/export", commonapi.ExportAccountsCSVHandler)
 	api.POST("/accounts/import", commonapi.ImportAccountsCSVHandler)
+
+	// 主机记录管理
+	api.POST("/hosts/create", commonapi.CreateHostHandler)
+	api.DELETE("/hosts/delete", commonapi.DeleteHostHandler)
+	api.PUT("/hosts/update", commonapi.UpdateHostHandler)
+	api.GET("/hosts/find", commonapi.FindHostsHandler)
+	api.GET("/hosts/list", commonapi.FindHostsListHandler)
 }
