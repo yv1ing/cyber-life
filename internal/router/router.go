@@ -64,4 +64,13 @@ func InitRouter(eng *gin.Engine) {
 	api.GET("/hosts/list", commonapi.FindHostsListHandler)
 	api.GET("/hosts/export", commonapi.ExportHostsCSVHandler)
 	api.POST("/hosts/import", commonapi.ImportHostsCSVHandler)
+
+	// 密钥记录管理
+	api.POST("/secrets/create", commonapi.CreateSecretHandler)
+	api.DELETE("/secrets/delete", commonapi.DeleteSecretHandler)
+	api.PUT("/secrets/update", commonapi.UpdateSecretHandler)
+	api.GET("/secrets/find", commonapi.FindSecretsHandler)
+	api.GET("/secrets/list", commonapi.FindSecretsListHandler)
+	api.GET("/secrets/export", commonapi.ExportSecretsCSVHandler)
+	api.POST("/secrets/import", commonapi.ImportSecretsCSVHandler)
 }

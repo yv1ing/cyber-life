@@ -188,7 +188,7 @@
 
 /* 侧边栏 */
 .admin-sidebar {
-    width: 200px;
+    width: 240px;
     background-color: var(--surface-variant);
     border-right: 1px solid var(--outline-variant);
     display: flex;
@@ -572,10 +572,10 @@
 
     .admin-sidebar {
         position: fixed;
-        left: -200px;
+        left: -240px;
         top: 56px;
         bottom: 0;
-        width: 200px;
+        width: 240px;
         z-index: 200;
         box-shadow: var(--elevation-5);
         transition: left var(--duration-medium) var(--easing-standard);

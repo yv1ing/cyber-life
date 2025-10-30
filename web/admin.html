@@ -69,7 +69,11 @@
                     <div class="nav-section">
                         <div class="nav-item active" data-page="accounts">
                             <span class="nav-icon" id="nav-icon-accounts"></span>
-                            <span class="nav-label" data-i18n="nav.accounts">账号记录</span>
+                            <span class="nav-label" data-i18n="nav.accounts">账号管理</span>
+                        </div>
+                        <div class="nav-item" data-page="secrets">
+                            <span class="nav-icon" id="nav-icon-secrets"></span>
+                            <span class="nav-label" data-i18n="nav.secrets">密钥管理</span>
                         </div>
                         <div class="nav-item" data-page="hosts">
                             <span class="nav-icon" id="nav-icon-hosts"></span>
@@ -196,11 +200,44 @@
         </div>
     </div>
 
+    <!-- Core modules -->
     <script src="/js/icons.js"></script>
     <script src="/js/lang.js"></script>
     <script src="/js/theme.js"></script>
-    <script src="/js/common.js"></script>
-    <script src="/js/api.js"></script>
-    <script src="/js/admin.js"></script>
+    <script src="/js/core/storage.js"></script>
+    <script src="/js/core/auth.js"></script>
+    <script src="/js/core/http.js"></script>
+
+    <!-- Utils -->
+    <script src="/js/utils/date.js"></script>
+    <script src="/js/utils/helpers.js"></script>
+    <script src="/js/utils/formatters.js"></script>
+
+    <!-- UI Components -->
+    <script src="/js/ui/toast.js"></script>
+    <script src="/js/ui/modal.js"></script>
+    <script src="/js/ui/table.js"></script>
+    <script src="/js/ui/form.js"></script>
+
+    <!-- Services -->
+    <script src="/js/services/csv-handler.js"></script>
+    <script src="/js/services/base-api.js"></script>
+    <script src="/js/services/account-api.js"></script>
+    <script src="/js/services/host-api.js"></script>
+    <script src="/js/services/secret-api.js"></script>
+    <script src="/js/services/user-api.js"></script>
+
+    <!-- Admin Page Modules -->
+    <script src="/js/pages/admin/config.js"></script>
+    <script src="/js/pages/admin/data-manager.js"></script>
+    <script src="/js/pages/admin/form-manager.js"></script>
+    <script src="/js/pages/admin/search.js"></script>
+    <script src="/js/pages/admin/csv-manager.js"></script>
+
+    <!-- Compatibility Layer -->
+    <script src="/js/compat.js"></script>
+
+    <!-- Main Entry -->
+    <script src="/js/admin-new.js"></script>
 </body>
 </html>

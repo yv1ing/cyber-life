@@ -54,7 +54,8 @@ const translations = {
         'admin.administrator': '管理员',
 
         // 侧边栏
-        'nav.accounts': '账号记录',
+        'nav.accounts': '账号管理',
+        'nav.secrets': '密钥管理',
         'nav.hosts': '主机信息',
         'nav.sites': '站点信息',
 
@@ -74,6 +75,20 @@ const translations = {
         'accounts.deleteConfirm': '确定要删除这条记录吗？此操作不可恢复。',
         'accounts.deleteSuccess': '删除成功',
         'accounts.saveSuccess': '保存成功',
+
+        // 密钥记录
+        'secrets.title': '密钥信息',
+        'secrets.platform': '平台名称',
+        'secrets.keyID': 'Key ID',
+        'secrets.keySecret': 'Key Secret',
+        'secrets.remark': '备注信息',
+        'secrets.createdAt': '创建时间',
+        'secrets.updatedAt': '更新时间',
+        'secrets.createTitle': '新建密钥记录',
+        'secrets.editTitle': '编辑密钥记录',
+        'secrets.deleteConfirm': '确定要删除这条记录吗？此操作不可恢复。',
+        'secrets.deleteSuccess': '删除成功',
+        'secrets.saveSuccess': '保存成功',
 
         // 主机记录
         'hosts.title': '主机信息',
@@ -190,7 +205,8 @@ const translations = {
         'admin.administrator': 'Administrator',
 
         // Sidebar
-        'nav.accounts': 'Accounts',
+        'nav.accounts': 'Account Management',
+        'nav.secrets': 'Secret Management',
         'nav.hosts': 'Hosts',
         'nav.sites': 'Sites',
 
@@ -210,6 +226,20 @@ const translations = {
         'accounts.deleteConfirm': 'Are you sure you want to delete this record? This action cannot be undone.',
         'accounts.deleteSuccess': 'Deleted successfully',
         'accounts.saveSuccess': 'Saved successfully',
+
+        // Secrets
+        'secrets.title': 'Secret Records',
+        'secrets.platform': 'Platform Name',
+        'secrets.keyID': 'Key ID',
+        'secrets.keySecret': 'Key Secret',
+        'secrets.remark': 'Remark Information',
+        'secrets.createdAt': 'Created At',
+        'secrets.updatedAt': 'Updated At',
+        'secrets.createTitle': 'Create Secret',
+        'secrets.editTitle': 'Edit Secret',
+        'secrets.deleteConfirm': 'Are you sure you want to delete this record? This action cannot be undone.',
+        'secrets.deleteSuccess': 'Deleted successfully',
+        'secrets.saveSuccess': 'Saved successfully',
 
         // Hosts
         'hosts.title': 'Host Records',

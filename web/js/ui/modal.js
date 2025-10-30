@@ -1,0 +1,75 @@
+// 模态框管理组件
+class Modal {
+    constructor(id) {
+        this.id = id;
+        this.element = document.getElementById(id);
+        this.overlay = this.element?.closest('.modal-overlay');
+
+        if (this.overlay) {
+            // 点击遮罩关闭
+            this.overlay.addEventListener('click', (e) => {
+                if (e.target === this.overlay) {
+                    this.close();
+                }
+            });
+
+            // ESC 键关闭
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && this.overlay.classList.contains('show')) {
+                    this.close();
+                }
+            });
+        }
+    }
+
+    show() {
+        if (this.overlay) {
+            this.overlay.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    close() {
+        if (this.overlay) {
+            this.overlay.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+    }
+
+    static confirm(title, message, onConfirm) {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+            <div class="modal" style="width: 400px;">
+                <div class="modal-header">
+                    <h3 class="modal-title">${title}</h3>
+                </div>
+                <div class="modal-body">
+                    <p>${message}</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="modal-cancel">取消</button>
+                    <button class="btn btn-primary" id="modal-confirm">确认</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+        setTimeout(() => overlay.classList.add('show'), 10);
+
+        const close = () => {
+            overlay.classList.remove('show');
+            setTimeout(() => overlay.remove(), 300);
+        };
+
+        overlay.querySelector('#modal-cancel').addEventListener('click', close);
+        overlay.querySelector('#modal-confirm').addEventListener('click', () => {
+            onConfirm();
+            close();
+        });
+
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) close();
+        });
+    }
+}
