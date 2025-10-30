@@ -27,12 +27,24 @@
 .search-section {
     width: 100%;
     max-width: 584px;
-    margin-bottom: 15vh;
+    margin-bottom: 25vh;
 }
 
 .logo-section {
     text-align: center;
     margin-bottom: 28px;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .logo-text {
@@ -40,19 +52,37 @@
     font-weight: 300;
     color: var(--on-background);
     letter-spacing: -0.5px;
+    cursor: default;
+    transition: transform 0.3s ease;
+}
+
+.logo-text:hover {
+    transform: scale(1.02);
 }
 
 .logo-text .highlight {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--primary) 100%);
+    background-size: 200% 100%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     font-weight: 400;
+    animation: gradientFlow 3s ease infinite;
+}
+
+@keyframes gradientFlow {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
 }
 
 .search-box {
     position: relative;
     width: 100%;
+    animation: fadeInUp 0.8s ease-out 0.2s backwards;
 }
 
 .search-input-wrapper {
@@ -170,7 +200,7 @@
     }
 
     .search-section {
-        margin-bottom: 10vh;
+        margin-bottom: 20vh;
         max-width: 90%;
     }
 
