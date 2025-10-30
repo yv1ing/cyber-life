@@ -346,6 +346,10 @@
     height: 32px;
 }
 
+.search-box-btn:hover {
+    background-color: transparent;
+}
+
 .content-body {
     flex: 1;
     overflow-y: auto;
