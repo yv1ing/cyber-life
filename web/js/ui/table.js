@@ -63,9 +63,10 @@ class TableRenderer {
                 <td>
                     <input type="checkbox" class="row-checkbox table-checkbox" data-id="${rowId}" />
                 </td>
-                ${config.columns.map(col => `
-                    <td>${this._formatCellValue(item[col.key], col.format, rowId, item, col)}</td>
-                `).join('')}
+                ${config.columns.map(col => {
+                    const cellValue = this._formatCellValue(item[col.key], col.format, rowId, item, col);
+                    return `<td>${cellValue}</td>`;
+                }).join('')}
                 <td>
                     <div class="table-actions">
                         <button class="action-btn edit" onclick='window.tableCallbacks.edit(${itemJson})' title="${langManager.t('common.edit')}">
@@ -83,35 +84,61 @@ class TableRenderer {
     static _formatCellValue(value, format, rowId, item, col) {
         if (value === null || value === undefined || value === '') return '-';
 
+        let formattedValue;
         switch (format) {
             case 'datetime':
-                return DateUtils.formatDateTime(value);
+                formattedValue = DateUtils.formatDateTime(value);
+                break;
             case 'date':
-                return value ? value.split('T')[0] : '-';
+                formattedValue = value ? value.split('T')[0] : '-';
+                break;
             case 'password':
-                return this._formatPassword(value, rowId);
+                formattedValue = this._formatPassword(value, rowId, col.copyable);
+                break;
             case 'platformLink':
-                return this._formatPlatformLink(value, item, col);
+                formattedValue = this._formatPlatformLink(value, item, col);
+                break;
             case 'json':
-                return this._formatJson(value);
+                formattedValue = this._formatJson(value);
+                break;
             case 'storage':
-                return Formatters.formatStorage(value);
+                formattedValue = Formatters.formatStorage(value);
+                break;
             default:
-                return this._escapeHtml(String(value));
+                formattedValue = this._escapeHtml(String(value));
         }
+
+        // 如果列标记为可复制，包装成可复制的元素
+        if (col.copyable && format !== 'password') {
+            return this._makeCopyable(formattedValue, value);
+        }
+
+        return formattedValue;
     }
 
-    static _formatPassword(value, rowId) {
+    static _formatPassword(value, rowId, copyable = false) {
         const uniqueId = `pwd-${rowId}`;
         const escapedValue = this._escapeHtml(String(value));
-        return `
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span id="${uniqueId}" class="password-field" data-password="${escapedValue}">••••••••</span>
-                <button class="btn-icon" onclick="TableRenderer.togglePassword('${uniqueId}')">
-                    <i class="fas fa-eye"></i>
-                </button>
-            </div>
-        `;
+
+        if (copyable) {
+            return `
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span id="${uniqueId}" class="password-field copyable-cell" data-password="${escapedValue}" data-copy-value="${escapedValue}" onclick="TableRenderer.copyToClipboard('${escapedValue}')" title="点击复制">••••••••</span>
+                    <button class="btn-icon" onclick="TableRenderer.togglePassword('${uniqueId}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            `;
+        } else {
+            return `
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span id="${uniqueId}" class="password-field" data-password="${escapedValue}">••••••••</span>
+                    <button class="btn-icon" onclick="TableRenderer.togglePassword('${uniqueId}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            `;
+        }
     }
 
     static _formatPlatformLink(value, item, col) {
@@ -225,6 +252,72 @@ class TableRenderer {
         } else {
             element.textContent = '••••••••';
             icon.className = 'fas fa-eye';
+        }
+    }
+
+    /**
+     * 创建可复制的元素
+     * @param {string} displayValue - 显示的值
+     * @param {string} copyValue - 复制的值
+     * @returns {string} HTML 字符串
+     */
+    static _makeCopyable(displayValue, copyValue) {
+        const escapedCopyValue = this._escapeHtml(String(copyValue));
+        return `<span class="copyable-cell" onclick="TableRenderer.copyToClipboard('${escapedCopyValue}')" title="点击复制">${displayValue}</span>`;
+    }
+
+    /**
+     * 复制文本到剪贴板
+     * @param {string} text - 要复制的文本
+     */
+    static copyToClipboard(text) {
+        // 如果文本为空或只有占位符，不复制
+        if (!text || text === '-') {
+            return;
+        }
+
+        // 使用 Clipboard API
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    Toast.success('已复制到剪贴板');
+                })
+                .catch(err => {
+                    console.error('复制失败:', err);
+                    this._fallbackCopyToClipboard(text);
+                });
+        } else {
+            // 降级方案：使用旧的 document.execCommand 方法
+            this._fallbackCopyToClipboard(text);
+        }
+    }
+
+    /**
+     * 降级复制方案
+     * @param {string} text - 要复制的文本
+     */
+    static _fallbackCopyToClipboard(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        textArea.style.top = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                Toast.success('已复制到剪贴板');
+            } else {
+                Toast.error('复制失败');
+            }
+        } catch (err) {
+            console.error('复制失败:', err);
+            Toast.error('复制失败');
+        } finally {
+            document.body.removeChild(textArea);
         }
     }
 
