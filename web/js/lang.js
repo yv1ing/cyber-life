@@ -56,7 +56,6 @@ const translations = {
         // 侧边栏
         'nav.accounts': '账号记录',
         'nav.hosts': '主机信息',
-        'nav.subscriptions': '订阅信息',
         'nav.sites': '站点信息',
 
         // 账号记录
@@ -193,7 +192,6 @@ const translations = {
         // Sidebar
         'nav.accounts': 'Accounts',
         'nav.hosts': 'Hosts',
-        'nav.subscriptions': 'Subscriptions',
         'nav.sites': 'Sites',
 
         // Accounts

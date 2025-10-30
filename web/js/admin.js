@@ -72,24 +72,6 @@ const pageConfigs = {
             { key: 'UpdatedAt', label: 'hosts.updatedAt', width: '160px', format: 'datetime' }
         ]
     },
-    subscriptions: {
-        title: '订阅信息',
-        icon: Icons.subscription,
-        api: SubscriptionAPI,
-        fields: [
-            { key: 'name', label: '订阅名称', type: 'text', required: true },
-            { key: 'url', label: '订阅地址', type: 'url', required: true },
-            { key: 'expire_date', label: '过期时间', type: 'date', required: false },
-            { key: 'note', label: '备注', type: 'textarea', required: false }
-        ],
-        columns: [
-            { key: 'id', label: 'common.id', width: '80px' },
-            { key: 'name', label: '订阅名称' },
-            { key: 'url', label: '订阅地址' },
-            { key: 'expire_date', label: '过期时间', format: 'date' },
-            { key: 'created_at', label: '创建时间', format: 'datetime' }
-        ]
-    },
     sites: {
         title: '站点信息',
         icon: Icons.web,
@@ -198,7 +180,6 @@ function initIcons() {
     // 导航图标
     document.getElementById('nav-icon-accounts').innerHTML = Icons.account;
     document.getElementById('nav-icon-hosts').innerHTML = Icons.host;
-    document.getElementById('nav-icon-subscriptions').innerHTML = Icons.subscription;
     document.getElementById('nav-icon-sites').innerHTML = Icons.web;
 }
 

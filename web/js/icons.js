@@ -28,7 +28,6 @@ const Icons = {
     dashboard: '<i class="fas fa-th-large"></i>',
     account: '<i class="fas fa-address-card"></i>',
     host: '<i class="fas fa-server"></i>',
-    subscription: '<i class="fas fa-rss"></i>',
     web: '<i class="fas fa-globe"></i>',
 
     // 状态图标

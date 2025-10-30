@@ -280,29 +280,6 @@ const HostAPI = {
     }
 };
 
-// 订阅信息 API（预留）
-const SubscriptionAPI = {
-    create(subscriptionData) {
-        return HTTP.post(`${API_BASE_URL}/subscriptions/create`, subscriptionData);
-    },
-
-    delete(id) {
-        return HTTP.delete(`${API_BASE_URL}/subscriptions/delete`, { id });
-    },
-
-    update(id, subscriptionData) {
-        return HTTP.put(`${API_BASE_URL}/subscriptions/update`, { id, ...subscriptionData });
-    },
-
-    find(id) {
-        return HTTP.get(`${API_BASE_URL}/subscriptions/find`, { id });
-    },
-
-    list(page = 1, pageSize = 10, keyword = '') {
-        return HTTP.get(`${API_BASE_URL}/subscriptions/list`, { page, page_size: pageSize, keyword });
-    }
-};
-
 // 站点信息 API（预留）
 const SiteAPI = {
     create(siteData) {
