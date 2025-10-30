@@ -163,7 +163,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // 文件选择处理
     document.getElementById('import-csv-file-input').addEventListener('change', handleImportCSV);
 
-    // 加载默认页面
+    // 恢复上次访问的页面，如果没有则加载默认页面
+    const savedPage = Storage.get('current_page') || currentPage;
+    if (pageConfigs[savedPage]) {
+        currentPage = savedPage;
+        // 更新导航激活状态
+        document.querySelectorAll('.nav-item').forEach(nav => {
+            if (nav.getAttribute('data-page') === savedPage) {
+                nav.classList.add('active');
+            } else {
+                nav.classList.remove('active');
+            }
+        });
+    }
     loadPage(currentPage);
 });
 
@@ -260,6 +272,9 @@ function initNavigation() {
                 currentPageNum = 1;
                 currentKeyword = ''; // 清空搜索关键词
 
+                // 保存当前页面到 localStorage
+                Storage.set('current_page', page);
+
                 // 清空搜索框
                 const searchInput = document.getElementById('search-input');
                 if (searchInput) {
@@ -282,11 +297,11 @@ async function loadPage(page) {
         return;
     }
 
-    // 控制导入导出按钮的显示（仅在账号记录页面显示）
+    // 控制导入导出按钮的显示（账号记录和主机信息页面显示）
     const exportBtn = document.getElementById('export-csv-btn');
     const importBtn = document.getElementById('import-csv-btn');
 
-    if (page === 'accounts') {
+    if (page === 'accounts' || page === 'hosts') {
         exportBtn.style.display = '';
         importBtn.style.display = '';
     } else {
@@ -1127,9 +1142,13 @@ function initSearch() {
 // 导出CSV处理函数
 async function handleExportCSV() {
     try {
+        Toast.info('正在导出CSV文件...');
+
         if (currentPage === 'accounts') {
-            Toast.info('正在导出CSV文件...');
             await AccountAPI.exportCSV();
+            Toast.success('导出成功');
+        } else if (currentPage === 'hosts') {
+            await HostAPI.exportCSV();
             Toast.success('导出成功');
         } else {
             Toast.warning('当前页面不支持CSV导出');
@@ -1164,29 +1183,33 @@ async function handleImportCSV(event) {
     }
 
     try {
+        Toast.info('正在导入CSV文件...');
+
+        let response;
         if (currentPage === 'accounts') {
-            Toast.info('正在导入CSV文件...');
-
-            const response = await AccountAPI.importCSV(file);
-
-            if (response && response.data) {
-                const successCount = response.data.success_count || 0;
-                const failedCount = response.data.failed_count || 0;
-
-                if (failedCount > 0) {
-                    Toast.warning(`导入完成：成功 ${successCount} 条，失败 ${failedCount} 条。请检查后台日志了解失败原因。`, 5000);
-                } else {
-                    Toast.success(`成功导入 ${successCount} 条记录`);
-                }
-
-                // 重新加载数据
-                loadData(currentPage, currentPageNum, currentKeyword);
-            } else {
-                Toast.success('导入完成');
-                loadData(currentPage, currentPageNum, currentKeyword);
-            }
+            response = await AccountAPI.importCSV(file);
+        } else if (currentPage === 'hosts') {
+            response = await HostAPI.importCSV(file);
         } else {
             Toast.warning('当前页面不支持CSV导入');
+            return;
+        }
+
+        if (response && response.data) {
+            const successCount = response.data.success_count || 0;
+            const failedCount = response.data.failed_count || 0;
+
+            if (failedCount > 0) {
+                Toast.warning(`导入完成：成功 ${successCount} 条，失败 ${failedCount} 条。请检查后台日志了解失败原因。`, 5000);
+            } else {
+                Toast.success(`成功导入 ${successCount} 条记录`);
+            }
+
+            // 重新加载数据
+            loadData(currentPage, currentPageNum, currentKeyword);
+        } else {
+            Toast.success('导入完成');
+            loadData(currentPage, currentPageNum, currentKeyword);
         }
     } catch (error) {
         Toast.error('导入失败: ' + (error.message || '未知错误'));

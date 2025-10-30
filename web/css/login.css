@@ -38,6 +38,7 @@
     overflow: hidden;
     position: relative;
     z-index: 1;
+    transform: translateY(-60px);
 }
 
 .login-header {

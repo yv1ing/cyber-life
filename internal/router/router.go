@@ -62,4 +62,6 @@ func InitRouter(eng *gin.Engine) {
 	api.PUT("/hosts/update", commonapi.UpdateHostHandler)
 	api.GET("/hosts/find", commonapi.FindHostsHandler)
 	api.GET("/hosts/list", commonapi.FindHostsListHandler)
+	api.GET("/hosts/export", commonapi.ExportHostsCSVHandler)
+	api.POST("/hosts/import", commonapi.ImportHostsCSVHandler)
 }

@@ -211,6 +211,72 @@ const HostAPI = {
     // 主机记录列表
     list(page = 1, pageSize = 10) {
         return HTTP.get(`${API_BASE_URL}/hosts/list`, { page, size: pageSize });
+    },
+
+    // 导出CSV
+    async exportCSV() {
+        const jwt_token = Storage.get('jwt_token');
+        const response = await fetch(`${API_BASE_URL}/hosts/export`, {
+            method: 'GET',
+            headers: jwt_token ? { 'Authorization': `Bearer ${jwt_token}` } : {}
+        });
+
+        if (response.status === 401) {
+            Toast.error('登录已过期，请重新登录');
+            logout();
+            throw new Error('Unauthorized');
+        }
+
+        if (!response.ok) throw new Error('导出失败');
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `hosts_${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+    },
+
+    // 导入CSV
+    async importCSV(file) {
+        const jwt_token = Storage.get('jwt_token');
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch(`${API_BASE_URL}/hosts/import`, {
+            method: 'POST',
+            headers: {
+                ...(jwt_token ? { 'Authorization': `Bearer ${jwt_token}` } : {})
+            },
+            body: formData
+        });
+
+        // 检查Content-Type是否为JSON
+        const contentType = response.headers.get('content-type');
+        const isJson = contentType && contentType.includes('application/json');
+
+        let data;
+        if (isJson) {
+            data = await response.json();
+        } else {
+            const text = await response.text();
+            data = { info: text || `请求失败 (${response.status})` };
+        }
+
+        // 处理未授权
+        if (response.status === 401) {
+            Toast.error('登录已过期，请重新登录');
+            logout();
+            throw new Error('Unauthorized');
+        }
+
+        // 处理其他错误
+        if (!response.ok) {
+            throw new Error(data.info || data.message || data.error || '请求失败');
+        }
+
+        return data;
     }
 };
 
