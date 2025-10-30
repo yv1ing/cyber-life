@@ -137,8 +137,3 @@
                 border-color var(--duration-medium) var(--easing-standard),
                 box-shadow var(--duration-medium) var(--easing-standard);
 }
-
-/* 取消某些元素的主题切换动画 */
-input, select, textarea, button {
-    transition-property: none;
-}

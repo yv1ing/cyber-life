@@ -112,6 +112,17 @@
     font-size: var(--text-xs);
 }
 
+.login-footer a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: color var(--duration-short) var(--easing-standard);
+}
+
+.login-footer a:hover {
+    color: var(--primary-variant);
+    text-decoration: underline;
+}
+
 .password-toggle {
     position: relative;
     width: 100%;
