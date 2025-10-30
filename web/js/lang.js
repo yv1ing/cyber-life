@@ -9,6 +9,7 @@ const translations = {
         'app.title.index': '赛博人生',
 
         // 通用
+        'common.id': '编号',
         'common.confirm': '确认',
         'common.cancel': '取消',
         'common.save': '保存',
@@ -79,7 +80,7 @@ const translations = {
         'profile.account': '账号',
         'profile.accountPlaceholder': '请输入账号',
         'profile.password': '密码',
-        'profile.passwordPlaceholder': '留空则不修改密码',
+        'profile.passwordPlaceholder': '请输入密码',
         'profile.name': '姓名',
         'profile.namePlaceholder': '请输入姓名',
         'profile.email': '邮箱',
@@ -114,6 +115,7 @@ const translations = {
         'app.title.index': 'Cyber Life',
 
         // Common
+        'common.id': 'ID',
         'common.confirm': 'Confirm',
         'common.cancel': 'Cancel',
         'common.save': 'Save',
@@ -184,7 +186,7 @@ const translations = {
         'profile.account': 'Account',
         'profile.accountPlaceholder': 'Enter your account',
         'profile.password': 'Password',
-        'profile.passwordPlaceholder': 'Leave blank to keep current password',
+        'profile.passwordPlaceholder': 'Enter your password',
         'profile.name': 'Name',
         'profile.namePlaceholder': 'Enter your name',
         'profile.email': 'Email',

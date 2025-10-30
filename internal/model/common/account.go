@@ -10,9 +10,9 @@ import "gorm.io/gorm"
 type Account struct {
 	gorm.Model
 
-	Platform      string `json:"platform" gorm:"index"`
-	Username      string `json:"username" gorm:"index"`
-	Password      string `json:"password"`
+	Platform      string `json:"platform" gorm:"index" binding:"required"`
+	Username      string `json:"username" gorm:"index" binding:"required"`
+	Password      string `json:"password" binding:"required"`
 	SecurityEmail string `json:"security_email"`
 	SecurityPhone string `json:"security_phone"`
 	Remark        string `json:"remark"`

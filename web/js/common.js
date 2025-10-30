@@ -251,7 +251,9 @@ function escapeHtml(text) {
 const Storage = {
     set(key, value) {
         try {
-            localStorage.setItem(key, JSON.stringify(value));
+            // 如果value是字符串，直接存储；否则序列化为JSON
+            const storageValue = typeof value === 'string' ? value : JSON.stringify(value);
+            localStorage.setItem(key, storageValue);
             return true;
         } catch (e) {
             console.error('存储失败:', e);
@@ -262,7 +264,14 @@ const Storage = {
     get(key, defaultValue = null) {
         try {
             const item = localStorage.getItem(key);
-            return item ? JSON.parse(item) : defaultValue;
+            if (!item) return defaultValue;
+
+            // 尝试解析JSON，如果失败则直接返回字符串
+            try {
+                return JSON.parse(item);
+            } catch {
+                return item;
+            }
         } catch (e) {
             console.error('读取失败:', e);
             return defaultValue;
@@ -280,8 +289,8 @@ const Storage = {
 
 // 权限检查
 function checkAuth() {
-    const token = Storage.get('token');
-    if (!token) {
+    const jwt_token = Storage.get('jwt_token');
+    if (!jwt_token) {
         window.location.href = '/login.html';
         return false;
     }
@@ -295,7 +304,7 @@ function getCurrentUser() {
 
 // 登出
 function logout() {
-    Storage.remove('token');
+    Storage.remove('jwt_token');
     Storage.remove('user');
     window.location.href = '/login.html';
 }

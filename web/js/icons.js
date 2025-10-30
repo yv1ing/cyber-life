@@ -12,6 +12,9 @@ const Icons = {
     // 用户图标
     person: '<i class="fas fa-user"></i>',
     logout: '<i class="fas fa-sign-out-alt"></i>',
+    settings: '<i class="fas fa-cog"></i>',
+    adminPanel: '<i class="fas fa-user-cog"></i>',
+    home: '<i class="fas fa-home"></i>',
 
     // 操作图标
     add: '<i class="fas fa-plus"></i>',

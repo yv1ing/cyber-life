@@ -2,6 +2,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // 初始化图标
     document.getElementById('search-icon').innerHTML = Icons.search;
+    document.getElementById('admin-icon').innerHTML = Icons.adminPanel;
 
     // 更新 Logo 文本（固定为英文）
     updateLogoText();
@@ -23,19 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 用户头像和信息
-    const userAvatar = document.getElementById('user-avatar');
-    const userInitial = document.getElementById('user-initial');
-    const user = getCurrentUser();
-
-    if (user && user.username) {
-        userInitial.textContent = user.username.charAt(0).toUpperCase();
-    }
-
-    // 点击头像跳转到管理面板
-    userAvatar.addEventListener('click', () => {
-        const token = Storage.get('token');
-        if (token) {
+    // 管理面板按钮
+    const adminBtn = document.getElementById('admin-btn');
+    adminBtn.addEventListener('click', () => {
+        const jwt_token = Storage.get('jwt_token');
+        if (jwt_token) {
             window.location.href = '/admin.html';
         } else {
             window.location.href = '/login.html';

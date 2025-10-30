@@ -78,6 +78,13 @@ func InitDatabase() (*gorm.DB, error) {
 	err = recreateTables(
 		db,
 		&systemmodel.User{},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	err = createTables(
+		db,
 		&commonmodel.Account{},
 	)
 

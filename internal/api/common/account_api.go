@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
@@ -95,9 +96,9 @@ func DeleteAccountHandler(ctx *gin.Context) {
 func UpdateAccountHandler(ctx *gin.Context) {
 	type reqType struct {
 		AccountID     uint   `json:"account_id" binding:"required"`
-		Platform      string `json:"platform"`
-		Username      string `json:"username"`
-		Password      string `json:"password"`
+		Platform      string `json:"platform" binding:"required"`
+		Username      string `json:"username" binding:"required"`
+		Password      string `json:"password" binding:"required"`
 		SecurityEmail string `json:"security_email"`
 		SecurityPhone string `json:"security_phone"`
 		Remark        string `json:"remark"`
@@ -155,7 +156,7 @@ func FindAccountsHandler(ctx *gin.Context) {
 		return
 	}
 
-	accounts, err := commonservice.FindAccounts(keyword, page, size)
+	accounts, total, err := commonservice.FindAccounts(keyword, page, size)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
@@ -169,7 +170,7 @@ func FindAccountsHandler(ctx *gin.Context) {
 		Info: "查询成功",
 		Data: gin.H{
 			"list":  accounts,
-			"total": len(accounts),
+			"total": total,
 		},
 	})
 }
@@ -280,7 +281,7 @@ func ImportAccountsCSVHandler(ctx *gin.Context) {
 
 	defer os.Remove(tempFilePath)
 
-	importedCount, err := commonservice.ImportAccountsCSV(tempFilePath)
+	result, err := commonservice.ImportAccountsCSV(tempFilePath)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
@@ -289,11 +290,20 @@ func ImportAccountsCSVHandler(ctx *gin.Context) {
 		return
 	}
 
+	// 构造详细的响应消息
+	var message string
+	if result.FailedCount > 0 {
+		message = fmt.Sprintf("导入完成：成功 %d 条，失败 %d 条", result.SuccessCount, result.FailedCount)
+	} else {
+		message = "导入CSV成功"
+	}
+
 	ctx.JSON(http.StatusOK, systemmodel.Response{
 		Code: http.StatusOK,
-		Info: "导入CSV成功",
+		Info: message,
 		Data: gin.H{
-			"imported_count": importedCount,
+			"success_count": result.SuccessCount,
+			"failed_count":  result.FailedCount,
 		},
 	})
 }

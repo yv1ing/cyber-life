@@ -32,15 +32,34 @@ func UpdateAccount(account *commonmodel.Account) error {
 }
 
 // FindAccounts 查询账号记录
-func FindAccounts(keyword string, page, size int) ([]commonmodel.Account, error) {
-	var accounts []commonmodel.Account
-
-	offset := (page - 1) * size
-	err := repository.Repo.DB.Where("platform LIKE ? OR username LIKE ?", "%"+keyword+"%", "%"+keyword+"%").Offset(offset).Limit(size).Find(&accounts).Error
-	if err != nil {
-		return nil, err
+func FindAccounts(keyword string, page, size int) ([]commonmodel.Account, int64, error) {
+	if page < 1 {
+		page = 1
 	}
-	return accounts, nil
+	if size < 1 {
+		size = 10
+	}
+
+	var accounts []commonmodel.Account
+	var total int64
+
+	// 构建查询条件
+	query := repository.Repo.DB.Model(&commonmodel.Account{}).Where("platform LIKE ? OR username LIKE ?", "%"+keyword+"%", "%"+keyword+"%")
+
+	// 获取总数
+	err := query.Count(&total).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// 分页查询
+	offset := (page - 1) * size
+	err = query.Offset(offset).Limit(size).Find(&accounts).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return accounts, total, nil
 }
 
 // FindAccountsList 获取账号记录列表

@@ -166,10 +166,18 @@ a:hover {
     border-radius: var(--radius-full);
     background-color: transparent;
     color: var(--on-surface-variant);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-icon:hover {
     background-color: var(--surface-2);
+}
+
+.btn-icon #lang-icon {
+    font-size: 12px;
+    font-weight: 600;
 }
 
 /* 输入框样式 */

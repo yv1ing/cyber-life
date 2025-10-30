@@ -4,11 +4,11 @@ const API_BASE_URL = '/api';
 // HTTP 请求封装
 class HTTP {
     static async request(url, options = {}) {
-        const token = Storage.get('token');
+        const jwt_token = Storage.get('jwt_token');
         const defaultOptions = {
             headers: {
                 'Content-Type': 'application/json',
-                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                ...(jwt_token ? { 'Authorization': `Bearer ${jwt_token}` } : {})
             }
         };
 
@@ -110,16 +110,16 @@ const AccountAPI = {
     },
 
     // 账号记录列表
-    list(page = 1, pageSize = 10, keyword = '') {
+    list(page = 1, pageSize = 10) {
         return HTTP.get(`${API_BASE_URL}/accounts/list`, { page, size: pageSize });
     },
 
     // 导出CSV
     async exportCSV() {
-        const token = Storage.get('token');
+        const jwt_token = Storage.get('jwt_token');
         const response = await fetch(`${API_BASE_URL}/accounts/export`, {
             method: 'GET',
-            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+            headers: jwt_token ? { 'Authorization': `Bearer ${jwt_token}` } : {}
         });
 
         if (response.status === 401) {
@@ -141,14 +141,14 @@ const AccountAPI = {
 
     // 导入CSV
     async importCSV(file) {
-        const token = Storage.get('token');
+        const jwt_token = Storage.get('jwt_token');
         const formData = new FormData();
         formData.append('file', file);
 
         const response = await fetch(`${API_BASE_URL}/accounts/import`, {
             method: 'POST',
             headers: {
-                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                ...(jwt_token ? { 'Authorization': `Bearer ${jwt_token}` } : {})
             },
             body: formData
         });

@@ -1,14 +1,15 @@
 // 登录页面逻辑
 document.addEventListener('DOMContentLoaded', () => {
     // 检查是否已登录
-    const token = Storage.get('token');
-    if (token) {
+    const jwt_token = Storage.get('jwt_token');
+    if (jwt_token) {
         window.location.href = '/admin.html';
         return;
     }
 
     // 初始化图标
     document.getElementById('logo-icon').innerHTML = Icons.web;
+    document.getElementById('home-icon').innerHTML = Icons.home;
 
     // 语言切换按钮
     const langToggle = document.getElementById('lang-toggle');
@@ -51,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 保存 token 和用户信息
             if (response.data && response.data.jwt_token) {
-                Storage.set('token', response.data.jwt_token);
+                Storage.set('jwt_token', response.data.jwt_token);
                 Storage.set('user', { username });
 
                 Toast.success(langManager.t('login.success'));

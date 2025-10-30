@@ -21,7 +21,7 @@ const pageConfigs = {
             { key: 'remark', label: 'accounts.remark', type: 'textarea', required: false }
         ],
         columns: [
-            { key: 'ID', label: 'ID', width: '80px' },
+            { key: 'ID', label: 'common.id', width: '80px' },
             { key: 'platform', label: 'accounts.platform', width: '120px' },
             { key: 'username', label: 'accounts.username', width: '150px' },
             { key: 'password', label: 'accounts.password', width: '200px', format: 'password' },
@@ -44,7 +44,7 @@ const pageConfigs = {
             { key: 'note', label: '备注', type: 'textarea', required: false }
         ],
         columns: [
-            { key: 'id', label: 'ID', width: '80px' },
+            { key: 'id', label: 'common.id', width: '80px' },
             { key: 'hostname', label: '主机名' },
             { key: 'ip', label: 'IP地址' },
             { key: 'os', label: '操作系统' },
@@ -62,7 +62,7 @@ const pageConfigs = {
             { key: 'note', label: '备注', type: 'textarea', required: false }
         ],
         columns: [
-            { key: 'id', label: 'ID', width: '80px' },
+            { key: 'id', label: 'common.id', width: '80px' },
             { key: 'name', label: '订阅名称' },
             { key: 'url', label: '订阅地址' },
             { key: 'expire_date', label: '过期时间', format: 'date' },
@@ -80,7 +80,7 @@ const pageConfigs = {
             { key: 'note', label: '备注', type: 'textarea', required: false }
         ],
         columns: [
-            { key: 'id', label: 'ID', width: '80px' },
+            { key: 'id', label: 'common.id', width: '80px' },
             { key: 'name', label: '站点名称' },
             { key: 'url', label: '站点地址' },
             { key: 'category', label: '分类' },
@@ -112,6 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 初始化模态框
     initModal();
+
+    // 初始化资料模态框
+    initProfileModal();
 
     // 初始化移动端侧边栏
     initMobileSidebar();
@@ -562,7 +565,8 @@ async function handleSave() {
 
     config.fields.forEach(field => {
         const value = document.getElementById(`field-${field.key}`).value.trim();
-        if (value || field.required) {
+        // 必填字段必须有值，可选字段只在有值时添加
+        if (field.required || value) {
             data[field.key] = value;
         }
     });
@@ -726,14 +730,6 @@ function initProfileModal() {
     document.getElementById('profile-modal-cancel').addEventListener('click', () => modal.close());
     document.getElementById('profile-modal-save').addEventListener('click', handleProfileSave);
 }
-
-// 在 DOMContentLoaded 中添加初始化
-document.addEventListener('DOMContentLoaded', () => {
-    // 在现有代码之后添加
-    setTimeout(() => {
-        initProfileModal();
-    }, 0);
-});
 
 // 初始化移动端侧边栏
 function initMobileSidebar() {
@@ -944,8 +940,14 @@ async function handleImportCSV(event) {
             const response = await AccountAPI.importCSV(file);
 
             if (response && response.data) {
-                const importedCount = response.data.imported_count || 0;
-                Toast.success(`成功导入 ${importedCount} 条记录`);
+                const successCount = response.data.success_count || 0;
+                const failedCount = response.data.failed_count || 0;
+
+                if (failedCount > 0) {
+                    Toast.warning(`导入完成：成功 ${successCount} 条，失败 ${failedCount} 条。请检查后台日志了解失败原因。`, 5000);
+                } else {
+                    Toast.success(`成功导入 ${successCount} 条记录`);
+                }
 
                 // 重新加载数据
                 loadData(currentPage, currentPageNum, currentKeyword);
