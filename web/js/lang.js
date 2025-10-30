@@ -56,11 +56,11 @@ const translations = {
         // 侧边栏
         'nav.accounts': '账号管理',
         'nav.secrets': '密钥管理',
-        'nav.hosts': '主机信息',
+        'nav.hosts': '主机管理',
         'nav.sites': '站点信息',
 
         // 账号记录
-        'accounts.title': '账号记录',
+        'accounts.title': '账号',
         'accounts.platform': '平台名称',
         'accounts.platformURL': '平台链接',
         'accounts.username': '平台账号',
@@ -77,7 +77,7 @@ const translations = {
         'accounts.saveSuccess': '保存成功',
 
         // 密钥记录
-        'secrets.title': '密钥信息',
+        'secrets.title': '密钥',
         'secrets.platform': '平台名称',
         'secrets.keyID': 'Key ID',
         'secrets.keySecret': 'Key Secret',
@@ -91,7 +91,7 @@ const translations = {
         'secrets.saveSuccess': '保存成功',
 
         // 主机记录
-        'hosts.title': '主机信息',
+        'hosts.title': '主机',
         'hosts.provider': '服务商名称',
         'hosts.providerURL': '服务商链接',
         'hosts.hostname': '主机名称',
@@ -142,6 +142,7 @@ const translations = {
         'toast.deleteFailed': '删除失败',
         'toast.copied': '已复制到剪贴板',
         'toast.copyFailed': '复制失败',
+        'toast.featureNotImplemented': '该功能暂未实现',
 
         // 表单验证
         'validation.required': '此字段为必填项',
@@ -205,13 +206,13 @@ const translations = {
         'admin.administrator': 'Administrator',
 
         // Sidebar
-        'nav.accounts': 'Account Management',
-        'nav.secrets': 'Secret Management',
-        'nav.hosts': 'Hosts',
-        'nav.sites': 'Sites',
+        'nav.accounts': 'Manage Accounts',
+        'nav.secrets': 'Manage Secrets',
+        'nav.hosts': 'Manage Hosts',
+        'nav.sites': 'Manage Sites',
 
         // Accounts
-        'accounts.title': 'Account Records',
+        'accounts.title': 'Account',
         'accounts.platform': 'Platform Name',
         'accounts.platformURL': 'Platform URL',
         'accounts.username': 'Platform Account',
@@ -228,7 +229,7 @@ const translations = {
         'accounts.saveSuccess': 'Saved successfully',
 
         // Secrets
-        'secrets.title': 'Secret Records',
+        'secrets.title': 'Secret',
         'secrets.platform': 'Platform Name',
         'secrets.keyID': 'Key ID',
         'secrets.keySecret': 'Key Secret',
@@ -242,7 +243,7 @@ const translations = {
         'secrets.saveSuccess': 'Saved successfully',
 
         // Hosts
-        'hosts.title': 'Host Records',
+        'hosts.title': 'Host',
         'hosts.provider': 'Provider Name',
         'hosts.providerURL': 'Provider URL',
         'hosts.hostname': 'Hostname',
@@ -293,6 +294,7 @@ const translations = {
         'toast.deleteFailed': 'Delete failed',
         'toast.copied': 'Copied to clipboard',
         'toast.copyFailed': 'Copy failed',
+        'toast.featureNotImplemented': 'This feature is not yet implemented',
 
         // Form Validation
         'validation.required': 'This field is required',

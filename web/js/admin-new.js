@@ -156,7 +156,7 @@ function initNavigation() {
 
                 loadPage(page);
             } else {
-                Toast.warning('该功能暂未实现');
+                Toast.warning(langManager.t('toast.featureNotImplemented'));
             }
         });
     });

@@ -181,7 +181,7 @@ const AccountAPI = {
     }
 };
 
-// 主机信息 API
+// 主机管理 API
 const HostAPI = {
     // 创建主机记录
     create(hostData) {

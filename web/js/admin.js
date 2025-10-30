@@ -285,7 +285,7 @@ function initNavigation() {
 
                 loadPage(page);
             } else {
-                Toast.warning('该功能暂未实现');
+                Toast.warning(langManager.t('toast.featureNotImplemented'));
             }
         });
     });
@@ -299,7 +299,7 @@ async function loadPage(page) {
         return;
     }
 
-    // 控制导入导出按钮的显示（账号管理、主机信息和密钥管理页面显示）
+    // 控制导入导出按钮的显示（账号管理、主机管理和密钥管理页面显示）
     const exportBtn = document.getElementById('export-csv-btn');
     const importBtn = document.getElementById('import-csv-btn');
 
