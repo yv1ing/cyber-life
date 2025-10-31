@@ -25,6 +25,7 @@ func CreateSecretHandler(ctx *gin.Context) {
 		KeyID       string `json:"key_id" binding:"required"`
 		KeySecret   string `json:"key_secret" binding:"required"`
 		Remark      string `json:"remark"`
+		Logo        string `json:"logo"`
 	}
 
 	var req reqType
@@ -37,7 +38,7 @@ func CreateSecretHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = commonservice.CreateSecret(req.Platform, req.PlatformURL, req.KeyID, req.KeySecret, req.Remark)
+	err = commonservice.CreateSecret(req.Platform, req.PlatformURL, req.KeyID, req.KeySecret, req.Remark, req.Logo)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
@@ -100,6 +101,7 @@ func UpdateSecretHandler(ctx *gin.Context) {
 		KeyID       string `json:"key_id" binding:"required"`
 		KeySecret   string `json:"key_secret" binding:"required"`
 		Remark      string `json:"remark"`
+		Logo        string `json:"logo"`
 	}
 
 	var req reqType
@@ -112,7 +114,7 @@ func UpdateSecretHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = commonservice.UpdateSecret(req.SecretID, req.Platform, req.PlatformURL, req.KeyID, req.KeySecret, req.Remark)
+	err = commonservice.UpdateSecret(req.SecretID, req.Platform, req.PlatformURL, req.KeyID, req.KeySecret, req.Remark, req.Logo)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,

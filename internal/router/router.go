@@ -36,8 +36,6 @@ func InitRouter(eng *gin.Engine) {
 	eng.Use(middleware.JwtAuthMiddleware(whitelist))
 
 	api := eng.Group("/api")
-
-	// 系统内置路由
 	sys := api.Group("/sys")
 
 	sys.POST("/users/login", systemapi.UserLoginHandler)
@@ -57,19 +55,6 @@ func InitRouter(eng *gin.Engine) {
 	api.GET("/accounts/list", commonapi.FindAccountsListHandler)
 	api.GET("/accounts/export", commonapi.ExportAccountsCSVHandler)
 	api.POST("/accounts/import", commonapi.ImportAccountsCSVHandler)
-	api.POST("/accounts/upload-platform-icon", commonapi.UploadPlatformIconHandler)
-	api.GET("/accounts/platform-icons", commonapi.GetPlatformIconsListHandler)
-
-	// 主机记录管理
-	api.POST("/hosts/create", commonapi.CreateHostHandler)
-	api.DELETE("/hosts/delete", commonapi.DeleteHostHandler)
-	api.PUT("/hosts/update", commonapi.UpdateHostHandler)
-	api.GET("/hosts/find", commonapi.FindHostsHandler)
-	api.GET("/hosts/list", commonapi.FindHostsListHandler)
-	api.GET("/hosts/export", commonapi.ExportHostsCSVHandler)
-	api.POST("/hosts/import", commonapi.ImportHostsCSVHandler)
-	api.POST("/hosts/upload-os-icon", commonapi.UploadOSIconHandler)
-	api.GET("/hosts/os-icons", commonapi.GetOSIconsListHandler)
 
 	// 密钥记录管理
 	api.POST("/secrets/create", commonapi.CreateSecretHandler)
@@ -79,4 +64,19 @@ func InitRouter(eng *gin.Engine) {
 	api.GET("/secrets/list", commonapi.FindSecretsListHandler)
 	api.GET("/secrets/export", commonapi.ExportSecretsCSVHandler)
 	api.POST("/secrets/import", commonapi.ImportSecretsCSVHandler)
+
+	// 主机记录管理
+	api.POST("/hosts/create", commonapi.CreateHostHandler)
+	api.DELETE("/hosts/delete", commonapi.DeleteHostHandler)
+	api.PUT("/hosts/update", commonapi.UpdateHostHandler)
+	api.GET("/hosts/find", commonapi.FindHostsHandler)
+	api.GET("/hosts/list", commonapi.FindHostsListHandler)
+	api.GET("/hosts/export", commonapi.ExportHostsCSVHandler)
+	api.POST("/hosts/import", commonapi.ImportHostsCSVHandler)
+
+	// 图标管理
+	api.POST("/icons/upload-platform-icon", commonapi.UploadPlatformIconHandler)
+	api.GET("/icons/platform-icons", commonapi.GetPlatformIconsListHandler)
+	api.POST("/icons/upload-os-icon", commonapi.UploadOSIconHandler)
+	api.GET("/icons/os-icons", commonapi.GetOSIconsListHandler)
 }

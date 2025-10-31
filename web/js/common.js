@@ -153,53 +153,21 @@ function formatRelativeTime(dateString) {
     return '刚刚';
 }
 
-// 防抖函数
-function debounce(func, wait = 300) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// 节流函数
-function throttle(func, limit = 300) {
-    let inThrottle;
-    return function executedFunction(...args) {
-        if (!inThrottle) {
-            func(...args);
-            inThrottle = true;
-            setTimeout(() => inThrottle = false, limit);
-        }
-    };
-}
-
-// 复制到剪贴板
-async function copyToClipboard(text) {
-    try {
-        if (navigator.clipboard) {
-            await navigator.clipboard.writeText(text);
-            Toast.success('已复制到剪贴板');
-        } else {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.style.position = 'fixed';
-            textarea.style.opacity = '0';
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            Toast.success('已复制到剪贴板');
-        }
-    } catch (err) {
-        Toast.error('复制失败');
-        console.error('复制失败:', err);
-    }
-}
+/**
+ * 以下工具函数已迁移到 /js/utils/helpers.js
+ * 为保持向后兼容，这里保留函数定义，但新代码应使用 Helpers 对象
+ *
+ * 可用的工具函数：
+ * - debounce(func, wait) - 防抖函数
+ * - throttle(func, limit) - 节流函数
+ * - copyToClipboard(text) - 复制到剪贴板
+ * - generateId() - 生成唯一 ID
+ * - escapeHtml(text) - HTML 转义
+ *
+ * 推荐使用方式：
+ * - Helpers.debounce(func, 300)
+ * - Helpers.escapeHtml(text)
+ */
 
 // 验证表单
 function validateForm(formElement) {
@@ -233,18 +201,6 @@ function validateForm(formElement) {
     });
 
     return isValid;
-}
-
-// 生成唯一 ID
-function generateId() {
-    return Date.now().toString(36) + Math.random().toString(36).substring(2);
-}
-
-// 安全的 HTML 转义
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
 }
 
 // 本地存储封装

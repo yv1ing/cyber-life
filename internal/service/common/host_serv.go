@@ -143,7 +143,7 @@ func ExportHostsCSV() (string, error) {
 }
 
 // ImportHostsCSV 从CSV文件导入主机记录
-func ImportHostsCSV(filePath string) (*ImportResult, error) {
+func ImportHostsCSV(filePath string) (*commonmodel.ImportResult, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
@@ -260,7 +260,7 @@ func ImportHostsCSV(filePath string) (*ImportResult, error) {
 		importedCount++
 	}
 
-	return &ImportResult{
+	return &commonmodel.ImportResult{
 		SuccessCount: importedCount,
 		FailedCount:  failedCount,
 	}, nil

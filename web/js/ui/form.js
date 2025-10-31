@@ -101,8 +101,8 @@ class FormGenerator {
     }
 
     static _generateLogoField(field, value) {
-        // 注意：这里的初始路径会在 Logo.init() 中根据模块配置动态更新
-        const logoPreviewSrc = value ? `/platform-icons/${value}` : '/platform-icons/default.png';
+        // 使用 data-value 属性存储图标文件名，在 Logo.init() 中动态设置正确的路径
+        // 避免在初始渲染时加载错误的路径（如主机记录加载 /platform-icons/ 下的图标）
         return `
             <div class="input-group">
                 <label class="input-label">
@@ -110,7 +110,7 @@ class FormGenerator {
                 </label>
                 <div class="logo-input-group">
                     <div class="logo-preview-wrapper">
-                        <img id="logo-preview" src="${logoPreviewSrc}" alt="Logo" class="logo-preview" onerror="this.src='/platform-icons/default.png'"/>
+                        <img id="logo-preview" src="" alt="Logo" class="logo-preview" data-value="${this._escapeHtml(value)}" style="display:none;"/>
                     </div>
                     <div class="logo-controls">
                         <div class="logo-grid-wrapper">
@@ -471,12 +471,40 @@ const LogoManager = {
             staticPath: '/os-icons',
             paramName: 'os',
             displayName: '操作系统'
+        },
+        secrets: {
+            apiBase: '/api/secrets',
+            staticPath: '/platform-icons',
+            paramName: 'platform',
+            displayName: '平台'
         }
     },
 
     async init(fieldConfig, module = 'accounts') {
         // 设置当前模块配置
         this.moduleConfig = this.moduleConfigs[module] || this.moduleConfigs.accounts;
+
+        // 立即更新预览图片的路径（从 data-value 属性读取值）
+        const preview = document.getElementById('logo-preview');
+        const valueInput = document.getElementById('field-logo-value');
+        if (preview) {
+            // 从 data-value 属性或 valueInput 获取当前值
+            const currentValue = preview.dataset.value || (valueInput ? valueInput.value : '');
+
+            if (currentValue) {
+                preview.src = `${this.moduleConfig.staticPath}/${currentValue}`;
+            } else {
+                preview.src = `${this.moduleConfig.staticPath}/default.png`;
+            }
+
+            // 显示图片
+            preview.style.display = '';
+
+            // 更新错误回退路径
+            preview.onerror = function() {
+                this.src = `${LogoManager.moduleConfig.staticPath}/default.png`;
+            };
+        }
 
         // 加载已有图标列表
         await this.loadIcons();
@@ -490,9 +518,10 @@ const LogoManager = {
         const jwt_token = Storage.get('jwt_token');
 
         try {
-            const apiPath = this.moduleConfig.apiBase === '/api/accounts'
-                ? `${this.moduleConfig.apiBase}/platform-icons`
-                : `${this.moduleConfig.apiBase}/os-icons`;
+            // 使用统一的图标管理API
+            const apiPath = this.moduleConfig.apiBase === '/api/hosts'
+                ? '/api/icons/os-icons'
+                : '/api/icons/platform-icons';
 
             const response = await fetch(apiPath, {
                 method: 'GET',
@@ -677,9 +706,10 @@ const LogoManager = {
         const jwt_token = Storage.get('jwt_token');
 
         try {
-            const uploadPath = this.moduleConfig.apiBase === '/api/accounts'
-                ? `${this.moduleConfig.apiBase}/upload-platform-icon`
-                : `${this.moduleConfig.apiBase}/upload-os-icon`;
+            // 使用统一的图标管理API
+            const uploadPath = this.moduleConfig.apiBase === '/api/hosts'
+                ? '/api/icons/upload-os-icon'
+                : '/api/icons/upload-platform-icon';
 
             const response = await fetch(uploadPath, {
                 method: 'POST',

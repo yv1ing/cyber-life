@@ -17,12 +17,6 @@ import (
 // @Date:   2025/10/29 13:58
 // @Desc:	账号记录服务
 
-// ImportResult 导入结果
-type ImportResult struct {
-	SuccessCount int
-	FailedCount  int
-}
-
 // CreateAccount 创建账号记录
 func CreateAccount(platform, platformURL, username, password, securityEmail, securityPhone, remark, logo string) error {
 	account := &commonmodel.Account{
@@ -130,7 +124,7 @@ func ExportAccountsCSV() (string, error) {
 }
 
 // ImportAccountsCSV 从CSV文件导入账号记录
-func ImportAccountsCSV(filePath string) (*ImportResult, error) {
+func ImportAccountsCSV(filePath string) (*commonmodel.ImportResult, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
@@ -219,7 +213,7 @@ func ImportAccountsCSV(filePath string) (*ImportResult, error) {
 		importedCount++
 	}
 
-	return &ImportResult{
+	return &commonmodel.ImportResult{
 		SuccessCount: importedCount,
 		FailedCount:  failedCount,
 	}, nil

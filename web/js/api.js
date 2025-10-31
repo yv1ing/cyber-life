@@ -1,3 +1,16 @@
+/**
+ * @deprecated 此文件已废弃，仅为向后兼容保留
+ * 新代码请使用以下模块：
+ * - HTTP 类: /js/core/http.js
+ * - API 服务: /js/services/ 目录下的对应文件
+ *
+ * 推荐迁移路径：
+ * - UserAPI → /js/services/user-api.js
+ * - AccountAPI → /js/services/account-api.js
+ * - HostAPI → /js/services/host-api.js
+ * - SecretAPI → /js/services/secret-api.js
+ */
+
 // API 基础配置
 const API_BASE_URL = '/api';
 

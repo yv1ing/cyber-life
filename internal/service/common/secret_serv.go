@@ -18,13 +18,14 @@ import (
 // @Desc:	密钥记录服务
 
 // CreateSecret 创建密钥记录
-func CreateSecret(platform, platformURL, keyID, keySecret, remark string) error {
+func CreateSecret(platform, platformURL, keyID, keySecret, remark, logo string) error {
 	secret := &commonmodel.Secret{
 		Platform:    platform,
 		PlatformURL: platformURL,
 		KeyID:       keyID,
 		KeySecret:   keySecret,
 		Remark:      remark,
+		Logo:        logo,
 	}
 
 	return commonrepository.CreateSecret(secret)
@@ -42,13 +43,14 @@ func DeleteSecret(secretID uint, hardDelete bool) error {
 }
 
 // UpdateSecret 更新密钥记录
-func UpdateSecret(secretID uint, platform, platformURL, keyID, keySecret, remark string) error {
+func UpdateSecret(secretID uint, platform, platformURL, keyID, keySecret, remark, logo string) error {
 	secret := &commonmodel.Secret{
 		Platform:    platform,
 		PlatformURL: platformURL,
 		KeyID:       keyID,
 		KeySecret:   keySecret,
 		Remark:      remark,
+		Logo:        logo,
 	}
 	secret.ID = secretID
 
@@ -83,7 +85,7 @@ func ExportSecretsCSV() (string, error) {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	headers := []string{"ID", "平台", "平台链接", "密钥ID", "密钥Secret", "备注", "创建时间", "更新时间"}
+	headers := []string{"ID", "平台", "平台链接", "密钥ID", "密钥Secret", "备注", "Logo", "创建时间", "更新时间"}
 	err = writer.Write(headers)
 	if err != nil {
 		return "", err
@@ -102,6 +104,7 @@ func ExportSecretsCSV() (string, error) {
 			secret.KeyID,
 			secret.KeySecret,
 			secret.Remark,
+			secret.Logo,
 			secret.CreatedAt.Format("2006-01-02 15:04:05"),
 			secret.UpdatedAt.Format("2006-01-02 15:04:05"),
 		}
@@ -115,7 +118,7 @@ func ExportSecretsCSV() (string, error) {
 }
 
 // ImportSecretsCSV 从CSV文件导入密钥记录
-func ImportSecretsCSV(filePath string) (*ImportResult, error) {
+func ImportSecretsCSV(filePath string) (*commonmodel.ImportResult, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
@@ -135,7 +138,7 @@ func ImportSecretsCSV(filePath string) (*ImportResult, error) {
 	importedCount := 0
 	failedCount := 0
 	for _, record := range records[1:] {
-		// CSV格式: 平台,平台链接,密钥ID,密钥Secret,备注（ID和时间字段会被忽略）
+		// CSV格式: 平台,平台链接,密钥ID,密钥Secret,备注,Logo（ID和时间字段会被忽略）
 		if len(record) < 4 {
 			failedCount++
 			continue
@@ -146,9 +149,10 @@ func ImportSecretsCSV(filePath string) (*ImportResult, error) {
 		keyID := ""
 		keySecret := ""
 		remark := ""
+		logo := ""
 
-		if len(record) >= 8 {
-			// 完整格式：ID, 平台, 平台链接, 密钥ID, 密钥Secret, 备注, 创建时间, 更新时间
+		if len(record) >= 9 {
+			// 完整格式：ID, 平台, 平台链接, 密钥ID, 密钥Secret, 备注, Logo, 创建时间, 更新时间
 			platform = record[1]
 			platformURL = record[2]
 			keyID = record[3]
@@ -156,14 +160,20 @@ func ImportSecretsCSV(filePath string) (*ImportResult, error) {
 			if len(record) > 5 {
 				remark = record[5]
 			}
+			if len(record) > 6 {
+				logo = record[6]
+			}
 		} else {
-			// 简化格式：平台, 平台链接, 密钥ID, 密钥Secret, 备注
+			// 简化格式：平台, 平台链接, 密钥ID, 密钥Secret, 备注, Logo
 			platform = record[0]
 			platformURL = record[1]
 			keyID = record[2]
 			keySecret = record[3]
 			if len(record) > 4 {
 				remark = record[4]
+			}
+			if len(record) > 5 {
+				logo = record[5]
 			}
 		}
 
@@ -174,7 +184,7 @@ func ImportSecretsCSV(filePath string) (*ImportResult, error) {
 		}
 
 		// 创建密钥记录
-		err = CreateSecret(platform, platformURL, keyID, keySecret, remark)
+		err = CreateSecret(platform, platformURL, keyID, keySecret, remark, logo)
 		if err != nil {
 			failedCount++
 			continue
@@ -183,7 +193,7 @@ func ImportSecretsCSV(filePath string) (*ImportResult, error) {
 		importedCount++
 	}
 
-	return &ImportResult{
+	return &commonmodel.ImportResult{
 		SuccessCount: importedCount,
 		FailedCount:  failedCount,
 	}, nil

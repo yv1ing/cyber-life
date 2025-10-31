@@ -15,4 +15,5 @@ type Secret struct {
 	KeyID       string `json:"key_id" binding:"required"`
 	KeySecret   string `json:"key_secret" binding:"required"`
 	Remark      string `json:"remark"`
+	Logo        string `json:"logo"`
 }
