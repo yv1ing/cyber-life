@@ -53,6 +53,14 @@ class AdminFormManager {
             }, 0);
         }
 
+        // 初始化 Logo 管理器（如果有 logo 字段）
+        const logoField = config.fields.find(f => f.type === 'logo');
+        if (logoField) {
+            setTimeout(() => {
+                LogoManager.init(logoField, this.dataManager.currentPage);
+            }, 0);
+        }
+
         this.editModal.show();
     }
 

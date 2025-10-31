@@ -19,6 +19,11 @@ class FormGenerator {
             return this._generateCapacityField(field, value);
         }
 
+        // 处理 Logo 类型
+        if (field.type === 'logo') {
+            return this._generateLogoField(field, value);
+        }
+
         // 处理 JSON 类型字段
         if (field.type === 'json' && value && typeof value === 'object') {
             value = JSON.stringify(value, null, 2);
@@ -91,6 +96,37 @@ class FormGenerator {
                         `}
                     </select>
                 </div>
+            </div>
+        `;
+    }
+
+    static _generateLogoField(field, value) {
+        const logoPreviewSrc = value ? `/icons/${value}` : '/icons/default.png';
+        return `
+            <div class="input-group">
+                <label class="input-label">
+                    ${langManager.t(field.label)}${field.required ? ' *' : ''}
+                </label>
+                <div class="logo-input-group">
+                    <div class="logo-left-section">
+                        <div class="logo-preview-wrapper">
+                            <img id="logo-preview" src="${logoPreviewSrc}" alt="Logo" class="logo-preview" onerror="this.src='/icons/default.png'"/>
+                        </div>
+                        <input type="file" id="logo-file-input" accept=".jpg,.jpeg,.png" style="display:none" ${field.dependsOn ? 'disabled' : ''}/>
+                        <button type="button" class="btn-secondary logo-upload-btn" ${field.dependsOn ? 'disabled' : ''} title="${field.dependsOn ? '请先输入平台名称' : '上传新图标'}">
+                            <i class="fas fa-upload"></i> 上传
+                        </button>
+                    </div>
+                    <div class="logo-controls">
+                        <div class="logo-grid-wrapper">
+                            <div class="logo-grid-header">
+                                <span>选择已有图标</span>
+                            </div>
+                            <div id="logo-grid" class="logo-grid"></div>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="field-${field.key}-value" value="${this._escapeHtml(value)}"/>
             </div>
         `;
     }
@@ -191,6 +227,15 @@ class FormGenerator {
                 const capacityData = this._collectCapacityData(field);
                 if (capacityData !== null) {
                     data[field.key] = capacityData;
+                }
+                return;
+            }
+
+            // 处理 Logo 类型
+            if (field.type === 'logo') {
+                const logoValue = document.getElementById(`field-${field.key}-value`)?.value.trim() || '';
+                if (logoValue) {
+                    data[field.key] = logoValue;
                 }
                 return;
             }
@@ -401,6 +446,274 @@ const PortManager = {
         });
 
         return ports;
+    },
+
+    _escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+};
+
+// Logo 管理器
+const LogoManager = {
+    currentIcons: [],
+    moduleConfig: null,
+
+    // 模块配置映射
+    moduleConfigs: {
+        accounts: {
+            apiBase: '/api/accounts',
+            staticPath: '/icons',
+            paramName: 'platform',
+            displayName: '平台'
+        },
+        hosts: {
+            apiBase: '/api/hosts',
+            staticPath: '/os',
+            paramName: 'os',
+            displayName: '操作系统'
+        }
+    },
+
+    async init(fieldConfig, module = 'accounts') {
+        // 设置当前模块配置
+        this.moduleConfig = this.moduleConfigs[module] || this.moduleConfigs.accounts;
+
+        // 加载已有图标列表
+        await this.loadIcons();
+
+        // 绑定事件
+        this.bindEvents(fieldConfig);
+    },
+
+    async loadIcons() {
+        // 获取 JWT token
+        const jwt_token = Storage.get('jwt_token');
+
+        try {
+            const apiPath = this.moduleConfig.apiBase === '/api/accounts'
+                ? `${this.moduleConfig.apiBase}/icons`
+                : `${this.moduleConfig.apiBase}/logos`;
+
+            const response = await fetch(apiPath, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(jwt_token ? { 'Authorization': `Bearer ${jwt_token}` } : {})
+                }
+            });
+
+            const data = await response.json();
+
+            // 处理未授权
+            if (response.status === 401) {
+                Toast.error('登录已过期，请重新登录');
+                Auth.logout();
+                throw new Error('Unauthorized');
+            }
+
+            if (data.code === 200) {
+                // accounts API返回data.icons，hosts API返回data.logos
+                this.currentIcons = data.data.icons || data.data.logos || [];
+                this.updateIconSelect();
+            }
+        } catch (error) {
+            console.error('加载图标列表失败:', error);
+        }
+    },
+
+    updateIconSelect() {
+        const grid = document.getElementById('logo-grid');
+        if (!grid) return;
+
+        const currentValue = document.getElementById('field-logo-value')?.value || '';
+
+        // 清空网格
+        grid.innerHTML = '';
+
+        // 添加默认图标
+        const defaultItem = document.createElement('div');
+        defaultItem.className = 'logo-grid-item';
+        if (!currentValue || currentValue === 'default.png') {
+            defaultItem.classList.add('selected');
+        }
+        defaultItem.innerHTML = `
+            <img src="${this.moduleConfig.staticPath}/default.png" alt="默认图标" />
+            <span class="logo-name">默认</span>
+        `;
+        defaultItem.addEventListener('click', () => {
+            this.selectIcon('', grid);
+        });
+        grid.appendChild(defaultItem);
+
+        // 添加其他图标（过滤掉 default.png）
+        this.currentIcons.forEach(icon => {
+            // 跳过 default.png，避免重复显示
+            if (icon.toLowerCase() === 'default.png') {
+                return;
+            }
+
+            const item = document.createElement('div');
+            item.className = 'logo-grid-item';
+            if (icon === currentValue) {
+                item.classList.add('selected');
+            }
+
+            // 提取文件名（不含扩展名）作为显示名称
+            const iconName = icon.replace(/\.(png|jpg|jpeg)$/i, '');
+
+            item.innerHTML = `
+                <img src="${this.moduleConfig.staticPath}/${icon}" alt="${iconName}" onerror="this.src='${this.moduleConfig.staticPath}/default.png'" />
+                <span class="logo-name">${iconName}</span>
+            `;
+            item.addEventListener('click', () => {
+                this.selectIcon(icon, grid);
+            });
+            grid.appendChild(item);
+        });
+    },
+
+    selectIcon(iconFilename, grid) {
+        const preview = document.getElementById('logo-preview');
+        const valueInput = document.getElementById('field-logo-value');
+
+        // 更新预览
+        if (preview) {
+            preview.src = iconFilename ? `${this.moduleConfig.staticPath}/${iconFilename}` : `${this.moduleConfig.staticPath}/default.png`;
+        }
+
+        // 更新隐藏值
+        if (valueInput) {
+            valueInput.value = iconFilename;
+        }
+
+        // 更新选中状态
+        if (grid) {
+            grid.querySelectorAll('.logo-grid-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+        }
+    },
+
+    bindEvents(fieldConfig) {
+        const grid = document.getElementById('logo-grid');
+        const uploadBtn = document.querySelector('.logo-upload-btn');
+        const fileInput = document.getElementById('logo-file-input');
+        const preview = document.getElementById('logo-preview');
+        const valueInput = document.getElementById('field-logo-value');
+        const leftSection = document.querySelector('.logo-left-section');
+
+        // 上传按钮点击
+        if (uploadBtn && fileInput) {
+            uploadBtn.addEventListener('click', () => {
+                if (fieldConfig.dependsOn) {
+                    const platformInput = document.getElementById(`field-${fieldConfig.dependsOn}`);
+                    if (!platformInput || !platformInput.value.trim()) {
+                        alert(`请先输入${this.moduleConfig.displayName}名称`);
+                        return;
+                    }
+                }
+                fileInput.click();
+            });
+        }
+
+        // 文件选择后上传
+        if (fileInput) {
+            fileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const platformInput = document.getElementById(`field-${fieldConfig.dependsOn}`);
+                const platform = platformInput ? platformInput.value.trim() : '';
+
+                if (fieldConfig.dependsOn && !platform) {
+                    alert(`请先输入${this.moduleConfig.displayName}名称`);
+                    fileInput.value = '';
+                    return;
+                }
+
+                await this.uploadLogo(file, platform);
+                fileInput.value = '';
+            });
+        }
+
+        // 监听平台名称变化，启用/禁用上传功能
+        if (fieldConfig.dependsOn) {
+            const platformInput = document.getElementById(`field-${fieldConfig.dependsOn}`);
+            if (platformInput) {
+                platformInput.addEventListener('input', (e) => {
+                    const hasValue = e.target.value.trim() !== '';
+                    if (leftSection) leftSection.style.opacity = hasValue ? '1' : '0.5';
+                    if (uploadBtn) uploadBtn.disabled = !hasValue;
+                    if (fileInput) fileInput.disabled = !hasValue;
+
+                    if (uploadBtn) {
+                        uploadBtn.title = hasValue ? '上传新图标' : `请先输入${this.moduleConfig.displayName}名称`;
+                    }
+                });
+            }
+        }
+    },
+
+    async uploadLogo(file, platform) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append(this.moduleConfig.paramName, platform);
+
+        // 获取 JWT token
+        const jwt_token = Storage.get('jwt_token');
+
+        try {
+            const response = await fetch(`${this.moduleConfig.apiBase}/upload-logo`, {
+                method: 'POST',
+                headers: {
+                    ...(jwt_token ? { 'Authorization': `Bearer ${jwt_token}` } : {})
+                    // 不设置 Content-Type，让浏览器自动设置 multipart/form-data
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+
+            // 处理未授权
+            if (response.status === 401) {
+                Toast.error('登录已过期，请重新登录');
+                Auth.logout();
+                throw new Error('Unauthorized');
+            }
+
+            if (!response.ok) {
+                throw new Error(data.info || '上传失败');
+            }
+
+            if (data.code === 200 && data.data.logo) {
+                const logoFilename = data.data.logo;
+
+                // 更新预览
+                const preview = document.getElementById('logo-preview');
+                if (preview) {
+                    preview.src = `${this.moduleConfig.staticPath}/${logoFilename}`;
+                }
+
+                // 更新隐藏值
+                const valueInput = document.getElementById('field-logo-value');
+                if (valueInput) {
+                    valueInput.value = logoFilename;
+                }
+
+                // 重新加载图标列表
+                await this.loadIcons();
+
+                alert('图标上传成功');
+            } else {
+                alert(data.info || '上传失败');
+            }
+        } catch (error) {
+            console.error('上传图标失败:', error);
+            alert(error.message || '上传失败');
+        }
     },
 
     _escapeHtml(text) {

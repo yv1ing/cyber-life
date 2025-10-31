@@ -27,6 +27,7 @@ func CreateAccountHandler(ctx *gin.Context) {
 		SecurityEmail string `json:"security_email"`
 		SecurityPhone string `json:"security_phone"`
 		Remark        string `json:"remark"`
+		Logo          string `json:"logo"`
 	}
 
 	var req reqType
@@ -39,7 +40,7 @@ func CreateAccountHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = commonservice.CreateAccount(req.Platform, req.PlatformURL, req.Username, req.Password, req.SecurityEmail, req.SecurityPhone, req.Remark)
+	err = commonservice.CreateAccount(req.Platform, req.PlatformURL, req.Username, req.Password, req.SecurityEmail, req.SecurityPhone, req.Remark, req.Logo)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
@@ -104,6 +105,7 @@ func UpdateAccountHandler(ctx *gin.Context) {
 		SecurityEmail string `json:"security_email"`
 		SecurityPhone string `json:"security_phone"`
 		Remark        string `json:"remark"`
+		Logo          string `json:"logo"`
 	}
 
 	var req reqType
@@ -116,7 +118,7 @@ func UpdateAccountHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = commonservice.UpdateAccount(req.AccountID, req.Platform, req.PlatformURL, req.Username, req.Password, req.SecurityEmail, req.SecurityPhone, req.Remark)
+	err = commonservice.UpdateAccount(req.AccountID, req.Platform, req.PlatformURL, req.Username, req.Password, req.SecurityEmail, req.SecurityPhone, req.Remark, req.Logo)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
@@ -306,6 +308,105 @@ func ImportAccountsCSVHandler(ctx *gin.Context) {
 		Data: gin.H{
 			"success_count": result.SuccessCount,
 			"failed_count":  result.FailedCount,
+		},
+	})
+}
+
+// UploadLogoHandler 上传平台Logo图标
+func UploadLogoHandler(ctx *gin.Context) {
+	platform := ctx.PostForm("platform")
+	if platform == "" {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
+			Code: http.StatusBadRequest,
+			Info: "平台名称不能为空",
+		})
+		return
+	}
+
+	file, err := ctx.FormFile("file")
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
+			Code: http.StatusBadRequest,
+			Info: "请求参数非法",
+		})
+		return
+	}
+
+	ext := filepath.Ext(file.Filename)
+	if ext != ".jpg" && ext != ".png" && ext != ".jpeg" {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
+			Code: http.StatusBadRequest,
+			Info: "只支持jpg、png格式的图片",
+		})
+		return
+	}
+
+	iconsDir := "data/icons"
+	if err := os.MkdirAll(iconsDir, 0755); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
+			Code: http.StatusInternalServerError,
+			Info: "系统内部错误",
+		})
+		return
+	}
+
+	filename := platform + ext
+	filePath := filepath.Join(iconsDir, filename)
+	err = ctx.SaveUploadedFile(file, filePath)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
+			Code: http.StatusInternalServerError,
+			Info: "系统内部错误",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, systemmodel.Response{
+		Code: http.StatusOK,
+		Info: "上传成功",
+		Data: gin.H{
+			"logo": filename,
+		},
+	})
+}
+
+// GetIconsListHandler 获取已有图标列表
+func GetIconsListHandler(ctx *gin.Context) {
+	iconsDir := "data/icons"
+
+	// 确保目录存在
+	if err := os.MkdirAll(iconsDir, 0755); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
+			Code: http.StatusInternalServerError,
+			Info: "系统内部错误",
+		})
+		return
+	}
+
+	files, err := os.ReadDir(iconsDir)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
+			Code: http.StatusInternalServerError,
+			Info: "系统内部错误",
+		})
+		return
+	}
+
+	var icons []string
+	for _, file := range files {
+		if !file.IsDir() {
+			ext := filepath.Ext(file.Name())
+			if ext == ".jpg" || ext == ".png" || ext == ".jpeg" {
+				icons = append(icons, file.Name())
+			}
+		}
+	}
+
+	ctx.JSON(http.StatusOK, systemmodel.Response{
+		Code: http.StatusOK,
+		Info: "查询成功",
+		Data: gin.H{
+			"icons": icons,
 		},
 	})
 }

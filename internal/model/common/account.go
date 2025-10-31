@@ -17,4 +17,5 @@ type Account struct {
 	SecurityEmail string `json:"security_email"`
 	SecurityPhone string `json:"security_phone"`
 	Remark        string `json:"remark"`
+	Logo          string `json:"logo"`
 }

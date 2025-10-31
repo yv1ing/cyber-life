@@ -143,12 +143,25 @@ class TableRenderer {
 
     static _formatPlatformLink(value, item, col) {
         const url = item && col && col.urlKey ? item[col.urlKey] : '';
+        const logo = item && col && col.logoKey ? item[col.logoKey] : '';
+        const logoPath = col && col.logoPath ? col.logoPath : '/icons';
         const platformName = this._escapeHtml(String(value));
+
+        // 构建 Logo 图标 HTML
+        let logoHtml = '';
+        if (logo) {
+            const logoSrc = `${logoPath}/${logo}`;
+            logoHtml = `<img src="${logoSrc}" alt="logo" class="platform-logo" onerror="this.src='${logoPath}/default.png'" />`;
+        } else {
+            logoHtml = `<img src="${logoPath}/default.png" alt="logo" class="platform-logo" />`;
+        }
+
+        // 构建完整的 HTML
         if (url && url !== '') {
             const escapedUrl = this._escapeHtml(String(url));
-            return `<a href="${escapedUrl}" target="_blank" rel="noopener noreferrer" class="platform-link">${platformName}</a>`;
+            return `<div class="platform-with-logo">${logoHtml}<a href="${escapedUrl}" target="_blank" rel="noopener noreferrer" class="platform-link">${platformName}</a></div>`;
         }
-        return platformName;
+        return `<div class="platform-with-logo">${logoHtml}<span>${platformName}</span></div>`;
     }
 
     static _formatJson(value) {

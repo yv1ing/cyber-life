@@ -28,6 +28,7 @@ func CreateHostHandler(ctx *gin.Context) {
 		Username    string         `json:"username" binding:"required"`
 		Password    string         `json:"password" binding:"required"`
 		OS          string         `json:"os"`
+		Logo        string         `json:"logo"`
 		CpuNum      int            `json:"cpu_num"`
 		RamSize     int            `json:"ram_size"`
 		DiskSize    int            `json:"disk_size"`
@@ -43,7 +44,7 @@ func CreateHostHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = commonservice.CreateHost(req.Provider, req.ProviderURL, req.Hostname, req.Address, req.Ports, req.Username, req.Password, req.OS, req.CpuNum, req.RamSize, req.DiskSize)
+	err = commonservice.CreateHost(req.Provider, req.ProviderURL, req.Hostname, req.Address, req.Ports, req.Username, req.Password, req.OS, req.Logo, req.CpuNum, req.RamSize, req.DiskSize)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
@@ -109,6 +110,7 @@ func UpdateHostHandler(ctx *gin.Context) {
 		Username    string         `json:"username" binding:"required"`
 		Password    string         `json:"password" binding:"required"`
 		OS          string         `json:"os"`
+		Logo        string         `json:"logo"`
 		CpuNum      int            `json:"cpu_num"`
 		RamSize     int            `json:"ram_size"`
 		DiskSize    int            `json:"disk_size"`
@@ -124,7 +126,7 @@ func UpdateHostHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = commonservice.UpdateHost(req.HostID, req.Provider, req.ProviderURL, req.Hostname, req.Address, req.Ports, req.Username, req.Password, req.OS, req.CpuNum, req.RamSize, req.DiskSize)
+	err = commonservice.UpdateHost(req.HostID, req.Provider, req.ProviderURL, req.Hostname, req.Address, req.Ports, req.Username, req.Password, req.OS, req.Logo, req.CpuNum, req.RamSize, req.DiskSize)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
@@ -314,6 +316,105 @@ func ImportHostsCSVHandler(ctx *gin.Context) {
 		Data: gin.H{
 			"success_count": result.SuccessCount,
 			"failed_count":  result.FailedCount,
+		},
+	})
+}
+
+// UploadOSLogoHandler 上传操作系统Logo图标
+func UploadOSLogoHandler(ctx *gin.Context) {
+	osName := ctx.PostForm("os")
+	if osName == "" {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
+			Code: http.StatusBadRequest,
+			Info: "操作系统名称不能为空",
+		})
+		return
+	}
+
+	file, err := ctx.FormFile("file")
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
+			Code: http.StatusBadRequest,
+			Info: "请求参数非法",
+		})
+		return
+	}
+
+	ext := filepath.Ext(file.Filename)
+	if ext != ".jpg" && ext != ".png" && ext != ".jpeg" {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
+			Code: http.StatusBadRequest,
+			Info: "只支持jpg、png格式的图片",
+		})
+		return
+	}
+
+	osLogosDir := "data/os"
+	if err := os.MkdirAll(osLogosDir, 0755); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
+			Code: http.StatusInternalServerError,
+			Info: "系统内部错误",
+		})
+		return
+	}
+
+	filename := osName + ext
+	filePath := filepath.Join(osLogosDir, filename)
+	err = ctx.SaveUploadedFile(file, filePath)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
+			Code: http.StatusInternalServerError,
+			Info: "系统内部错误",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, systemmodel.Response{
+		Code: http.StatusOK,
+		Info: "上传成功",
+		Data: gin.H{
+			"logo": filename,
+		},
+	})
+}
+
+// GetOSLogosListHandler 获取已有操作系统Logo列表
+func GetOSLogosListHandler(ctx *gin.Context) {
+	osLogosDir := "data/os"
+
+	// 确保目录存在
+	if err := os.MkdirAll(osLogosDir, 0755); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
+			Code: http.StatusInternalServerError,
+			Info: "系统内部错误",
+		})
+		return
+	}
+
+	files, err := os.ReadDir(osLogosDir)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
+			Code: http.StatusInternalServerError,
+			Info: "系统内部错误",
+		})
+		return
+	}
+
+	var logos []string
+	for _, file := range files {
+		if !file.IsDir() {
+			ext := filepath.Ext(file.Name())
+			if ext == ".jpg" || ext == ".png" || ext == ".jpeg" {
+				logos = append(logos, file.Name())
+			}
+		}
+	}
+
+	ctx.JSON(http.StatusOK, systemmodel.Response{
+		Code: http.StatusOK,
+		Info: "查询成功",
+		Data: gin.H{
+			"logos": logos,
 		},
 	})
 }

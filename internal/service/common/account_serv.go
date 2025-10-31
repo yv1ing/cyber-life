@@ -24,7 +24,7 @@ type ImportResult struct {
 }
 
 // CreateAccount 创建账号记录
-func CreateAccount(platform, platformURL, username, password, securityEmail, securityPhone, remark string) error {
+func CreateAccount(platform, platformURL, username, password, securityEmail, securityPhone, remark, logo string) error {
 	account := &commonmodel.Account{
 		Platform:      platform,
 		PlatformURL:   platformURL,
@@ -33,6 +33,7 @@ func CreateAccount(platform, platformURL, username, password, securityEmail, sec
 		SecurityEmail: securityEmail,
 		SecurityPhone: securityPhone,
 		Remark:        remark,
+		Logo:          logo,
 	}
 
 	return commonrepository.CreateAccount(account)
@@ -50,7 +51,7 @@ func DeleteAccount(accountID uint, hardDelete bool) error {
 }
 
 // UpdateAccount 更新账号记录
-func UpdateAccount(accountID uint, platform, platformURL, username, password, securityEmail, securityPhone, remark string) error {
+func UpdateAccount(accountID uint, platform, platformURL, username, password, securityEmail, securityPhone, remark, logo string) error {
 	account := &commonmodel.Account{
 		Platform:      platform,
 		PlatformURL:   platformURL,
@@ -59,6 +60,7 @@ func UpdateAccount(accountID uint, platform, platformURL, username, password, se
 		SecurityEmail: securityEmail,
 		SecurityPhone: securityPhone,
 		Remark:        remark,
+		Logo:          logo,
 	}
 	account.ID = accountID
 
@@ -93,7 +95,7 @@ func ExportAccountsCSV() (string, error) {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	headers := []string{"ID", "平台", "平台链接", "账号", "密码", "安全邮箱", "安全电话", "备注", "创建时间", "更新时间"}
+	headers := []string{"ID", "平台", "平台链接", "账号", "密码", "安全邮箱", "安全电话", "备注", "Logo", "创建时间", "更新时间"}
 	err = writer.Write(headers)
 	if err != nil {
 		return "", err
@@ -114,6 +116,7 @@ func ExportAccountsCSV() (string, error) {
 			account.SecurityEmail,
 			account.SecurityPhone,
 			account.Remark,
+			account.Logo,
 			account.CreatedAt.Format("2006-01-02 15:04:05"),
 			account.UpdatedAt.Format("2006-01-02 15:04:05"),
 		}
@@ -147,7 +150,7 @@ func ImportAccountsCSV(filePath string) (*ImportResult, error) {
 	importedCount := 0
 	failedCount := 0
 	for _, record := range records[1:] {
-		// CSV格式: 平台,平台链接,账号,密码,安全邮箱,安全电话,备注（ID和时间字段会被忽略）
+		// CSV格式: 平台,平台链接,账号,密码,安全邮箱,安全电话,备注,Logo（ID和时间字段会被忽略）
 		if len(record) < 4 {
 			failedCount++
 			continue
@@ -160,9 +163,10 @@ func ImportAccountsCSV(filePath string) (*ImportResult, error) {
 		securityEmail := ""
 		securityPhone := ""
 		remark := ""
+		logo := ""
 
-		if len(record) >= 10 {
-			// 完整格式：ID, 平台, 平台链接, 账号, 密码, 安全邮箱, 安全电话, 备注, 创建时间, 更新时间
+		if len(record) >= 11 {
+			// 完整格式：ID, 平台, 平台链接, 账号, 密码, 安全邮箱, 安全电话, 备注, Logo, 创建时间, 更新时间
 			platform = record[1]
 			platformURL = record[2]
 			username = record[3]
@@ -176,8 +180,11 @@ func ImportAccountsCSV(filePath string) (*ImportResult, error) {
 			if len(record) > 7 {
 				remark = record[7]
 			}
+			if len(record) > 8 {
+				logo = record[8]
+			}
 		} else {
-			// 简化格式：平台, 平台链接, 账号, 密码, 安全邮箱, 安全电话, 备注
+			// 简化格式：平台, 平台链接, 账号, 密码, 安全邮箱, 安全电话, 备注, Logo
 			platform = record[0]
 			platformURL = record[1]
 			username = record[2]
@@ -191,6 +198,9 @@ func ImportAccountsCSV(filePath string) (*ImportResult, error) {
 			if len(record) > 6 {
 				remark = record[6]
 			}
+			if len(record) > 7 {
+				logo = record[7]
+			}
 		}
 
 		// 验证必填字段
@@ -200,7 +210,7 @@ func ImportAccountsCSV(filePath string) (*ImportResult, error) {
 		}
 
 		// 创建账号记录
-		err = CreateAccount(platform, platformURL, username, password, securityEmail, securityPhone, remark)
+		err = CreateAccount(platform, platformURL, username, password, securityEmail, securityPhone, remark, logo)
 		if err != nil {
 			failedCount++
 			continue

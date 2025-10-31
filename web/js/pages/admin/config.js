@@ -6,6 +6,7 @@ const PageConfig = {
         api: AccountAPI,
         fields: [
             { key: 'platform', label: 'accounts.platform', type: 'text', required: true },
+            { key: 'logo', label: 'accounts.logo', type: 'logo', required: false, dependsOn: 'platform' },
             { key: 'platform_url', label: 'accounts.platformURL', type: 'url', required: true },
             { key: 'username', label: 'accounts.username', type: 'text', required: true },
             { key: 'password', label: 'accounts.password', type: 'password', required: true },
@@ -15,7 +16,7 @@ const PageConfig = {
         ],
         columns: [
             { key: 'ID', label: 'common.id', width: '80px' },
-            { key: 'platform', label: 'accounts.platform', width: '120px', format: 'platformLink', urlKey: 'platform_url' },
+            { key: 'platform', label: 'accounts.platform', width: '120px', format: 'platformLink', urlKey: 'platform_url', logoKey: 'logo' },
             { key: 'username', label: 'accounts.username', width: '150px', copyable: true },
             { key: 'password', label: 'accounts.password', width: '200px', format: 'password', copyable: true },
             { key: 'security_email', label: 'accounts.securityEmail', width: '180px', copyable: true },
@@ -30,16 +31,27 @@ const PageConfig = {
         icon: Icons.host,
         api: HostAPI,
         fields: [
-            { key: 'provider', label: 'hosts.provider', type: 'text', required: true },
-            { key: 'provider_url', label: 'hosts.providerURL', type: 'url', required: true },
-            { key: 'address', label: 'hosts.address', type: 'text', required: true },
-            { key: 'ports', label: 'hosts.ports', type: 'portlist', required: true },
-            { key: 'username', label: 'hosts.username', type: 'text', required: true },
-            { key: 'password', label: 'hosts.password', type: 'password', required: true },
+            // 服务商信息：服务商名称 + 服务商链接
+            { key: 'provider_group', type: 'group', fields: [
+                { key: 'provider', label: 'hosts.provider', type: 'text', required: true },
+                { key: 'provider_url', label: 'hosts.providerURL', type: 'url', required: true }
+            ]},
+            // 主机名称 + 操作系统
             { key: 'hostname_os_group', type: 'group', fields: [
                 { key: 'hostname', label: 'hosts.hostname', type: 'text', required: true },
                 { key: 'os', label: 'hosts.os', type: 'text', required: false }
             ]},
+            // 操作系统图标（单独一行）
+            { key: 'logo', label: 'hosts.logo', type: 'logo', required: false, dependsOn: 'os' },
+            // 主机地址 + 登录账号 + 登录密码
+            { key: 'auth_group', type: 'group', fields: [
+                { key: 'address', label: 'hosts.address', type: 'text', required: true },
+                { key: 'username', label: 'hosts.username', type: 'text', required: true },
+                { key: 'password', label: 'hosts.password', type: 'password', required: true }
+            ]},
+            // 端口映射（单独一行）
+            { key: 'ports', label: 'hosts.ports', type: 'portlist', required: true },
+            // 容量信息：CPU + 内存 + 磁盘
             { key: 'capacity_group', type: 'group', fields: [
                 { key: 'cpu_num', label: 'hosts.cpuCapacity', type: 'capacity', unit: 'cores', placeholder: 'hosts.cpuPlaceholder', required: false },
                 { key: 'ram_size', label: 'hosts.ramCapacity', type: 'capacity', unit: 'storage', placeholder: 'hosts.ramPlaceholder', required: false },
@@ -54,7 +66,7 @@ const PageConfig = {
             { key: 'ports', label: 'hosts.ports', width: '150px', format: 'json' },
             { key: 'username', label: 'hosts.username', width: '120px', copyable: true },
             { key: 'password', label: 'hosts.password', width: '150px', format: 'password', copyable: true },
-            { key: 'os', label: 'hosts.os', width: '120px' },
+            { key: 'os', label: 'hosts.os', width: '120px', format: 'platformLink', logoKey: 'logo', logoPath: '/os' },
             { key: 'cpu_num', label: 'hosts.cpuNum', width: '80px' },
             { key: 'ram_size', label: 'hosts.ramSize', width: '100px', format: 'storage' },
             { key: 'disk_size', label: 'hosts.diskSize', width: '100px', format: 'storage' },

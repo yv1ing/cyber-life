@@ -18,6 +18,7 @@ type Host struct {
 	Username    string         `json:"username" gorm:"index" binding:"required"`
 	Password    string         `json:"password" binding:"required"`
 	OS          string         `json:"os"`        // 操作系统
+	Logo        string         `json:"logo"`      // 操作系统Logo文件名
 	CpuNum      int            `json:"cpu_num"`   // CPU核心数
 	RamSize     int            `json:"ram_size"`  // 内存大小（单位MB）
 	DiskSize    int            `json:"disk_size"` // 磁盘大小（单位MB）

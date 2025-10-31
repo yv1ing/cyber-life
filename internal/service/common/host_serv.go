@@ -19,7 +19,7 @@ import (
 // @Desc:	主机记录服务
 
 // CreateHost 创建主机记录
-func CreateHost(provider, providerURL, hostname, address string, ports map[int]string, username, password, os string, cpuNum, ramSize, diskSize int) error {
+func CreateHost(provider, providerURL, hostname, address string, ports map[int]string, username, password, os, logo string, cpuNum, ramSize, diskSize int) error {
 	host := &commonmodel.Host{
 		Provider:    provider,
 		ProviderURL: providerURL,
@@ -29,6 +29,7 @@ func CreateHost(provider, providerURL, hostname, address string, ports map[int]s
 		Username:    username,
 		Password:    password,
 		OS:          os,
+		Logo:        logo,
 		CpuNum:      cpuNum,
 		RamSize:     ramSize,
 		DiskSize:    diskSize,
@@ -49,7 +50,7 @@ func DeleteHost(hostID uint, hardDelete bool) error {
 }
 
 // UpdateHost 更新主机记录
-func UpdateHost(hostID uint, provider, providerURL, hostname, address string, ports map[int]string, username, password, os string, cpuNum, ramSize, diskSize int) error {
+func UpdateHost(hostID uint, provider, providerURL, hostname, address string, ports map[int]string, username, password, os, logo string, cpuNum, ramSize, diskSize int) error {
 	host := &commonmodel.Host{
 		Provider:    provider,
 		ProviderURL: providerURL,
@@ -59,6 +60,7 @@ func UpdateHost(hostID uint, provider, providerURL, hostname, address string, po
 		Username:    username,
 		Password:    password,
 		OS:          os,
+		Logo:        logo,
 		CpuNum:      cpuNum,
 		RamSize:     ramSize,
 		DiskSize:    diskSize,
@@ -96,7 +98,7 @@ func ExportHostsCSV() (string, error) {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	headers := []string{"ID", "提供商", "提供商链接", "主机名", "地址", "端口映射", "用户名", "密码", "操作系统", "CPU核心数", "内存大小(MB)", "磁盘大小(MB)", "创建时间", "更新时间"}
+	headers := []string{"ID", "提供商", "提供商链接", "主机名", "地址", "端口映射", "用户名", "密码", "操作系统", "Logo", "CPU核心数", "内存大小(MB)", "磁盘大小(MB)", "创建时间", "更新时间"}
 	err = writer.Write(headers)
 	if err != nil {
 		return "", err
@@ -124,6 +126,7 @@ func ExportHostsCSV() (string, error) {
 			host.Username,
 			host.Password,
 			host.OS,
+			host.Logo,
 			strconv.Itoa(host.CpuNum),
 			strconv.Itoa(host.RamSize),
 			strconv.Itoa(host.DiskSize),
@@ -160,7 +163,7 @@ func ImportHostsCSV(filePath string) (*ImportResult, error) {
 	importedCount := 0
 	failedCount := 0
 	for _, record := range records[1:] {
-		// CSV格式: 提供商,提供商链接,主机名,地址,端口映射,用户名,密码,操作系统,CPU核心数,内存大小,磁盘大小（ID和时间字段会被忽略）
+		// CSV格式: 提供商,提供商链接,主机名,地址,端口映射,用户名,密码,操作系统,Logo,CPU核心数,内存大小,磁盘大小（ID和时间字段会被忽略）
 		if len(record) < 7 {
 			failedCount++
 			continue
@@ -174,12 +177,13 @@ func ImportHostsCSV(filePath string) (*ImportResult, error) {
 		username := ""
 		password := ""
 		os := ""
+		logo := ""
 		cpuNum := 0
 		ramSize := 0
 		diskSize := 0
 
-		if len(record) >= 14 {
-			// 完整格式：ID, 提供商, 提供商链接, 主机名, 地址, 端口映射, 用户名, 密码, 操作系统, CPU核心数, 内存大小, 磁盘大小, 创建时间, 更新时间
+		if len(record) >= 15 {
+			// 完整格式：ID, 提供商, 提供商链接, 主机名, 地址, 端口映射, 用户名, 密码, 操作系统, Logo, CPU核心数, 内存大小, 磁盘大小, 创建时间, 更新时间
 			provider = record[1]
 			providerURL = record[2]
 			hostname = record[3]
@@ -191,16 +195,19 @@ func ImportHostsCSV(filePath string) (*ImportResult, error) {
 				os = record[8]
 			}
 			if len(record) > 9 {
-				cpuNum, _ = strconv.Atoi(record[9])
+				logo = record[9]
 			}
 			if len(record) > 10 {
-				ramSize, _ = strconv.Atoi(record[10])
+				cpuNum, _ = strconv.Atoi(record[10])
 			}
 			if len(record) > 11 {
-				diskSize, _ = strconv.Atoi(record[11])
+				ramSize, _ = strconv.Atoi(record[11])
+			}
+			if len(record) > 12 {
+				diskSize, _ = strconv.Atoi(record[12])
 			}
 		} else {
-			// 简化格式：提供商, 提供商链接, 主机名, 地址, 端口映射, 用户名, 密码, 操作系统, CPU核心数, 内存大小, 磁盘大小
+			// 简化格式：提供商, 提供商链接, 主机名, 地址, 端口映射, 用户名, 密码, 操作系统, Logo, CPU核心数, 内存大小, 磁盘大小
 			provider = record[0]
 			providerURL = record[1]
 			hostname = record[2]
@@ -212,13 +219,16 @@ func ImportHostsCSV(filePath string) (*ImportResult, error) {
 				os = record[7]
 			}
 			if len(record) > 8 {
-				cpuNum, _ = strconv.Atoi(record[8])
+				logo = record[8]
 			}
 			if len(record) > 9 {
-				ramSize, _ = strconv.Atoi(record[9])
+				cpuNum, _ = strconv.Atoi(record[9])
 			}
 			if len(record) > 10 {
-				diskSize, _ = strconv.Atoi(record[10])
+				ramSize, _ = strconv.Atoi(record[10])
+			}
+			if len(record) > 11 {
+				diskSize, _ = strconv.Atoi(record[11])
 			}
 		}
 
@@ -241,7 +251,7 @@ func ImportHostsCSV(filePath string) (*ImportResult, error) {
 		}
 
 		// 创建主机记录
-		err = CreateHost(provider, providerURL, hostname, address, ports, username, password, os, cpuNum, ramSize, diskSize)
+		err = CreateHost(provider, providerURL, hostname, address, ports, username, password, os, logo, cpuNum, ramSize, diskSize)
 		if err != nil {
 			failedCount++
 			continue

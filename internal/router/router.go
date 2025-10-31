@@ -23,6 +23,8 @@ func InitRouter(eng *gin.Engine) {
 	eng.Static("/js", "./web/js")
 	eng.Static("/lib", "./web/lib")
 	eng.Static("/assets", "./web/assets")
+	eng.Static("/icons", "./data/icons")
+	eng.Static("/os", "./data/os")
 
 	// HTML 页面路由
 	eng.StaticFile("/", "./web/index.html")
@@ -55,6 +57,8 @@ func InitRouter(eng *gin.Engine) {
 	api.GET("/accounts/list", commonapi.FindAccountsListHandler)
 	api.GET("/accounts/export", commonapi.ExportAccountsCSVHandler)
 	api.POST("/accounts/import", commonapi.ImportAccountsCSVHandler)
+	api.POST("/accounts/upload-logo", commonapi.UploadLogoHandler)
+	api.GET("/accounts/icons", commonapi.GetIconsListHandler)
 
 	// 主机记录管理
 	api.POST("/hosts/create", commonapi.CreateHostHandler)
@@ -64,6 +68,8 @@ func InitRouter(eng *gin.Engine) {
 	api.GET("/hosts/list", commonapi.FindHostsListHandler)
 	api.GET("/hosts/export", commonapi.ExportHostsCSVHandler)
 	api.POST("/hosts/import", commonapi.ImportHostsCSVHandler)
+	api.POST("/hosts/upload-logo", commonapi.UploadOSLogoHandler)
+	api.GET("/hosts/logos", commonapi.GetOSLogosListHandler)
 
 	// 密钥记录管理
 	api.POST("/secrets/create", commonapi.CreateSecretHandler)
