@@ -5,13 +5,19 @@ const PageConfig = {
         icon: Icons.account,
         api: AccountAPI,
         fields: [
-            { key: 'platform', label: 'accounts.platform', type: 'text', required: true },
+            { key: 'platform_group', type: 'group', fields: [
+                { key: 'platform', label: 'accounts.platform', type: 'text', required: true },
+                { key: 'platform_url', label: 'accounts.platformURL', type: 'url', required: true }
+            ]},
             { key: 'logo', label: 'accounts.logo', type: 'logo', required: false, dependsOn: 'platform' },
-            { key: 'platform_url', label: 'accounts.platformURL', type: 'url', required: true },
-            { key: 'username', label: 'accounts.username', type: 'text', required: true },
-            { key: 'password', label: 'accounts.password', type: 'password', required: true },
-            { key: 'security_email', label: 'accounts.securityEmail', type: 'email', required: false },
-            { key: 'security_phone', label: 'accounts.securityPhone', type: 'tel', required: false },
+            { key: 'account_group', type: 'group', fields: [
+                { key: 'username', label: 'accounts.username', type: 'text', required: true },
+                { key: 'password', label: 'accounts.password', type: 'password', required: true }
+            ]},
+            { key: 'security_group', type: 'group', fields: [
+                { key: 'security_email', label: 'accounts.securityEmail', type: 'email', required: false },
+                { key: 'security_phone', label: 'accounts.securityPhone', type: 'tel', required: false }
+            ]},
             { key: 'remark', label: 'accounts.remark', type: 'textarea', required: false }
         ],
         columns: [

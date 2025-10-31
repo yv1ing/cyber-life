@@ -108,19 +108,19 @@ class FormGenerator {
                     ${langManager.t(field.label)}${field.required ? ' *' : ''}
                 </label>
                 <div class="logo-input-group">
-                    <div class="logo-left-section">
-                        <div class="logo-preview-wrapper">
-                            <img id="logo-preview" src="${logoPreviewSrc}" alt="Logo" class="logo-preview" onerror="this.src='/icons/default.png'"/>
-                        </div>
-                        <input type="file" id="logo-file-input" accept=".jpg,.jpeg,.png" style="display:none" ${field.dependsOn ? 'disabled' : ''}/>
-                        <button type="button" class="btn-secondary logo-upload-btn" ${field.dependsOn ? 'disabled' : ''} title="${field.dependsOn ? langManager.t('title.enterNameFirst', { name: '' }) : langManager.t('title.uploadNewLogo')}">
-                            <i class="fas fa-upload"></i> 上传
-                        </button>
+                    <div class="logo-preview-wrapper">
+                        <img id="logo-preview" src="${logoPreviewSrc}" alt="Logo" class="logo-preview" onerror="this.src='/icons/default.png'"/>
                     </div>
                     <div class="logo-controls">
                         <div class="logo-grid-wrapper">
                             <div id="logo-grid" class="logo-grid"></div>
                         </div>
+                    </div>
+                    <div class="logo-right-section">
+                        <input type="file" id="logo-file-input" accept=".jpg,.jpeg,.png" style="display:none" ${field.dependsOn ? 'disabled' : ''}/>
+                        <button type="button" class="btn-secondary logo-upload-btn" ${field.dependsOn ? 'disabled' : ''} title="${field.dependsOn ? langManager.t('title.enterNameFirst', { name: '' }) : langManager.t('title.uploadNewLogo')}">
+                            <i class="fas fa-upload"></i> 上传
+                        </button>
                     </div>
                 </div>
                 <input type="hidden" id="field-${field.key}-value" value="${this._escapeHtml(value)}"/>
@@ -600,7 +600,7 @@ const LogoManager = {
         const fileInput = document.getElementById('logo-file-input');
         const preview = document.getElementById('logo-preview');
         const valueInput = document.getElementById('field-logo-value');
-        const leftSection = document.querySelector('.logo-left-section');
+        const rightSection = document.querySelector('.logo-right-section');
 
         // 上传按钮点击
         if (uploadBtn && fileInput) {
@@ -652,7 +652,7 @@ const LogoManager = {
             if (platformInput) {
                 platformInput.addEventListener('input', (e) => {
                     const hasValue = e.target.value.trim() !== '';
-                    if (leftSection) leftSection.style.opacity = hasValue ? '1' : '0.5';
+                    if (rightSection) rightSection.style.opacity = hasValue ? '1' : '0.5';
                     if (uploadBtn) uploadBtn.disabled = !hasValue;
                     if (fileInput) fileInput.disabled = !hasValue;
                     updateUploadButtonTitle();
