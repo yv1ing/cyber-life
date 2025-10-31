@@ -70,6 +70,11 @@ func UpdateHost(hostID uint, provider, providerURL, hostname, address string, po
 	return commonrepository.UpdateHost(host)
 }
 
+// UpdateHostFields 更新主机记录（只更新指定字段）
+func UpdateHostFields(hostID uint, fields map[string]interface{}) error {
+	return commonrepository.UpdateHostFields(hostID, fields)
+}
+
 // FindHostsList 获取主机记录列表
 func FindHostsList(page, size int) ([]commonmodel.Host, int64, error) {
 	return commonrepository.FindHostsList(page, size)

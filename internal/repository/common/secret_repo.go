@@ -31,6 +31,11 @@ func UpdateSecret(secret *commonmodel.Secret) error {
 	return repository.Repo.DB.Model(secret).Updates(secret).Error
 }
 
+// UpdateSecretFields 更新密钥记录（只更新指定字段）
+func UpdateSecretFields(secretID uint, fields map[string]interface{}) error {
+	return repository.Repo.DB.Model(&commonmodel.Secret{}).Where("id = ?", secretID).Updates(fields).Error
+}
+
 // FindSecrets 查询密钥记录
 func FindSecrets(keyword string, page, size int) ([]commonmodel.Secret, int64, error) {
 	if page < 1 {

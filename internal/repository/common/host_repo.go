@@ -31,6 +31,11 @@ func UpdateHost(host *commonmodel.Host) error {
 	return repository.Repo.DB.Model(host).Updates(host).Error
 }
 
+// UpdateHostFields 更新主机记录（只更新指定字段）
+func UpdateHostFields(hostID uint, fields map[string]interface{}) error {
+	return repository.Repo.DB.Model(&commonmodel.Host{}).Where("id = ?", hostID).Updates(fields).Error
+}
+
 // FindHosts 查询主机记录
 func FindHosts(keyword string, page, size int) ([]commonmodel.Host, int64, error) {
 	if page < 1 {

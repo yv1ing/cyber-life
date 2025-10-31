@@ -94,18 +94,9 @@ func DeleteSecretHandler(ctx *gin.Context) {
 
 // UpdateSecretHandler 更新密钥记录
 func UpdateSecretHandler(ctx *gin.Context) {
-	type reqType struct {
-		SecretID    uint   `json:"secret_id" binding:"required"`
-		Platform    string `json:"platform" binding:"required"`
-		PlatformURL string `json:"platform_url" binding:"required"`
-		KeyID       string `json:"key_id" binding:"required"`
-		KeySecret   string `json:"key_secret" binding:"required"`
-		Remark      string `json:"remark"`
-		Logo        string `json:"logo"`
-	}
-
-	var req reqType
-	err := ctx.ShouldBindBodyWithJSON(&req)
+	// 先绑定到map以获取所有字段
+	var rawData map[string]interface{}
+	err := ctx.ShouldBindBodyWithJSON(&rawData)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
 			Code: http.StatusBadRequest,
@@ -114,7 +105,30 @@ func UpdateSecretHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = commonservice.UpdateSecret(req.SecretID, req.Platform, req.PlatformURL, req.KeyID, req.KeySecret, req.Remark, req.Logo)
+	// 提取secret_id
+	secretIDFloat, ok := rawData["secret_id"].(float64)
+	if !ok {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
+			Code: http.StatusBadRequest,
+			Info: "请求参数非法",
+		})
+		return
+	}
+	secretID := uint(secretIDFloat)
+
+	// 移除secret_id，剩余的就是要更新的字段
+	delete(rawData, "secret_id")
+
+	// 只有当有字段需要更新时才调用service
+	if len(rawData) == 0 {
+		ctx.JSON(http.StatusOK, systemmodel.Response{
+			Code: http.StatusOK,
+			Info: "没有字段需要更新",
+		})
+		return
+	}
+
+	err = commonservice.UpdateSecretFields(secretID, rawData)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,

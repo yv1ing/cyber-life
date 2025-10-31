@@ -103,5 +103,22 @@ const PageConfig = {
             { key: 'CreatedAt', label: 'secrets.createdAt', width: '160px', format: 'datetime' },
             { key: 'UpdatedAt', label: 'secrets.updatedAt', width: '160px', format: 'datetime' }
         ]
+    },
+    sites: {
+        title: 'sites.title',
+        icon: Icons.web,
+        api: SiteAPI,
+        fields: [
+            { key: 'name', label: 'sites.name', type: 'text', required: true },
+            { key: 'url', label: 'sites.url', type: 'url', required: true },
+            { key: 'logo', label: 'sites.logo', type: 'logo', required: false, dependsOn: 'name', uploadType: 'site' }
+        ],
+        columns: [
+            { key: 'ID', label: 'common.id', width: '80px' },
+            { key: 'name', label: 'sites.name', width: '200px', format: 'platformLink', urlKey: 'url', logoKey: 'logo', logoPath: '/site-icons' },
+            { key: 'url', label: 'sites.url', copyable: true },
+            { key: 'CreatedAt', label: 'sites.createdAt', width: '160px', format: 'datetime' },
+            { key: 'UpdatedAt', label: 'sites.updatedAt', width: '160px', format: 'datetime' }
+        ]
     }
 };

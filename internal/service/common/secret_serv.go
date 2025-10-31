@@ -57,6 +57,11 @@ func UpdateSecret(secretID uint, platform, platformURL, keyID, keySecret, remark
 	return commonrepository.UpdateSecret(secret)
 }
 
+// UpdateSecretFields 更新密钥记录（只更新指定字段）
+func UpdateSecretFields(secretID uint, fields map[string]interface{}) error {
+	return commonrepository.UpdateSecretFields(secretID, fields)
+}
+
 // FindSecretsList 获取密钥记录列表
 func FindSecretsList(page, size int) ([]commonmodel.Secret, int64, error) {
 	return commonrepository.FindSecretsList(page, size)

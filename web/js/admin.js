@@ -171,7 +171,7 @@ async function loadPage(page) {
     }
 
     // 控制CSV按钮显示
-    csvManager.toggleButtons(['accounts', 'hosts', 'secrets'].includes(page));
+    csvManager.toggleButtons(['accounts', 'hosts', 'secrets', 'sites'].includes(page));
 
     // 加载数据
     await dataManager.loadData(1, '');

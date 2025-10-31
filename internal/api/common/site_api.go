@@ -14,20 +14,15 @@ import (
 
 // @Author: yv1ing
 // @Email:  me@yvling.cn
-// @Date:   2025/10/29 13:58
-// @Desc:	账号记录接口
+// @Date:   2025/10/31
+// @Desc:	站点记录接口
 
-// CreateAccountHandler 创建账号记录
-func CreateAccountHandler(ctx *gin.Context) {
+// CreateSiteHandler 创建站点记录
+func CreateSiteHandler(ctx *gin.Context) {
 	type reqType struct {
-		Platform      string `json:"platform" binding:"required"`
-		PlatformURL   string `json:"platform_url" binding:"required"`
-		Username      string `json:"username" binding:"required"`
-		Password      string `json:"password" binding:"required"`
-		SecurityEmail string `json:"security_email"`
-		SecurityPhone string `json:"security_phone"`
-		Remark        string `json:"remark"`
-		Logo          string `json:"logo"`
+		Name string `json:"name" binding:"required"`
+		Logo string `json:"logo"`
+		URL  string `json:"url" binding:"required"`
 	}
 
 	var req reqType
@@ -40,7 +35,7 @@ func CreateAccountHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = commonservice.CreateAccount(req.Platform, req.PlatformURL, req.Username, req.Password, req.SecurityEmail, req.SecurityPhone, req.Remark, req.Logo)
+	err = commonservice.CreateSite(req.Name, req.Logo, req.URL)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
@@ -55,10 +50,10 @@ func CreateAccountHandler(ctx *gin.Context) {
 	})
 }
 
-// DeleteAccountHandler 删除账号记录（支持单个删除和批量删除）
-func DeleteAccountHandler(ctx *gin.Context) {
+// DeleteSiteHandler 删除站点记录（支持单个删除和批量删除）
+func DeleteSiteHandler(ctx *gin.Context) {
 	type reqType struct {
-		AccountIDs []uint `json:"account_ids" binding:"required,min=1"`
+		SiteIDs []uint `json:"site_ids" binding:"required,min=1"`
 	}
 
 	var req reqType
@@ -71,10 +66,10 @@ func DeleteAccountHandler(ctx *gin.Context) {
 		return
 	}
 
-	// 批量删除账号
+	// 批量删除站点
 	var failedCount int
-	for _, id := range req.AccountIDs {
-		err = commonservice.DeleteAccount(id, false)
+	for _, id := range req.SiteIDs {
+		err = commonservice.DeleteSite(id, false)
 		if err != nil {
 			failedCount++
 		}
@@ -94,8 +89,8 @@ func DeleteAccountHandler(ctx *gin.Context) {
 	})
 }
 
-// UpdateAccountHandler 更新账号记录
-func UpdateAccountHandler(ctx *gin.Context) {
+// UpdateSiteHandler 更新站点记录
+func UpdateSiteHandler(ctx *gin.Context) {
 	// 先绑定到map以获取所有字段
 	var rawData map[string]interface{}
 	err := ctx.ShouldBindBodyWithJSON(&rawData)
@@ -107,8 +102,8 @@ func UpdateAccountHandler(ctx *gin.Context) {
 		return
 	}
 
-	// 提取account_id
-	accountIDFloat, ok := rawData["account_id"].(float64)
+	// 提取site_id
+	siteIDFloat, ok := rawData["site_id"].(float64)
 	if !ok {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
 			Code: http.StatusBadRequest,
@@ -116,10 +111,10 @@ func UpdateAccountHandler(ctx *gin.Context) {
 		})
 		return
 	}
-	accountID := uint(accountIDFloat)
+	siteID := uint(siteIDFloat)
 
-	// 移除account_id，剩余的就是要更新的字段
-	delete(rawData, "account_id")
+	// 移除site_id，剩余的就是要更新的字段
+	delete(rawData, "site_id")
 
 	// 只有当有字段需要更新时才调用service
 	if len(rawData) == 0 {
@@ -130,7 +125,7 @@ func UpdateAccountHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = commonservice.UpdateAccountFields(accountID, rawData)
+	err = commonservice.UpdateSiteFields(siteID, rawData)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
@@ -145,8 +140,8 @@ func UpdateAccountHandler(ctx *gin.Context) {
 	})
 }
 
-// FindAccountsHandler 搜索账号记录
-func FindAccountsHandler(ctx *gin.Context) {
+// FindSitesHandler 搜索站点记录
+func FindSitesHandler(ctx *gin.Context) {
 	var (
 		err     error
 		page    int
@@ -172,7 +167,7 @@ func FindAccountsHandler(ctx *gin.Context) {
 		return
 	}
 
-	accounts, total, err := commonservice.FindAccounts(keyword, page, size)
+	sites, total, err := commonservice.FindSites(keyword, page, size)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
@@ -185,14 +180,14 @@ func FindAccountsHandler(ctx *gin.Context) {
 		Code: http.StatusOK,
 		Info: "查询成功",
 		Data: gin.H{
-			"list":  accounts,
+			"list":  sites,
 			"total": total,
 		},
 	})
 }
 
-// FindAccountsListHandler 获取账号记录列表
-func FindAccountsListHandler(ctx *gin.Context) {
+// FindSitesListHandler 获取站点记录列表
+func FindSitesListHandler(ctx *gin.Context) {
 	var (
 		err  error
 		page int
@@ -216,7 +211,7 @@ func FindAccountsListHandler(ctx *gin.Context) {
 		return
 	}
 
-	accounts, total, err := commonservice.FindAccountsList(page, size)
+	sites, total, err := commonservice.FindSitesList(page, size)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
@@ -229,15 +224,15 @@ func FindAccountsListHandler(ctx *gin.Context) {
 		Code: http.StatusOK,
 		Info: "查询成功",
 		Data: gin.H{
-			"list":  accounts,
+			"list":  sites,
 			"total": total,
 		},
 	})
 }
 
-// ExportAccountsCSVHandler 导出账号记录为CSV文件
-func ExportAccountsCSVHandler(ctx *gin.Context) {
-	filePath, err := commonservice.ExportAccountsCSV()
+// ExportSitesCSVHandler 导出站点记录为CSV文件
+func ExportSitesCSVHandler(ctx *gin.Context) {
+	filePath, err := commonservice.ExportSitesCSV()
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
@@ -256,8 +251,8 @@ func ExportAccountsCSVHandler(ctx *gin.Context) {
 	ctx.File(filePath)
 }
 
-// ImportAccountsCSVHandler 从CSV文件导入账号记录
-func ImportAccountsCSVHandler(ctx *gin.Context) {
+// ImportSitesCSVHandler 从CSV文件导入站点记录
+func ImportSitesCSVHandler(ctx *gin.Context) {
 	file, err := ctx.FormFile("file")
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
@@ -297,7 +292,7 @@ func ImportAccountsCSVHandler(ctx *gin.Context) {
 
 	defer os.Remove(tempFilePath)
 
-	result, err := commonservice.ImportAccountsCSV(tempFilePath)
+	result, err := commonservice.ImportSitesCSV(tempFilePath)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,

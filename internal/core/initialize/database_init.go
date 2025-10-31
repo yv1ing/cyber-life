@@ -88,6 +88,7 @@ func InitDatabase() (*gorm.DB, error) {
 		&commonmodel.Account{},
 		&commonmodel.Secret{},
 		&commonmodel.Host{},
+		&commonmodel.Site{},
 	)
 	if err != nil {
 		return nil, err

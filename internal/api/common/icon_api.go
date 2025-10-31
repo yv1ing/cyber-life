@@ -138,3 +138,66 @@ func GetOSIconsListHandler(ctx *gin.Context) {
 		},
 	})
 }
+
+// UploadSiteIconHandler 上传站点图标
+func UploadSiteIconHandler(ctx *gin.Context) {
+	siteName := ctx.PostForm("site")
+	if siteName == "" {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
+			Code: http.StatusBadRequest,
+			Info: "站点名称不能为空",
+		})
+		return
+	}
+
+	file, err := ctx.FormFile("file")
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
+			Code: http.StatusBadRequest,
+			Info: "请求参数非法",
+		})
+		return
+	}
+
+	// 使用公共服务上传图标（完整流程）
+	iconsDir := "data/site_icons"
+	filename, err := commonservice.UploadIcon(siteName, iconsDir, file)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
+			Code: http.StatusBadRequest,
+			Info: err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, systemmodel.Response{
+		Code: http.StatusOK,
+		Info: "上传成功",
+		Data: gin.H{
+			"icon": filename,
+		},
+	})
+}
+
+// GetSiteIconsListHandler 获取已有站点图标列表
+func GetSiteIconsListHandler(ctx *gin.Context) {
+	iconsDir := "data/site_icons"
+
+	// 使用公共服务获取图标列表
+	icons, err := commonservice.GetIconsList(iconsDir)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
+			Code: http.StatusInternalServerError,
+			Info: "获取图标列表失败",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, systemmodel.Response{
+		Code: http.StatusOK,
+		Info: "查询成功",
+		Data: gin.H{
+			"icons": icons,
+		},
+	})
+}

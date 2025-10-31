@@ -61,6 +61,11 @@ func UpdateAccount(accountID uint, platform, platformURL, username, password, se
 	return commonrepository.UpdateAccount(account)
 }
 
+// UpdateAccountFields 更新账号记录（只更新指定字段）
+func UpdateAccountFields(accountID uint, fields map[string]interface{}) error {
+	return commonrepository.UpdateAccountFields(accountID, fields)
+}
+
 // FindAccountsList 获取账号记录列表
 func FindAccountsList(page, size int) ([]commonmodel.Account, int64, error) {
 	return commonrepository.FindAccountsList(page, size)

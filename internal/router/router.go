@@ -25,6 +25,7 @@ func InitRouter(eng *gin.Engine) {
 	eng.Static("/assets", "./web/assets")
 	eng.Static("/platform-icons", "./data/platform_icons")
 	eng.Static("/os-icons", "./data/os_icons")
+	eng.Static("/site-icons", "./data/site_icons")
 
 	// HTML 页面路由
 	eng.StaticFile("/", "./web/index.html")
@@ -74,9 +75,20 @@ func InitRouter(eng *gin.Engine) {
 	api.GET("/hosts/export", commonapi.ExportHostsCSVHandler)
 	api.POST("/hosts/import", commonapi.ImportHostsCSVHandler)
 
+	// 站点记录管理
+	api.POST("/sites/create", commonapi.CreateSiteHandler)
+	api.DELETE("/sites/delete", commonapi.DeleteSiteHandler)
+	api.PUT("/sites/update", commonapi.UpdateSiteHandler)
+	api.GET("/sites/find", commonapi.FindSitesHandler)
+	api.GET("/sites/list", commonapi.FindSitesListHandler)
+	api.GET("/sites/export", commonapi.ExportSitesCSVHandler)
+	api.POST("/sites/import", commonapi.ImportSitesCSVHandler)
+
 	// 图标管理
 	api.POST("/icons/upload-platform-icon", commonapi.UploadPlatformIconHandler)
 	api.GET("/icons/platform-icons", commonapi.GetPlatformIconsListHandler)
 	api.POST("/icons/upload-os-icon", commonapi.UploadOSIconHandler)
 	api.GET("/icons/os-icons", commonapi.GetOSIconsListHandler)
+	api.POST("/icons/upload-site-icon", commonapi.UploadSiteIconHandler)
+	api.GET("/icons/site-icons", commonapi.GetSiteIconsListHandler)
 }

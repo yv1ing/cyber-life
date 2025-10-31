@@ -31,6 +31,11 @@ func UpdateAccount(account *commonmodel.Account) error {
 	return repository.Repo.DB.Model(account).Updates(account).Error
 }
 
+// UpdateAccountFields 更新账号记录（只更新指定字段）
+func UpdateAccountFields(accountID uint, fields map[string]interface{}) error {
+	return repository.Repo.DB.Model(&commonmodel.Account{}).Where("id = ?", accountID).Updates(fields).Error
+}
+
 // FindAccounts 查询账号记录
 func FindAccounts(keyword string, page, size int) ([]commonmodel.Account, int64, error) {
 	if page < 1 {

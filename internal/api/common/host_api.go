@@ -100,24 +100,9 @@ func DeleteHostHandler(ctx *gin.Context) {
 
 // UpdateHostHandler 更新主机记录
 func UpdateHostHandler(ctx *gin.Context) {
-	type reqType struct {
-		HostID      uint           `json:"host_id" binding:"required"`
-		Provider    string         `json:"provider" binding:"required"`
-		ProviderURL string         `json:"provider_url" binding:"required"`
-		Hostname    string         `json:"hostname" binding:"required"`
-		Address     string         `json:"address" binding:"required"`
-		Ports       map[int]string `json:"ports" binding:"required"`
-		Username    string         `json:"username" binding:"required"`
-		Password    string         `json:"password" binding:"required"`
-		OS          string         `json:"os"`
-		Logo        string         `json:"logo"`
-		CpuNum      int            `json:"cpu_num"`
-		RamSize     int            `json:"ram_size"`
-		DiskSize    int            `json:"disk_size"`
-	}
-
-	var req reqType
-	err := ctx.ShouldBindBodyWithJSON(&req)
+	// 先绑定到map以获取所有字段
+	var rawData map[string]interface{}
+	err := ctx.ShouldBindBodyWithJSON(&rawData)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
 			Code: http.StatusBadRequest,
@@ -126,7 +111,30 @@ func UpdateHostHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = commonservice.UpdateHost(req.HostID, req.Provider, req.ProviderURL, req.Hostname, req.Address, req.Ports, req.Username, req.Password, req.OS, req.Logo, req.CpuNum, req.RamSize, req.DiskSize)
+	// 提取host_id
+	hostIDFloat, ok := rawData["host_id"].(float64)
+	if !ok {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
+			Code: http.StatusBadRequest,
+			Info: "请求参数非法",
+		})
+		return
+	}
+	hostID := uint(hostIDFloat)
+
+	// 移除host_id，剩余的就是要更新的字段
+	delete(rawData, "host_id")
+
+	// 只有当有字段需要更新时才调用service
+	if len(rawData) == 0 {
+		ctx.JSON(http.StatusOK, systemmodel.Response{
+			Code: http.StatusOK,
+			Info: "没有字段需要更新",
+		})
+		return
+	}
+
+	err = commonservice.UpdateHostFields(hostID, rawData)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,

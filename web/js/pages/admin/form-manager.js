@@ -3,6 +3,7 @@ class AdminFormManager {
     constructor(dataManager) {
         this.dataManager = dataManager;
         this.editModal = null;
+        this.originalData = null; // 保存原始数据，用于比较
     }
 
     /**
@@ -22,6 +23,9 @@ class AdminFormManager {
      */
     openEditModal(item = null) {
         const config = PageConfig[this.dataManager.currentPage];
+
+        // 保存原始数据（深拷贝）
+        this.originalData = item ? JSON.parse(JSON.stringify(item)) : null;
 
         // 设置标题
         const title = langManager.t(config.title);
@@ -65,6 +69,43 @@ class AdminFormManager {
     }
 
     /**
+     * 比较数据差异，返回发生改变的字段
+     * @param {Object} newData - 新数据
+     * @param {Object} originalData - 原始数据
+     * @returns {Object|null} 改变的字段，如果没有改变返回null
+     */
+    _getChangedFields(newData, originalData) {
+        const changes = {};
+        let hasChanges = false;
+
+        for (const key in newData) {
+            const newValue = newData[key];
+            const oldValue = originalData[key];
+
+            // 处理不同类型的比较
+            if (typeof newValue === 'object' && typeof oldValue === 'object') {
+                // 对象类型（如ports）
+                if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+                    changes[key] = newValue;
+                    hasChanges = true;
+                }
+            } else {
+                // 基本类型
+                // 将undefined和null视为空字符串
+                const normalizedNew = newValue === undefined || newValue === null ? '' : String(newValue);
+                const normalizedOld = oldValue === undefined || oldValue === null ? '' : String(oldValue);
+
+                if (normalizedNew !== normalizedOld) {
+                    changes[key] = newValue;
+                    hasChanges = true;
+                }
+            }
+        }
+
+        return hasChanges ? changes : null;
+    }
+
+    /**
      * 处理保存
      * @private
      * @returns {Promise<void>}
@@ -87,8 +128,18 @@ class AdminFormManager {
             const data = FormGenerator.collectData(config.fields);
 
             if (id) {
-                await config.api.update(id, data);
+                // 更新模式：只发送改变的字段
+                const changedFields = this._getChangedFields(data, this.originalData);
+
+                if (!changedFields) {
+                    Toast.info('没有数据发生改变');
+                    this.editModal.close();
+                    return;
+                }
+
+                await config.api.update(id, changedFields);
             } else {
+                // 创建模式：发送所有字段
                 await config.api.create(data);
             }
 

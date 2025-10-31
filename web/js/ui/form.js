@@ -225,6 +225,8 @@ class FormGenerator {
                 const capacityData = this._collectCapacityData(field);
                 if (capacityData !== null) {
                     data[field.key] = capacityData;
+                } else {
+                    data[field.key] = 0;
                 }
                 return;
             }
@@ -232,9 +234,8 @@ class FormGenerator {
             // 处理 Logo 类型
             if (field.type === 'logo') {
                 const logoValue = document.getElementById(`field-${field.key}-value`)?.value.trim() || '';
-                if (logoValue) {
-                    data[field.key] = logoValue;
-                }
+                // 始终包含logo字段，即使为空字符串
+                data[field.key] = logoValue;
                 return;
             }
 
@@ -243,20 +244,22 @@ class FormGenerator {
 
             const value = fieldElement.value.trim();
 
-            // 必填字段必须有值，可选字段只在有值时添加
-            if (field.required || value) {
-                // 处理 JSON 类型字段
-                if (field.type === 'json') {
-                    try {
-                        data[field.key] = value ? JSON.parse(value) : {};
-                    } catch (e) {
-                        throw new Error(`${langManager.t(field.label)} 格式错误`);
-                    }
-                } else if (field.type === 'number') {
-                    data[field.key] = value ? parseInt(value, 10) : 0;
-                } else {
-                    data[field.key] = value;
+            // 验证必填字段
+            if (field.required && !value) {
+                throw new Error(`${langManager.t(field.label)} 是必填项`);
+            }
+
+            // 处理不同类型的字段，始终包含所有字段（即使为空）
+            if (field.type === 'json') {
+                try {
+                    data[field.key] = value ? JSON.parse(value) : {};
+                } catch (e) {
+                    throw new Error(`${langManager.t(field.label)} 格式错误`);
                 }
+            } else if (field.type === 'number') {
+                data[field.key] = value ? parseInt(value, 10) : 0;
+            } else {
+                data[field.key] = value;
             }
         });
 
@@ -464,19 +467,33 @@ const LogoManager = {
             apiBase: '/api/accounts',
             staticPath: '/platform-icons',
             paramName: 'platform',
-            displayName: '平台'
+            displayName: '平台',
+            uploadApi: '/api/icons/upload-platform-icon',
+            listApi: '/api/icons/platform-icons'
         },
         hosts: {
             apiBase: '/api/hosts',
             staticPath: '/os-icons',
             paramName: 'os',
-            displayName: '操作系统'
+            displayName: '操作系统',
+            uploadApi: '/api/icons/upload-os-icon',
+            listApi: '/api/icons/os-icons'
         },
         secrets: {
             apiBase: '/api/secrets',
             staticPath: '/platform-icons',
             paramName: 'platform',
-            displayName: '平台'
+            displayName: '平台',
+            uploadApi: '/api/icons/upload-platform-icon',
+            listApi: '/api/icons/platform-icons'
+        },
+        sites: {
+            apiBase: '/api/sites',
+            staticPath: '/site-icons',
+            paramName: 'site',
+            displayName: '站点',
+            uploadApi: '/api/icons/upload-site-icon',
+            listApi: '/api/icons/site-icons'
         }
     },
 
@@ -518,10 +535,8 @@ const LogoManager = {
         const jwt_token = Storage.get('jwt_token');
 
         try {
-            // 使用统一的图标管理API
-            const apiPath = this.moduleConfig.apiBase === '/api/hosts'
-                ? '/api/icons/os-icons'
-                : '/api/icons/platform-icons';
+            // 使用配置中的 API 路径
+            const apiPath = this.moduleConfig.listApi;
 
             const response = await fetch(apiPath, {
                 method: 'GET',
@@ -706,10 +721,8 @@ const LogoManager = {
         const jwt_token = Storage.get('jwt_token');
 
         try {
-            // 使用统一的图标管理API
-            const uploadPath = this.moduleConfig.apiBase === '/api/hosts'
-                ? '/api/icons/upload-os-icon'
-                : '/api/icons/upload-platform-icon';
+            // 使用配置中的上传 API 路径
+            const uploadPath = this.moduleConfig.uploadApi;
 
             const response = await fetch(uploadPath, {
                 method: 'POST',

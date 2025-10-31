@@ -70,7 +70,7 @@ const translations = {
         'nav.accounts': '账号管理',
         'nav.secrets': '密钥管理',
         'nav.hosts': '主机管理',
-        'nav.sites': '站点信息',
+        'nav.sites': '站点管理',
 
         // 账号记录
         'accounts.title': '账号',
@@ -136,6 +136,19 @@ const translations = {
         'hosts.deleteConfirm': '确定要删除这条记录吗？此操作不可恢复。',
         'hosts.deleteSuccess': '删除成功',
         'hosts.saveSuccess': '保存成功',
+
+        // 站点记录
+        'sites.title': '站点',
+        'sites.name': '站点名称',
+        'sites.logo': '站点图标',
+        'sites.url': '站点链接',
+        'sites.createdAt': '创建时间',
+        'sites.updatedAt': '更新时间',
+        'sites.createTitle': '新建站点记录',
+        'sites.editTitle': '编辑站点记录',
+        'sites.deleteConfirm': '确定要删除这条记录吗？此操作不可恢复。',
+        'sites.deleteSuccess': '删除成功',
+        'sites.saveSuccess': '保存成功',
 
         // 用户资料
         'profile.title': '编辑资料',
@@ -305,6 +318,19 @@ const translations = {
         'hosts.deleteConfirm': 'Are you sure you want to delete this record? This action cannot be undone.',
         'hosts.deleteSuccess': 'Deleted successfully',
         'hosts.saveSuccess': 'Saved successfully',
+
+        // Sites
+        'sites.title': 'Site',
+        'sites.name': 'Site Name',
+        'sites.logo': 'Site Icon',
+        'sites.url': 'Site URL',
+        'sites.createdAt': 'Created At',
+        'sites.updatedAt': 'Updated At',
+        'sites.createTitle': 'Create Site',
+        'sites.editTitle': 'Edit Site',
+        'sites.deleteConfirm': 'Are you sure you want to delete this record? This action cannot be undone.',
+        'sites.deleteSuccess': 'Deleted successfully',
+        'sites.saveSuccess': 'Saved successfully',
 
         // User Profile
         'profile.title': 'Edit Profile',

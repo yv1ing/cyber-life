@@ -150,7 +150,9 @@ class TableRenderer {
         // 构建 Logo 图标 HTML
         let logoHtml = '';
         if (logo) {
-            const logoSrc = `${logoPath}/${logo}`;
+            // 添加时间戳作为查询参数，避免浏览器缓存
+            const timestamp = item.UpdatedAt ? new Date(item.UpdatedAt).getTime() : Date.now();
+            const logoSrc = `${logoPath}/${logo}?t=${timestamp}`;
             logoHtml = `<img src="${logoSrc}" alt="logo" class="platform-logo" onerror="this.src='${logoPath}/default.png'" />`;
         } else {
             logoHtml = `<img src="${logoPath}/default.png" alt="logo" class="platform-logo" />`;
