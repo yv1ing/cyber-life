@@ -34,6 +34,10 @@ class HTTP {
             }
         };
 
+        // 从 options 中提取是否跳过 401 自动处理的标志
+        const skipAuthCheck = options.skipAuthCheck || false;
+        delete finalOptions.skipAuthCheck; // 删除自定义选项，避免传递给 fetch
+
         try {
             const response = await fetch(url, finalOptions);
 
@@ -49,8 +53,8 @@ class HTTP {
                 data = { info: text || `请求失败 (${response.status})` };
             }
 
-            // 处理未授权
-            if (response.status === 401) {
+            // 处理未授权 - 但跳过登录接口的自动处理
+            if (response.status === 401 && !skipAuthCheck) {
                 Toast.error('登录已过期，请重新登录');
                 logout();
                 throw new Error('Unauthorized');
@@ -74,10 +78,11 @@ class HTTP {
         return this.request(fullUrl, { method: 'GET' });
     }
 
-    static post(url, data = {}) {
+    static post(url, data = {}, options = {}) {
         return this.request(url, {
             method: 'POST',
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            ...options
         });
     }
 
@@ -417,9 +422,9 @@ const SiteAPI = {
 
 // 用户信息 API
 const UserAPI = {
-    // 用户登录
+    // 用户登录 - 跳过 401 自动处理，避免重定向
     login(username, password) {
-        return HTTP.post(`${API_BASE_URL}/sys/users/login`, { username, password });
+        return HTTP.post(`${API_BASE_URL}/sys/users/login`, { username, password }, { skipAuthCheck: true });
     },
 
     // 根据用户ID查询用户信息

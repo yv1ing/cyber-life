@@ -1,18 +1,29 @@
 // Toast 消息提示
 class Toast {
     static show(message, type = 'info', duration = 3000) {
+        // 验证消息不为空
+        if (!message) {
+            console.warn('Toast: 消息内容为空');
+            return;
+        }
+
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
 
-        const iconMap = {
-            success: Icons.success,
-            error: Icons.error,
-            warning: Icons.warning,
-            info: Icons.info
-        };
+        // 安全地获取图标，如果 Icons 未定义则使用空字符串
+        let icon = '';
+        if (typeof Icons !== 'undefined') {
+            const iconMap = {
+                success: Icons.success,
+                error: Icons.error,
+                warning: Icons.warning,
+                info: Icons.info
+            };
+            icon = iconMap[type] || Icons.info;
+        }
 
         toast.innerHTML = `
-            <span class="icon">${iconMap[type] || Icons.info}</span>
+            <span class="icon">${icon}</span>
             <span class="toast-message">${message}</span>
         `;
 

@@ -65,16 +65,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(langManager.t('login.formatError'));
             }
         } catch (error) {
-            Toast.error(error.message || langManager.t('login.error'));
+            console.error('登录失败:', error);
+
+            // 获取错误消息
+            let errorMessage = langManager.t('login.error');
+            if (error && error.message) {
+                errorMessage = error.message;
+            }
+
+            // 确保 Toast 存在再调用
+            if (typeof Toast !== 'undefined' && Toast.error) {
+                Toast.error(errorMessage);
+            } else {
+                // 后备方案：使用 alert
+                alert(errorMessage);
+                console.error('Toast 未定义，使用 alert 显示错误');
+            }
+
             loginBtn.disabled = false;
             loginBtn.textContent = originalText;
         }
     });
 
-    // 回车键登录
+    // 回车键登录 - 阻止默认的表单提交行为
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !loginBtn.disabled) {
-            loginForm.dispatchEvent(new Event('submit'));
+        // 检查是否在表单内按下回车键
+        if (e.key === 'Enter' &&
+            (e.target.id === 'username' || e.target.id === 'password')) {
+            e.preventDefault(); // 阻止表单的默认提交
+            if (!loginBtn.disabled) {
+                // 手动触发 submit 事件
+                loginForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+            }
         }
     });
 });
