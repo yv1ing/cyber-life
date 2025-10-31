@@ -72,7 +72,7 @@ const PageConfig = {
             { key: 'ports', label: 'hosts.ports', width: '150px', format: 'json' },
             { key: 'username', label: 'hosts.username', width: '120px', copyable: true },
             { key: 'password', label: 'hosts.password', width: '150px', format: 'password', copyable: true },
-            { key: 'os', label: 'hosts.os', width: '120px', format: 'platformLink', logoKey: 'logo', logoPath: '/os' },
+            { key: 'os', label: 'hosts.os', width: '120px', format: 'platformLink', logoKey: 'logo', logoPath: '/os-icons' },
             { key: 'cpu_num', label: 'hosts.cpuNum', width: '80px' },
             { key: 'ram_size', label: 'hosts.ramSize', width: '100px', format: 'storage' },
             { key: 'disk_size', label: 'hosts.diskSize', width: '100px', format: 'storage' },

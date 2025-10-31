@@ -633,11 +633,12 @@
     background-color: transparent;
 }
 
-/* 添加端口按钮样式 - 与输入框高度一致 */
+/* 添加端口按钮样式 - 与输入框高度和圆角一致 */
 .add-port-btn {
     min-height: 40px;
     height: 40px;
     padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-xs); /* 与输入框圆角保持一致 */
 }
 
 /* 隐藏数字输入框的增减按钮 */

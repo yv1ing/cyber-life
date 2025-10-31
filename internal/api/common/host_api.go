@@ -320,8 +320,8 @@ func ImportHostsCSVHandler(ctx *gin.Context) {
 	})
 }
 
-// UploadOSLogoHandler 上传操作系统Logo图标
-func UploadOSLogoHandler(ctx *gin.Context) {
+// UploadOSIconHandler 上传操作系统图标
+func UploadOSIconHandler(ctx *gin.Context) {
 	osName := ctx.PostForm("os")
 	if osName == "" {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
@@ -349,8 +349,8 @@ func UploadOSLogoHandler(ctx *gin.Context) {
 		return
 	}
 
-	osLogosDir := "data/os"
-	if err := os.MkdirAll(osLogosDir, 0755); err != nil {
+	osIconsDir := "data/os_icons"
+	if err := os.MkdirAll(osIconsDir, 0755); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
 			Info: "系统内部错误",
@@ -359,7 +359,7 @@ func UploadOSLogoHandler(ctx *gin.Context) {
 	}
 
 	filename := osName + ext
-	filePath := filepath.Join(osLogosDir, filename)
+	filePath := filepath.Join(osIconsDir, filename)
 	err = ctx.SaveUploadedFile(file, filePath)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
@@ -373,17 +373,17 @@ func UploadOSLogoHandler(ctx *gin.Context) {
 		Code: http.StatusOK,
 		Info: "上传成功",
 		Data: gin.H{
-			"logo": filename,
+			"icon": filename,
 		},
 	})
 }
 
-// GetOSLogosListHandler 获取已有操作系统Logo列表
-func GetOSLogosListHandler(ctx *gin.Context) {
-	osLogosDir := "data/os"
+// GetOSIconsListHandler 获取已有操作系统图标列表
+func GetOSIconsListHandler(ctx *gin.Context) {
+	osIconsDir := "data/os_icons"
 
 	// 确保目录存在
-	if err := os.MkdirAll(osLogosDir, 0755); err != nil {
+	if err := os.MkdirAll(osIconsDir, 0755); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
 			Info: "系统内部错误",
@@ -391,7 +391,7 @@ func GetOSLogosListHandler(ctx *gin.Context) {
 		return
 	}
 
-	files, err := os.ReadDir(osLogosDir)
+	files, err := os.ReadDir(osIconsDir)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
@@ -400,12 +400,12 @@ func GetOSLogosListHandler(ctx *gin.Context) {
 		return
 	}
 
-	var logos []string
+	var icons []string
 	for _, file := range files {
 		if !file.IsDir() {
 			ext := filepath.Ext(file.Name())
 			if ext == ".jpg" || ext == ".png" || ext == ".jpeg" {
-				logos = append(logos, file.Name())
+				icons = append(icons, file.Name())
 			}
 		}
 	}
@@ -414,7 +414,7 @@ func GetOSLogosListHandler(ctx *gin.Context) {
 		Code: http.StatusOK,
 		Info: "查询成功",
 		Data: gin.H{
-			"logos": logos,
+			"icons": icons,
 		},
 	})
 }

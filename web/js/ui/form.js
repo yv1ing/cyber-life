@@ -101,7 +101,8 @@ class FormGenerator {
     }
 
     static _generateLogoField(field, value) {
-        const logoPreviewSrc = value ? `/icons/${value}` : '/icons/default.png';
+        // 注意：这里的初始路径会在 Logo.init() 中根据模块配置动态更新
+        const logoPreviewSrc = value ? `/platform-icons/${value}` : '/platform-icons/default.png';
         return `
             <div class="input-group">
                 <label class="input-label">
@@ -109,7 +110,7 @@ class FormGenerator {
                 </label>
                 <div class="logo-input-group">
                     <div class="logo-preview-wrapper">
-                        <img id="logo-preview" src="${logoPreviewSrc}" alt="Logo" class="logo-preview" onerror="this.src='/icons/default.png'"/>
+                        <img id="logo-preview" src="${logoPreviewSrc}" alt="Logo" class="logo-preview" onerror="this.src='/platform-icons/default.png'"/>
                     </div>
                     <div class="logo-controls">
                         <div class="logo-grid-wrapper">
@@ -461,13 +462,13 @@ const LogoManager = {
     moduleConfigs: {
         accounts: {
             apiBase: '/api/accounts',
-            staticPath: '/icons',
+            staticPath: '/platform-icons',
             paramName: 'platform',
             displayName: '平台'
         },
         hosts: {
             apiBase: '/api/hosts',
-            staticPath: '/os',
+            staticPath: '/os-icons',
             paramName: 'os',
             displayName: '操作系统'
         }
@@ -490,8 +491,8 @@ const LogoManager = {
 
         try {
             const apiPath = this.moduleConfig.apiBase === '/api/accounts'
-                ? `${this.moduleConfig.apiBase}/icons`
-                : `${this.moduleConfig.apiBase}/logos`;
+                ? `${this.moduleConfig.apiBase}/platform-icons`
+                : `${this.moduleConfig.apiBase}/os-icons`;
 
             const response = await fetch(apiPath, {
                 method: 'GET',
@@ -511,8 +512,8 @@ const LogoManager = {
             }
 
             if (data.code === 200) {
-                // accounts API返回data.icons，hosts API返回data.logos
-                this.currentIcons = data.data.icons || data.data.logos || [];
+                // 统一使用 data.icons
+                this.currentIcons = data.data.icons || [];
                 this.updateIconSelect();
             }
         } catch (error) {
@@ -676,7 +677,11 @@ const LogoManager = {
         const jwt_token = Storage.get('jwt_token');
 
         try {
-            const response = await fetch(`${this.moduleConfig.apiBase}/upload-logo`, {
+            const uploadPath = this.moduleConfig.apiBase === '/api/accounts'
+                ? `${this.moduleConfig.apiBase}/upload-platform-icon`
+                : `${this.moduleConfig.apiBase}/upload-os-icon`;
+
+            const response = await fetch(uploadPath, {
                 method: 'POST',
                 headers: {
                     ...(jwt_token ? { 'Authorization': `Bearer ${jwt_token}` } : {})
@@ -698,19 +703,19 @@ const LogoManager = {
                 throw new Error(data.info || '上传失败');
             }
 
-            if (data.code === 200 && data.data.logo) {
-                const logoFilename = data.data.logo;
+            if (data.code === 200 && data.data.icon) {
+                const iconFilename = data.data.icon;
 
                 // 更新预览
                 const preview = document.getElementById('logo-preview');
                 if (preview) {
-                    preview.src = `${this.moduleConfig.staticPath}/${logoFilename}`;
+                    preview.src = `${this.moduleConfig.staticPath}/${iconFilename}`;
                 }
 
                 // 更新隐藏值
                 const valueInput = document.getElementById('field-logo-value');
                 if (valueInput) {
-                    valueInput.value = logoFilename;
+                    valueInput.value = iconFilename;
                 }
 
                 // 重新加载图标列表

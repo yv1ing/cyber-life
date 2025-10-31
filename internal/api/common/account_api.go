@@ -312,8 +312,8 @@ func ImportAccountsCSVHandler(ctx *gin.Context) {
 	})
 }
 
-// UploadLogoHandler 上传平台Logo图标
-func UploadLogoHandler(ctx *gin.Context) {
+// UploadPlatformIconHandler 上传平台图标
+func UploadPlatformIconHandler(ctx *gin.Context) {
 	platform := ctx.PostForm("platform")
 	if platform == "" {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
@@ -341,7 +341,7 @@ func UploadLogoHandler(ctx *gin.Context) {
 		return
 	}
 
-	iconsDir := "data/icons"
+	iconsDir := "data/platform_icons"
 	if err := os.MkdirAll(iconsDir, 0755); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
@@ -365,14 +365,14 @@ func UploadLogoHandler(ctx *gin.Context) {
 		Code: http.StatusOK,
 		Info: "上传成功",
 		Data: gin.H{
-			"logo": filename,
+			"icon": filename,
 		},
 	})
 }
 
-// GetIconsListHandler 获取已有图标列表
-func GetIconsListHandler(ctx *gin.Context) {
-	iconsDir := "data/icons"
+// GetPlatformIconsListHandler 获取已有平台图标列表
+func GetPlatformIconsListHandler(ctx *gin.Context) {
+	iconsDir := "data/platform_icons"
 
 	// 确保目录存在
 	if err := os.MkdirAll(iconsDir, 0755); err != nil {

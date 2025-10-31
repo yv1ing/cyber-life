@@ -144,7 +144,7 @@ class TableRenderer {
     static _formatPlatformLink(value, item, col) {
         const url = item && col && col.urlKey ? item[col.urlKey] : '';
         const logo = item && col && col.logoKey ? item[col.logoKey] : '';
-        const logoPath = col && col.logoPath ? col.logoPath : '/icons';
+        const logoPath = col && col.logoPath ? col.logoPath : '/platform-icons';
         const platformName = this._escapeHtml(String(value));
 
         // 构建 Logo 图标 HTML
