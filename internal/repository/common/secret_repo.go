@@ -44,7 +44,7 @@ func FindSecrets(keyword string, page, size int) ([]commonmodel.Secret, int64, e
 	var total int64
 
 	// 构建查询条件
-	query := repository.Repo.DB.Model(&commonmodel.Secret{}).Where("platform LIKE ? OR key_id LIKE ?", "%"+keyword+"%", "%"+keyword+"%")
+	query := repository.Repo.DB.Model(&commonmodel.Secret{}).Where("platform LIKE ? OR platform_url LIKE ? OR key_id LIKE ?", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%")
 
 	// 获取总数
 	err := query.Count(&total).Error

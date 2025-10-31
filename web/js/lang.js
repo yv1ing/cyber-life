@@ -93,6 +93,7 @@ const translations = {
         // 密钥记录
         'secrets.title': '密钥',
         'secrets.platform': '平台名称',
+        'secrets.platformURL': '平台链接',
         'secrets.keyID': 'Key ID',
         'secrets.keySecret': 'Key Secret',
         'secrets.remark': '备注信息',
@@ -260,6 +261,7 @@ const translations = {
         // Secrets
         'secrets.title': 'Secret',
         'secrets.platform': 'Platform Name',
+        'secrets.platformURL': 'Platform URL',
         'secrets.keyID': 'Key ID',
         'secrets.keySecret': 'Key Secret',
         'secrets.remark': 'Remark Information',

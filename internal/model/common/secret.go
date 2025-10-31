@@ -10,8 +10,9 @@ import "gorm.io/gorm"
 type Secret struct {
 	gorm.Model
 
-	Platform  string `json:"platform" gorm:"index"`
-	KeyID     string `json:"key_id"`
-	KeySecret string `json:"key_secret"`
-	Remark    string `json:"remark"`
+	Platform    string `json:"platform" gorm:"index" binding:"required"`
+	PlatformURL string `json:"platform_url" gorm:"index" binding:"required"`
+	KeyID       string `json:"key_id" binding:"required"`
+	KeySecret   string `json:"key_secret" binding:"required"`
+	Remark      string `json:"remark"`
 }

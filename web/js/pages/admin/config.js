@@ -85,14 +85,17 @@ const PageConfig = {
         icon: Icons.key,
         api: SecretAPI,
         fields: [
-            { key: 'platform', label: 'secrets.platform', type: 'text', required: true },
+            { key: 'platform_group', type: 'group', fields: [
+                { key: 'platform', label: 'secrets.platform', type: 'text', required: true },
+                { key: 'platform_url', label: 'secrets.platformURL', type: 'url', required: true }
+            ]},
             { key: 'key_id', label: 'secrets.keyID', type: 'text', required: true },
             { key: 'key_secret', label: 'secrets.keySecret', type: 'password', required: true },
             { key: 'remark', label: 'secrets.remark', type: 'textarea', required: false }
         ],
         columns: [
             { key: 'ID', label: 'common.id', width: '80px' },
-            { key: 'platform', label: 'secrets.platform', width: '150px' },
+            { key: 'platform', label: 'secrets.platform', width: '150px', format: 'platformLink', urlKey: 'platform_url' },
             { key: 'key_id', label: 'secrets.keyID', width: '200px', copyable: true },
             { key: 'key_secret', label: 'secrets.keySecret', width: '250px', format: 'password', copyable: true },
             { key: 'remark', label: 'secrets.remark' },

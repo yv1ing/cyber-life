@@ -20,10 +20,11 @@ import (
 // CreateSecretHandler 创建密钥记录
 func CreateSecretHandler(ctx *gin.Context) {
 	type reqType struct {
-		Platform  string `json:"platform" binding:"required"`
-		KeyID     string `json:"key_id" binding:"required"`
-		KeySecret string `json:"key_secret" binding:"required"`
-		Remark    string `json:"remark"`
+		Platform    string `json:"platform" binding:"required"`
+		PlatformURL string `json:"platform_url" binding:"required"`
+		KeyID       string `json:"key_id" binding:"required"`
+		KeySecret   string `json:"key_secret" binding:"required"`
+		Remark      string `json:"remark"`
 	}
 
 	var req reqType
@@ -36,7 +37,7 @@ func CreateSecretHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = commonservice.CreateSecret(req.Platform, req.KeyID, req.KeySecret, req.Remark)
+	err = commonservice.CreateSecret(req.Platform, req.PlatformURL, req.KeyID, req.KeySecret, req.Remark)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
@@ -93,11 +94,12 @@ func DeleteSecretHandler(ctx *gin.Context) {
 // UpdateSecretHandler 更新密钥记录
 func UpdateSecretHandler(ctx *gin.Context) {
 	type reqType struct {
-		SecretID  uint   `json:"secret_id" binding:"required"`
-		Platform  string `json:"platform" binding:"required"`
-		KeyID     string `json:"key_id" binding:"required"`
-		KeySecret string `json:"key_secret" binding:"required"`
-		Remark    string `json:"remark"`
+		SecretID    uint   `json:"secret_id" binding:"required"`
+		Platform    string `json:"platform" binding:"required"`
+		PlatformURL string `json:"platform_url" binding:"required"`
+		KeyID       string `json:"key_id" binding:"required"`
+		KeySecret   string `json:"key_secret" binding:"required"`
+		Remark      string `json:"remark"`
 	}
 
 	var req reqType
@@ -110,7 +112,7 @@ func UpdateSecretHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = commonservice.UpdateSecret(req.SecretID, req.Platform, req.KeyID, req.KeySecret, req.Remark)
+	err = commonservice.UpdateSecret(req.SecretID, req.Platform, req.PlatformURL, req.KeyID, req.KeySecret, req.Remark)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: http.StatusInternalServerError,
