@@ -50,19 +50,19 @@ class AdminFormManager {
 
         // 如果是编辑模式且有端口数据，填充端口列表
         if (item && item.ports && typeof item.ports === 'object') {
-            setTimeout(() => {
+            requestAnimationFrame(() => {
                 Object.entries(item.ports).forEach(([port, service]) => {
                     PortManager.add('#ports-list', port, service);
                 });
-            }, 0);
+            });
         }
 
         // 初始化 Logo 管理器（如果有 logo 字段）
         const logoField = config.fields.find(f => f.type === 'logo');
         if (logoField) {
-            setTimeout(() => {
+            requestAnimationFrame(() => {
                 LogoManager.init(logoField, this.dataManager.currentPage);
-            }, 0);
+            });
         }
 
         this.editModal.show();

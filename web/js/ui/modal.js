@@ -4,18 +4,12 @@ class Modal {
         this.id = id;
         this.element = document.getElementById(id);
         this.overlay = this.element?.closest('.modal-overlay');
+        this._handleEscKey = null;
 
         if (this.overlay) {
             // 点击遮罩关闭
             this.overlay.addEventListener('click', (e) => {
                 if (e.target === this.overlay) {
-                    this.close();
-                }
-            });
-
-            // ESC 键关闭
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && this.overlay.classList.contains('show')) {
                     this.close();
                 }
             });
@@ -26,6 +20,16 @@ class Modal {
         if (this.overlay) {
             this.overlay.classList.add('show');
             document.body.style.overflow = 'hidden';
+
+            // ESC 键关闭 - 仅在模态框显示时监听
+            if (!this._handleEscKey) {
+                this._handleEscKey = (e) => {
+                    if (e.key === 'Escape' && this.overlay.classList.contains('show')) {
+                        this.close();
+                    }
+                };
+                document.addEventListener('keydown', this._handleEscKey);
+            }
         }
     }
 
@@ -33,6 +37,12 @@ class Modal {
         if (this.overlay) {
             this.overlay.classList.remove('show');
             document.body.style.overflow = '';
+
+            // 移除 ESC 键监听器
+            if (this._handleEscKey) {
+                document.removeEventListener('keydown', this._handleEscKey);
+                this._handleEscKey = null;
+            }
         }
     }
 

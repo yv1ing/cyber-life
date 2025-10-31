@@ -77,7 +77,9 @@ class DataManager {
                 {
                     onCheckboxChange: (event) => this._handleCheckboxChange(event),
                     onPageChange: (page) => this.loadData(page, this.currentKeyword),
-                    onEmpty: () => this._updateBatchDeleteButton()
+                    onEmpty: () => this._updateBatchDeleteButton(),
+                    onEdit: (item) => window.tableCallbacks?.edit(item),
+                    onDelete: (id) => window.tableCallbacks?.delete(id)
                 }
             );
 

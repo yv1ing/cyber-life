@@ -7,7 +7,8 @@ const UserAPI = {
      * @returns {Promise<Object>}
      */
     login(username, password) {
-        return HTTP.post(`${API_BASE_URL}/sys/users/login`, { username, password });
+        // 登录接口跳过 401 自动处理，避免登录失败时自动重定向
+        return HTTP.post(`${API_BASE_URL}/sys/users/login`, { username, password }, { skipAuthCheck: true });
     },
 
     /**

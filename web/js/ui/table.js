@@ -25,6 +25,16 @@ class TableRenderer {
 
         const totalPages = Math.ceil(total / pageSize);
 
+        // 保存 items 数据以供事件处理使用
+        this._cachedItems = items.reduce((acc, item) => {
+            const id = item.ID || item.id;
+            if (id) acc[id] = item;
+            return acc;
+        }, {});
+
+        // 保存 callbacks 引用
+        this._callbacks = callbacks;
+
         container.innerHTML = `
             <div class="data-table-wrapper">
                 <table class="data-table">
@@ -52,14 +62,16 @@ class TableRenderer {
         if (callbacks.onCheckboxChange) {
             this._initCheckboxEvents(callbacks.onCheckboxChange);
         }
+
+        // 初始化操作按钮事件委托
+        this._initActionButtons(container);
     }
 
     static _renderRow(item, config) {
-        const itemJson = this._escapeHtml(JSON.stringify(item));
         const rowId = item.ID || item.id || this._generateId();
 
         return `
-            <tr>
+            <tr data-item-id="${rowId}">
                 <td>
                     <input type="checkbox" class="row-checkbox table-checkbox" data-id="${rowId}" />
                 </td>
@@ -69,10 +81,10 @@ class TableRenderer {
                 }).join('')}
                 <td>
                     <div class="table-actions">
-                        <button class="action-btn edit" onclick='window.tableCallbacks.edit(${itemJson})' title="${langManager.t('common.edit')}">
+                        <button class="action-btn edit" data-id="${rowId}" title="${langManager.t('common.edit')}">
                             <span class="icon">${Icons.edit}</span>
                         </button>
-                        <button class="action-btn delete" onclick="window.tableCallbacks.delete(${rowId})" title="${langManager.t('common.delete')}">
+                        <button class="action-btn delete" data-id="${rowId}" title="${langManager.t('common.delete')}">
                             <span class="icon">${Icons.delete}</span>
                         </button>
                     </div>
@@ -105,7 +117,7 @@ class TableRenderer {
                 formattedValue = Formatters.formatStorage(value);
                 break;
             default:
-                formattedValue = this._escapeHtml(String(value));
+                formattedValue = Helpers.escapeHtml(String(value));
         }
 
         // 如果列标记为可复制，包装成可复制的元素
@@ -118,7 +130,7 @@ class TableRenderer {
 
     static _formatPassword(value, rowId, copyable = false) {
         const uniqueId = `pwd-${rowId}`;
-        const escapedValue = this._escapeHtml(String(value));
+        const escapedValue = Helpers.escapeHtml(String(value));
 
         if (copyable) {
             return `
@@ -145,7 +157,7 @@ class TableRenderer {
         const url = item && col && col.urlKey ? item[col.urlKey] : '';
         const logo = item && col && col.logoKey ? item[col.logoKey] : '';
         const logoPath = col && col.logoPath ? col.logoPath : '/platform-icons';
-        const platformName = this._escapeHtml(String(value));
+        const platformName = Helpers.escapeHtml(String(value));
 
         // 构建 Logo 图标 HTML
         let logoHtml = '';
@@ -160,7 +172,7 @@ class TableRenderer {
 
         // 构建完整的 HTML
         if (url && url !== '') {
-            const escapedUrl = this._escapeHtml(String(url));
+            const escapedUrl = Helpers.escapeHtml(String(url));
             return `<div class="platform-with-logo">${logoHtml}<a href="${escapedUrl}" target="_blank" rel="noopener noreferrer" class="platform-link">${platformName}</a></div>`;
         }
         return `<div class="platform-with-logo">${logoHtml}<span>${platformName}</span></div>`;
@@ -172,7 +184,7 @@ class TableRenderer {
             if (entries.length === 0) return '-';
             return entries.map(([k, v]) => `${k}:${v}`).join(', ');
         }
-        return this._escapeHtml(String(value));
+        return Helpers.escapeHtml(String(value));
     }
 
     static _renderPagination(currentPage, totalPages, total, pageSize, onPageChange) {
@@ -183,12 +195,12 @@ class TableRenderer {
                 <div class="pagination-info">
                     显示 ${(currentPage - 1) * pageSize + 1} - ${Math.min(currentPage * pageSize, total)} 条，共 ${total} 条
                 </div>
-                <div class="pagination">
-                    <button ${currentPage === 1 ? 'disabled' : ''} onclick="window.tableCallbacks.goToPage(${currentPage - 1})">
+                <div class="pagination" data-current-page="${currentPage}">
+                    <button ${currentPage === 1 ? 'disabled' : ''} data-page="${currentPage - 1}">
                         <span class="icon">${Icons.arrowBack}</span>
                     </button>
                     ${pages.join('')}
-                    <button ${currentPage === totalPages ? 'disabled' : ''} onclick="window.tableCallbacks.goToPage(${currentPage + 1})">
+                    <button ${currentPage === totalPages ? 'disabled' : ''} data-page="${currentPage + 1}">
                         <span class="icon">${Icons.arrowForward}</span>
                     </button>
                 </div>
@@ -209,7 +221,7 @@ class TableRenderer {
 
         for (let i = start; i <= end; i++) {
             pages.push(`
-                <button class="${i === current ? 'active' : ''}" onclick="window.tableCallbacks.goToPage(${i})">
+                <button class="${i === current ? 'active' : ''}" data-page="${i}">
                     ${i}
                 </button>
             `);
@@ -255,6 +267,47 @@ class TableRenderer {
         });
     }
 
+    static _initActionButtons(container) {
+        // 使用事件委托处理编辑和删除按钮
+        const table = container.querySelector('.data-table');
+        if (table) {
+            table.addEventListener('click', (e) => {
+                const button = e.target.closest('.action-btn');
+                if (!button) return;
+
+                const itemId = parseInt(button.getAttribute('data-id'));
+                if (!itemId) return;
+
+                if (button.classList.contains('edit')) {
+                    // 编辑按钮
+                    const item = this._cachedItems[itemId];
+                    if (item && this._callbacks.onEdit) {
+                        this._callbacks.onEdit(item);
+                    }
+                } else if (button.classList.contains('delete')) {
+                    // 删除按钮
+                    if (this._callbacks.onDelete) {
+                        this._callbacks.onDelete(itemId);
+                    }
+                }
+            });
+        }
+
+        // 使用事件委托处理分页按钮
+        const pagination = container.querySelector('.pagination');
+        if (pagination) {
+            pagination.addEventListener('click', (e) => {
+                const button = e.target.closest('button[data-page]');
+                if (!button || button.disabled) return;
+
+                const page = parseInt(button.getAttribute('data-page'));
+                if (page && this._callbacks.onPageChange) {
+                    this._callbacks.onPageChange(page);
+                }
+            });
+        }
+    }
+
     static togglePassword(elementId) {
         const element = document.getElementById(elementId);
         const button = element.nextElementSibling;
@@ -277,7 +330,7 @@ class TableRenderer {
      * @returns {string} HTML 字符串
      */
     static _makeCopyable(displayValue, copyValue) {
-        const escapedCopyValue = this._escapeHtml(String(copyValue));
+        const escapedCopyValue = Helpers.escapeHtml(String(copyValue));
         return `<span class="copyable-cell" onclick="TableRenderer.copyToClipboard('${escapedCopyValue}')" title="${langManager.t('title.clickToCopy')}">${displayValue}</span>`;
     }
 
@@ -334,12 +387,6 @@ class TableRenderer {
         } finally {
             document.body.removeChild(textArea);
         }
-    }
-
-    static _escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
     }
 
     static _generateId() {

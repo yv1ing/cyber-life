@@ -35,12 +35,14 @@ document.addEventListener('DOMContentLoaded', () => {
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        if (!validateForm(loginForm)) {
-            return;
-        }
-
+        // 简单的表单验证
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value;
+
+        if (!username || !password) {
+            Toast.error(langManager.t('login.emptyFields') || '请填写账号和密码');
+            return;
+        }
 
         // 禁用按钮，显示加载状态
         loginBtn.disabled = true;

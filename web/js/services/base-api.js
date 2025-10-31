@@ -1,6 +1,4 @@
 // API基类 - 提供通用的CRUD操作和CSV导入导出
-const API_BASE_URL = '/api';
-
 class BaseAPI {
     constructor(resource) {
         this.resource = resource; // 例如: 'accounts', 'hosts', 'secrets'

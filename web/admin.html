@@ -205,17 +205,21 @@
     <script src="/js/lang.js"></script>
     <script src="/js/theme.js"></script>
     <script src="/js/core/storage.js"></script>
-    <script src="/js/core/auth.js"></script>
-    <script src="/js/core/http.js"></script>
 
     <!-- Utils -->
     <script src="/js/utils/date.js"></script>
     <script src="/js/utils/helpers.js"></script>
     <script src="/js/utils/formatters.js"></script>
 
-    <!-- UI Components -->
+    <!-- UI Components (必须在 core/auth 和 core/http 之前加载) -->
     <script src="/js/ui/toast.js"></script>
     <script src="/js/ui/modal.js"></script>
+
+    <!-- Core modules (依赖 Toast) -->
+    <script src="/js/core/auth.js"></script>
+    <script src="/js/core/http.js"></script>
+
+    <!-- UI Components (依赖 HTTP 等核心模块) -->
     <script src="/js/ui/table.js"></script>
     <script src="/js/ui/form.js"></script>
 

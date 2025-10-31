@@ -1,3 +1,6 @@
+// API 基础配置
+const API_BASE_URL = '/api';
+
 // HTTP 请求封装
 class HTTP {
     static async request(url, options = {}) {
@@ -18,6 +21,10 @@ class HTTP {
             }
         };
 
+        // 从 options 中提取是否跳过 401 自动处理的标志
+        const skipAuthCheck = options.skipAuthCheck || false;
+        delete finalOptions.skipAuthCheck; // 删除自定义选项，避免传递给 fetch
+
         try {
             const response = await fetch(url, finalOptions);
 
@@ -33,8 +40,8 @@ class HTTP {
                 data = { info: text || `请求失败 (${response.status})` };
             }
 
-            // 处理未授权
-            if (response.status === 401) {
+            // 处理未授权 - 但跳过登录接口的自动处理
+            if (response.status === 401 && !skipAuthCheck) {
                 Toast.error('登录已过期，请重新登录');
                 Auth.logout();
                 throw new Error('Unauthorized');
@@ -52,29 +59,31 @@ class HTTP {
         }
     }
 
-    static get(url, params = {}) {
+    static get(url, params = {}, options = {}) {
         const query = new URLSearchParams(params).toString();
         const fullUrl = query ? `${url}?${query}` : url;
-        return this.request(fullUrl, { method: 'GET' });
+        return this.request(fullUrl, { method: 'GET', ...options });
     }
 
-    static post(url, data = {}) {
+    static post(url, data = {}, options = {}) {
         return this.request(url, {
             method: 'POST',
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            ...options
         });
     }
 
-    static put(url, data = {}) {
+    static put(url, data = {}, options = {}) {
         return this.request(url, {
             method: 'PUT',
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            ...options
         });
     }
 
-    static delete(url, params = {}) {
+    static delete(url, params = {}, options = {}) {
         const query = new URLSearchParams(params).toString();
         const fullUrl = query ? `${url}?${query}` : url;
-        return this.request(fullUrl, { method: 'DELETE' });
+        return this.request(fullUrl, { method: 'DELETE', ...options });
     }
 }

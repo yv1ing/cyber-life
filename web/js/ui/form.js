@@ -81,7 +81,7 @@ class FormGenerator {
                         type="number"
                         id="field-${field.key}-value"
                         class="input-field capacity-value"
-                        value="${this._escapeHtml(numValue)}"
+                        value="${Helpers.escapeHtml(numValue)}"
                         min="0"
                         step="${field.unit === 'cores' ? '1' : '0.01'}"
                         placeholder="${placeholderText}"
@@ -110,7 +110,7 @@ class FormGenerator {
                 </label>
                 <div class="logo-input-group">
                     <div class="logo-preview-wrapper">
-                        <img id="logo-preview" src="" alt="Logo" class="logo-preview" data-value="${this._escapeHtml(value)}" style="display:none;"/>
+                        <img id="logo-preview" src="" alt="Logo" class="logo-preview" data-value="${Helpers.escapeHtml(value)}" style="display:none;"/>
                     </div>
                     <div class="logo-controls">
                         <div class="logo-grid-wrapper">
@@ -124,7 +124,7 @@ class FormGenerator {
                         </button>
                     </div>
                 </div>
-                <input type="hidden" id="field-${field.key}-value" value="${this._escapeHtml(value)}"/>
+                <input type="hidden" id="field-${field.key}-value" value="${Helpers.escapeHtml(value)}"/>
             </div>
         `;
     }
@@ -146,13 +146,13 @@ class FormGenerator {
                         rows="${field.type === 'json' ? '5' : '3'}"
                         ${field.required ? 'required' : ''}
                         ${field.type === 'json' ? 'placeholder=\'{"22": "ssh", "80": "http"}\'' : ''}
-                    >${this._escapeHtml(value)}</textarea>
+                    >${Helpers.escapeHtml(value)}</textarea>
                 ` : `
                     <input
                         type="${field.type}"
                         id="field-${field.key}"
                         class="input-field"
-                        value="${this._escapeHtml(value)}"
+                        value="${Helpers.escapeHtml(value)}"
                         ${field.required ? 'required' : ''}
                     />
                 `}
@@ -171,7 +171,7 @@ class FormGenerator {
                         type="password"
                         id="field-${field.key}"
                         class="input-field"
-                        value="${this._escapeHtml(value)}"
+                        value="${Helpers.escapeHtml(value)}"
                         ${field.required ? 'required' : ''}
                     />
                     <button
@@ -302,12 +302,6 @@ class FormGenerator {
         return result;
     }
 
-    static _escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
     static enhancePasswordFields(container) {
         if (!container) return;
 
@@ -414,8 +408,8 @@ const PortManager = {
         const portItem = document.createElement('div');
         portItem.className = 'port-item';
         portItem.innerHTML = `
-            <input type="number" class="input-field port-number" placeholder="${langManager.t('hosts.portNumber')}" value="${this._escapeHtml(port)}" min="1" max="65535" />
-            <input type="text" class="input-field port-service" placeholder="${langManager.t('hosts.portService')}" value="${this._escapeHtml(service)}" />
+            <input type="number" class="input-field port-number" placeholder="${langManager.t('hosts.portNumber')}" value="${Helpers.escapeHtml(port)}" min="1" max="65535" />
+            <input type="text" class="input-field port-service" placeholder="${langManager.t('hosts.portService')}" value="${Helpers.escapeHtml(service)}" />
             <button type="button" class="btn-icon delete-port" onclick="PortManager.remove(this)" title="${langManager.t('common.delete')}">
                 <i class="fas fa-times"></i>
             </button>
@@ -447,12 +441,6 @@ const PortManager = {
         });
 
         return ports;
-    },
-
-    _escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
     }
 };
 
@@ -772,11 +760,5 @@ const LogoManager = {
             console.error('上传图标失败:', error);
             alert(error.message || '上传失败');
         }
-    },
-
-    _escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
     }
 };
