@@ -42,6 +42,8 @@ class AdminFormManager {
             return FormGenerator.generateField(field, item);
         }).join('');
 
+        FormGenerator.enhancePasswordFields(formFields);
+
         // 如果是编辑模式且有端口数据，填充端口列表
         if (item && item.ports && typeof item.ports === 'object') {
             setTimeout(() => {

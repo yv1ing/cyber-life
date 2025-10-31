@@ -96,6 +96,10 @@ class FormGenerator {
     }
 
     static _generateRegularField(field, value) {
+        if (field.type === 'password') {
+            return this._generatePasswordField(field, value);
+        }
+
         return `
             <div class="input-group">
                 <label class="input-label" for="field-${field.key}">
@@ -118,6 +122,44 @@ class FormGenerator {
                         ${field.required ? 'required' : ''}
                     />
                 `}
+            </div>
+        `;
+    }
+
+    static _generatePasswordField(field, value) {
+        return `
+            <div class="input-group">
+                <label class="input-label" for="field-${field.key}">
+                    ${langManager.t(field.label)}${field.required ? ' *' : ''}
+                </label>
+                <div class="password-input-wrapper">
+                    <input
+                        type="password"
+                        id="field-${field.key}"
+                        class="input-field"
+                        value="${this._escapeHtml(value)}"
+                        ${field.required ? 'required' : ''}
+                    />
+                    <button
+                        type="button"
+                        class="input-action-btn password-generate"
+                        data-target="field-${field.key}"
+                        data-length="16"
+                        data-i18n-title="common.generatePassword"
+                        title="${langManager.t('common.generatePassword')}"
+                    >
+                        <i class="fas fa-random"></i>
+                    </button>
+                    <button
+                        type="button"
+                        class="input-action-btn password-toggle"
+                        data-target="field-${field.key}"
+                        data-i18n-title="common.showPassword"
+                        title="${langManager.t('common.showPassword')}"
+                    >
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
             </div>
         `;
     }
@@ -220,6 +262,63 @@ class FormGenerator {
         return div.innerHTML;
     }
 
+    static enhancePasswordFields(container) {
+        if (!container) return;
+
+        container.querySelectorAll('.password-input-wrapper').forEach(wrapper => {
+            const input = wrapper.querySelector('input.input-field');
+            if (!input) return;
+
+            const generateBtn = wrapper.querySelector('.password-generate');
+            if (generateBtn && !generateBtn.dataset.bound) {
+                generateBtn.dataset.bound = 'true';
+                generateBtn.addEventListener('click', () => {
+                    const length = parseInt(generateBtn.dataset.length, 10) || 16;
+                    const password = FormGenerator.generateRandomPassword(length);
+                    input.value = password;
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                });
+            }
+
+            const toggleBtn = wrapper.querySelector('.password-toggle');
+            if (toggleBtn && !toggleBtn.dataset.bound) {
+                toggleBtn.dataset.bound = 'true';
+                toggleBtn.addEventListener('click', () => {
+                    const icon = toggleBtn.querySelector('i');
+                    const isVisible = input.type === 'text';
+                    input.type = isVisible ? 'password' : 'text';
+                    const titleKey = isVisible ? 'common.showPassword' : 'common.hidePassword';
+                    toggleBtn.setAttribute('data-i18n-title', titleKey);
+                    toggleBtn.setAttribute('title', langManager.t(titleKey));
+                    if (icon) {
+                        icon.classList.toggle('fa-eye');
+                        icon.classList.toggle('fa-eye-slash');
+                    }
+                });
+            }
+        });
+    }
+
+    static generateRandomPassword(length = 16) {
+        const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+        const result = [];
+
+        if (window.crypto && window.crypto.getRandomValues) {
+            const randomValues = new Uint32Array(length);
+            window.crypto.getRandomValues(randomValues);
+            for (let i = 0; i < length; i++) {
+                result.push(charset[randomValues[i] % charset.length]);
+            }
+        } else {
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                result.push(charset[randomIndex]);
+            }
+        }
+
+        return result.join('');
+    }
+
     /**
      * 验证表单
      * @param {HTMLFormElement} formElement - 表单元素
@@ -234,16 +333,19 @@ class FormGenerator {
                 isValid = false;
                 input.style.borderColor = 'var(--error-color)';
 
-                let errorMsg = input.nextElementSibling;
-                if (!errorMsg || !errorMsg.classList.contains('error-msg')) {
+                const group = input.closest('.input-group') || input.parentNode;
+                if (!group) return;
+
+                let errorMsg = group.querySelector('.error-msg');
+                if (!errorMsg) {
                     errorMsg = document.createElement('span');
                     errorMsg.className = 'error-msg';
                     errorMsg.style.color = 'var(--error-color)';
                     errorMsg.style.fontSize = '12px';
                     errorMsg.style.marginTop = '4px';
-                    input.parentNode.insertBefore(errorMsg, input.nextSibling);
+                    group.appendChild(errorMsg);
                 }
-                errorMsg.textContent = '此字段为必填项';
+                errorMsg.textContent = langManager.t('validation.required');
 
                 input.addEventListener('focus', function clearError() {
                     input.style.borderColor = '';

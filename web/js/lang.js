@@ -28,6 +28,9 @@ const translations = {
         'common.warning': '警告',
         'common.exportCSV': '导出CSV',
         'common.importCSV': '导入CSV',
+        'common.generatePassword': '生成随机密码',
+        'common.showPassword': '显示密码',
+        'common.hidePassword': '隐藏密码',
 
         // 登录页面
         'login.title': '登录',
@@ -180,6 +183,9 @@ const translations = {
         'common.warning': 'Warning',
         'common.exportCSV': 'Export CSV',
         'common.importCSV': 'Import CSV',
+        'common.generatePassword': 'Generate Random Password',
+        'common.showPassword': 'Show Password',
+        'common.hidePassword': 'Hide Password',
 
         // Login Page
         'login.title': 'Login',
