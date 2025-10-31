@@ -123,7 +123,7 @@ class TableRenderer {
         if (copyable) {
             return `
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <span id="${uniqueId}" class="password-field copyable-cell" data-password="${escapedValue}" data-copy-value="${escapedValue}" onclick="TableRenderer.copyToClipboard('${escapedValue}')" title="点击复制">••••••••</span>
+                    <span id="${uniqueId}" class="password-field copyable-cell" data-password="${escapedValue}" data-copy-value="${escapedValue}" onclick="TableRenderer.copyToClipboard('${escapedValue}')" title="${langManager.t('title.clickToCopy')}">••••••••</span>
                     <button class="btn-icon" onclick="TableRenderer.togglePassword('${uniqueId}')">
                         <i class="fas fa-eye"></i>
                     </button>
@@ -276,7 +276,7 @@ class TableRenderer {
      */
     static _makeCopyable(displayValue, copyValue) {
         const escapedCopyValue = this._escapeHtml(String(copyValue));
-        return `<span class="copyable-cell" onclick="TableRenderer.copyToClipboard('${escapedCopyValue}')" title="点击复制">${displayValue}</span>`;
+        return `<span class="copyable-cell" onclick="TableRenderer.copyToClipboard('${escapedCopyValue}')" title="${langManager.t('title.clickToCopy')}">${displayValue}</span>`;
     }
 
     /**

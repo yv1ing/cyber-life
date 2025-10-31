@@ -32,6 +32,16 @@ const translations = {
         'common.showPassword': '显示密码',
         'common.hidePassword': '隐藏密码',
 
+        // 标题提示
+        'title.switchLanguage': '切换语言',
+        'title.switchTheme': '切换主题',
+        'title.adminPanel': '管理面板',
+        'title.backHome': '返回首页',
+        'title.search': '搜索',
+        'title.uploadNewLogo': '上传新图标',
+        'title.enterNameFirst': '请先输入{name}名称',
+        'title.clickToCopy': '点击复制',
+
         // 登录页面
         'login.title': '登录',
         'login.subtitle': '欢迎回来',
@@ -188,6 +198,16 @@ const translations = {
         'common.generatePassword': 'Generate Random Password',
         'common.showPassword': 'Show Password',
         'common.hidePassword': 'Hide Password',
+
+        // Title Tooltips
+        'title.switchLanguage': 'Switch Language',
+        'title.switchTheme': 'Switch Theme',
+        'title.adminPanel': 'Admin Panel',
+        'title.backHome': 'Back to Home',
+        'title.search': 'Search',
+        'title.uploadNewLogo': 'Upload New Logo',
+        'title.enterNameFirst': 'Please enter {name} name first',
+        'title.clickToCopy': 'Click to copy',
 
         // Login Page
         'login.title': 'Login',

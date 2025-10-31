@@ -137,12 +137,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all var(--duration-short) var(--easing-standard);
     font-size: 18px;
 }
 
 .search-btn:hover {
-    background-color: var(--primary-light);
+    background-color: transparent;
 }
 
 .search-suggestions {

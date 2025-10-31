@@ -113,15 +113,12 @@ class FormGenerator {
                             <img id="logo-preview" src="${logoPreviewSrc}" alt="Logo" class="logo-preview" onerror="this.src='/icons/default.png'"/>
                         </div>
                         <input type="file" id="logo-file-input" accept=".jpg,.jpeg,.png" style="display:none" ${field.dependsOn ? 'disabled' : ''}/>
-                        <button type="button" class="btn-secondary logo-upload-btn" ${field.dependsOn ? 'disabled' : ''} title="${field.dependsOn ? '请先输入平台名称' : '上传新图标'}">
+                        <button type="button" class="btn-secondary logo-upload-btn" ${field.dependsOn ? 'disabled' : ''} title="${field.dependsOn ? langManager.t('title.enterNameFirst', { name: '' }) : langManager.t('title.uploadNewLogo')}">
                             <i class="fas fa-upload"></i> 上传
                         </button>
                     </div>
                     <div class="logo-controls">
                         <div class="logo-grid-wrapper">
-                            <div class="logo-grid-header">
-                                <span>选择已有图标</span>
-                            </div>
                             <div id="logo-grid" class="logo-grid"></div>
                         </div>
                     </div>
@@ -642,17 +639,30 @@ const LogoManager = {
         // 监听平台名称变化，启用/禁用上传功能
         if (fieldConfig.dependsOn) {
             const platformInput = document.getElementById(`field-${fieldConfig.dependsOn}`);
+
+            // 创建更新上传按钮标题的函数
+            const updateUploadButtonTitle = () => {
+                if (!uploadBtn || !platformInput) return;
+                const hasValue = platformInput.value.trim() !== '';
+                uploadBtn.title = hasValue
+                    ? langManager.t('title.uploadNewLogo')
+                    : langManager.t('title.enterNameFirst', { name: this.moduleConfig.displayName });
+            };
+
             if (platformInput) {
                 platformInput.addEventListener('input', (e) => {
                     const hasValue = e.target.value.trim() !== '';
                     if (leftSection) leftSection.style.opacity = hasValue ? '1' : '0.5';
                     if (uploadBtn) uploadBtn.disabled = !hasValue;
                     if (fileInput) fileInput.disabled = !hasValue;
-
-                    if (uploadBtn) {
-                        uploadBtn.title = hasValue ? '上传新图标' : `请先输入${this.moduleConfig.displayName}名称`;
-                    }
+                    updateUploadButtonTitle();
                 });
+
+                // 监听语言切换事件，更新按钮标题
+                window.addEventListener('languagechange', updateUploadButtonTitle);
+
+                // 初始化按钮标题
+                updateUploadButtonTitle();
             }
         }
     },
