@@ -348,10 +348,9 @@ class TableRenderer {
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(text)
                 .then(() => {
-                    Toast.success('已复制到剪贴板');
+                    Toast.success(langManager.t('toast.copied'));
                 })
                 .catch(err => {
-                    console.error('复制失败:', err);
                     this._fallbackCopyToClipboard(text);
                 });
         } else {
@@ -377,13 +376,12 @@ class TableRenderer {
         try {
             const successful = document.execCommand('copy');
             if (successful) {
-                Toast.success('已复制到剪贴板');
+                Toast.success(langManager.t('toast.copied'));
             } else {
-                Toast.error('复制失败');
+                Toast.error(langManager.t('toast.copyFailed'));
             }
         } catch (err) {
-            console.error('复制失败:', err);
-            Toast.error('复制失败');
+            Toast.error(langManager.t('toast.copyFailed'));
         } finally {
             document.body.removeChild(textArea);
         }

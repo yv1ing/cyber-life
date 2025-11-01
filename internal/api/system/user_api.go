@@ -1,6 +1,7 @@
 package system
 
 import (
+	"cyber-life/internal/constant"
 	"cyber-life/internal/core/config"
 	"cyber-life/pkg/auth"
 	"cyber-life/pkg/encrypt"
@@ -27,24 +28,24 @@ func UserLoginHandler(ctx *gin.Context) {
 	var req reqType
 	if err := ctx.ShouldBind(&req); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
 
 	user, err := systemservice.FindUserByUsername(req.Username)
 	if err != nil {
-		if err.Error() == "记录不存在" {
+		if err.Error() == "record not found" {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, systemmodel.Response{
-				Code: http.StatusUnauthorized,
-				Info: "账号或密码错误",
+				Code: constant.FAILED_TO_LOGIN,
+				Info: "incorrect username or password",
 			})
 			return
 		} else {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-				Code: http.StatusInternalServerError,
-				Info: "系统内部错误",
+				Code: constant.INTERNAL_ERROR,
+				Info: "system internal error",
 			})
 			return
 		}
@@ -52,8 +53,8 @@ func UserLoginHandler(ctx *gin.Context) {
 
 	if user.Password != encrypt.Sha256String(req.Password, config.Config.SecretKey) {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, systemmodel.Response{
-			Code: http.StatusUnauthorized,
-			Info: "账号或密码错误",
+			Code: constant.FAILED_TO_LOGIN,
+			Info: "incorrect username or password",
 		})
 		return
 	}
@@ -62,8 +63,8 @@ func UserLoginHandler(ctx *gin.Context) {
 	jwtToken, err := auth.CreateAccessToken(user.ID, user.Username, config.Config.SecretKey, jwtSign)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-			Code: http.StatusInternalServerError,
-			Info: "系统内部错误",
+			Code: constant.INTERNAL_ERROR,
+			Info: "system internal error",
 		})
 	}
 
@@ -71,14 +72,14 @@ func UserLoginHandler(ctx *gin.Context) {
 	err = systemservice.UpdateUser(user.ID, "", "", "", "", "", "", jwtSign)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-			Code: http.StatusInternalServerError,
-			Info: "系统内部错误",
+			Code: constant.INTERNAL_ERROR,
+			Info: "system internal error",
 		})
 	}
 
 	ctx.JSON(http.StatusOK, systemmodel.Response{
-		Code: http.StatusOK,
-		Info: "请求成功",
+		Code: constant.SUCCESSFUL_LOGIN,
+		Info: "login success",
 		Data: gin.H{
 			"jwt_token": jwtToken,
 		},
@@ -91,8 +92,8 @@ func UserLogoutHandler(ctx *gin.Context) {
 	user, err := systemservice.FindUserByID(userID.(uint))
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-			Code: http.StatusInternalServerError,
-			Info: "系统内部错误",
+			Code: constant.INTERNAL_ERROR,
+			Info: "system internal error",
 		})
 		return
 	}
@@ -100,15 +101,15 @@ func UserLogoutHandler(ctx *gin.Context) {
 	err = systemservice.UpdateUser(user.ID, "", "", "", "", "", "", "-")
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-			Code: http.StatusInternalServerError,
-			Info: "系统内部错误",
+			Code: constant.INTERNAL_ERROR,
+			Info: "system internal error",
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, systemmodel.Response{
-		Code: http.StatusOK,
-		Info: "请求成功",
+		Code: constant.SUCCESSFUL_LOGOUT,
+		Info: "logout success",
 	})
 }
 
@@ -130,32 +131,32 @@ func CreateUserHandler(ctx *gin.Context) {
 	err = ctx.ShouldBindBodyWithJSON(&req)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
 
 	err = systemservice.CreateUser(req.Username, req.Password, req.Name, req.Email, req.Phone, req.Avatar)
 	if err != nil {
-		if err.Error() == "用户名已经存在" {
+		if err.Error() == "the username already exists" {
 			ctx.AbortWithStatusJSON(http.StatusAlreadyReported, systemmodel.Response{
-				Code: http.StatusAlreadyReported,
-				Info: "用户名已经存在",
+				Code: constant.USERNAME_ALREADY_EXISTS,
+				Info: "username already exists",
 			})
 			return
 		} else {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-				Code: http.StatusInternalServerError,
-				Info: "系统内部错误",
+				Code: constant.INTERNAL_ERROR,
+				Info: "system internal error",
 			})
 			return
 		}
 	}
 
 	ctx.JSON(http.StatusOK, systemmodel.Response{
-		Code: http.StatusOK,
-		Info: "请求成功",
+		Code: constant.SUCCESSFUL_CREATE,
+		Info: "create success",
 	})
 }
 
@@ -164,32 +165,32 @@ func DeleteUserHandler(ctx *gin.Context) {
 	userID, err := strconv.Atoi(ctx.Query("user_id"))
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
 
 	err = systemservice.DeleteUser(uint(userID))
 	if err != nil {
-		if err.Error() == "记录不存在" {
+		if err.Error() == "record not found" {
 			ctx.AbortWithStatusJSON(http.StatusNotFound, systemmodel.Response{
-				Code: http.StatusNotFound,
-				Info: "记录不存在",
+				Code: constant.RECORD_NOT_FOUND,
+				Info: "record not found",
 			})
 			return
 		} else {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-				Code: http.StatusInternalServerError,
-				Info: "系统内部错误",
+				Code: constant.INTERNAL_ERROR,
+				Info: "system internal error",
 			})
 			return
 		}
 	}
 
 	ctx.JSON(http.StatusOK, systemmodel.Response{
-		Code: http.StatusOK,
-		Info: "请求成功",
+		Code: constant.SUCCESSFUL_DELETE,
+		Info: "delete success",
 	})
 }
 
@@ -213,38 +214,38 @@ func UpdateUserHandler(ctx *gin.Context) {
 	err = ctx.ShouldBindBodyWithJSON(&req)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
 
 	err = systemservice.UpdateUser(req.UserID, req.Username, req.Password, req.Name, req.Email, req.Phone, req.Avatar, "")
 	if err != nil {
-		if err.Error() == "记录不存在" {
+		if err.Error() == "record not found" {
 			ctx.AbortWithStatusJSON(http.StatusNotFound, systemmodel.Response{
-				Code: http.StatusNotFound,
-				Info: "记录不存在",
+				Code: constant.RECORD_NOT_FOUND,
+				Info: "record not found",
 			})
 			return
-		} else if err.Error() == "用户名已被使用" {
+		} else if err.Error() == "the username already exists" {
 			ctx.AbortWithStatusJSON(http.StatusAlreadyReported, systemmodel.Response{
-				Code: http.StatusAlreadyReported,
-				Info: "用户名已被使用",
+				Code: constant.USERNAME_ALREADY_EXISTS,
+				Info: "the username already exists",
 			})
 			return
 		} else {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-				Code: http.StatusInternalServerError,
-				Info: "系统内部错误",
+				Code: constant.INTERNAL_ERROR,
+				Info: "system internal error",
 			})
 			return
 		}
 	}
 
 	ctx.JSON(http.StatusOK, systemmodel.Response{
-		Code: http.StatusOK,
-		Info: "请求成功",
+		Code: constant.SUCCESSFUL_UPDATE,
+		Info: "update success",
 	})
 }
 
@@ -255,31 +256,31 @@ func FindUserHandler(ctx *gin.Context) {
 		userID, err := strconv.Atoi(ctx.Query("user_id"))
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-				Code: http.StatusBadRequest,
-				Info: "请求参数非法",
+				Code: constant.INVALID_REQUEST_PARAMS,
+				Info: "invalid request params",
 			})
 			return
 		}
 		user, err := systemservice.FindUserByID(uint(userID))
 		if err != nil {
-			if err.Error() == "记录不存在" {
+			if err.Error() == "record not found" {
 				ctx.AbortWithStatusJSON(http.StatusNotFound, systemmodel.Response{
-					Code: http.StatusNotFound,
-					Info: "记录不存在",
+					Code: constant.RECORD_NOT_FOUND,
+					Info: "record not found",
 				})
 				return
 			} else {
 				ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-					Code: http.StatusInternalServerError,
-					Info: "系统内部错误",
+					Code: constant.INTERNAL_ERROR,
+					Info: "system internal error",
 				})
 				return
 			}
 		}
 
 		ctx.JSON(http.StatusOK, systemmodel.Response{
-			Code: http.StatusOK,
-			Info: "请求成功",
+			Code: constant.SUCCESSFUL_FIND,
+			Info: "find success",
 			Data: gin.H{
 				"total": 1,
 				"users": []systemmodel.User{*user},
@@ -291,24 +292,24 @@ func FindUserHandler(ctx *gin.Context) {
 		username := ctx.Query("username")
 		user, err := systemservice.FindUserByUsername(username)
 		if err != nil {
-			if err.Error() == "记录不存在" {
+			if err.Error() == "record not found" {
 				ctx.AbortWithStatusJSON(http.StatusNotFound, systemmodel.Response{
-					Code: http.StatusNotFound,
-					Info: "记录不存在",
+					Code: constant.RECORD_NOT_FOUND,
+					Info: "record not found",
 				})
 				return
 			} else {
 				ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-					Code: http.StatusInternalServerError,
-					Info: "系统内部错误",
+					Code: constant.INTERNAL_ERROR,
+					Info: "system internal error",
 				})
 				return
 			}
 		}
 
 		ctx.JSON(http.StatusOK, systemmodel.Response{
-			Code: http.StatusOK,
-			Info: "请求成功",
+			Code: constant.SUCCESSFUL_FIND,
+			Info: "find success",
 			Data: gin.H{
 				"total": 1,
 				"users": []systemmodel.User{*user},
@@ -321,22 +322,22 @@ func FindUserHandler(ctx *gin.Context) {
 		users, err := systemservice.FindUserByName(name)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-				Code: http.StatusInternalServerError,
-				Info: "系统内部错误",
+				Code: constant.INTERNAL_ERROR,
+				Info: "system internal error",
 			})
 			return
 		}
 		if len(users) == 0 {
 			ctx.AbortWithStatusJSON(http.StatusNotFound, systemmodel.Response{
-				Code: http.StatusNotFound,
-				Info: "记录不存在",
+				Code: constant.RECORD_NOT_FOUND,
+				Info: "record not found",
 			})
 			return
 		}
 
 		ctx.JSON(http.StatusOK, systemmodel.Response{
-			Code: http.StatusOK,
-			Info: "请求成功",
+			Code: constant.SUCCESSFUL_FIND,
+			Info: "find success",
 			Data: gin.H{
 				"total": len(users),
 				"users": users,
@@ -346,8 +347,8 @@ func FindUserHandler(ctx *gin.Context) {
 
 	default:
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
@@ -361,16 +362,16 @@ func ListUserHandler(ctx *gin.Context) {
 	page, err := strconv.Atoi(_page)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
 	size, err := strconv.Atoi(_size)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
@@ -378,15 +379,15 @@ func ListUserHandler(ctx *gin.Context) {
 	users, total, err := systemservice.FindUserListWithPage(page, size)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-			Code: http.StatusInternalServerError,
-			Info: "系统内部错误",
+			Code: constant.INTERNAL_ERROR,
+			Info: "system internal error",
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, systemmodel.Response{
-		Code: http.StatusOK,
-		Info: "请求成功",
+		Code: constant.SUCCESSFUL_FIND,
+		Info: "find success",
 		Data: gin.H{
 			"users": users,
 			"total": total,

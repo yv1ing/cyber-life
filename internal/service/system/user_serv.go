@@ -17,11 +17,11 @@ import (
 // CreateUser 创建用户
 func CreateUser(username, password, name, email, phone, avatar string) error {
 	preUser, err := systemrepository.FindUserByUsername(username)
-	if err != nil && err.Error() != "记录不存在" {
+	if err != nil && err.Error() != "record not found" {
 		return err
 	}
 	if preUser != nil {
-		return errors.New("用户名已经存在")
+		return errors.New("the username already exists")
 	}
 
 	password = encrypt.Sha256String(password, config.Config.SecretKey)
@@ -66,7 +66,7 @@ func UpdateUser(userID uint, username, password, name, email, phone, avatar, jwt
 	if username != "" && username != user.Username {
 		existUser, _ := systemrepository.FindUserByUsername(username)
 		if existUser != nil {
-			return errors.New("用户名已被使用")
+			return errors.New("the username already exists")
 		}
 		user.Username = username
 	}

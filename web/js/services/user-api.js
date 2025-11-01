@@ -4,11 +4,12 @@ const UserAPI = {
      * 用户登录
      * @param {string} username - 用户名
      * @param {string} password - 密码
+     * @param {Object} options - HTTP请求选项
      * @returns {Promise<Object>}
      */
-    login(username, password) {
+    login(username, password, options = {}) {
         // 登录接口跳过 401 自动处理，避免登录失败时自动重定向
-        return HTTP.post(`${API_BASE_URL}/sys/users/login`, { username, password }, { skipAuthCheck: true });
+        return HTTP.post(`${API_BASE_URL}/sys/users/login`, { username, password }, { skipAuthCheck: true, ...options });
     },
 
     /**
@@ -39,20 +40,22 @@ const UserAPI = {
      * 更新用户信息
      * @param {number} userId - 用户ID
      * @param {Object} userData - 用户数据
+     * @param {Object} options - HTTP请求选项
      * @returns {Promise<Object>}
      */
-    update(userId, userData) {
+    update(userId, userData, options = {}) {
         return HTTP.put(`${API_BASE_URL}/sys/users/update`, {
             user_id: parseInt(userId),
             ...userData
-        });
+        }, options);
     },
 
     /**
      * 登出
+     * @param {Object} options - HTTP请求选项
      * @returns {Promise<Object>}
      */
-    logout() {
-        return HTTP.post(`${API_BASE_URL}/sys/users/logout`);
+    logout(options = {}) {
+        return HTTP.post(`${API_BASE_URL}/sys/users/logout`, {}, options);
     }
 };

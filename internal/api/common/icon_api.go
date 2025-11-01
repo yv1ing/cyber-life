@@ -1,6 +1,7 @@
 package common
 
 import (
+	"cyber-life/internal/constant"
 	"github.com/gin-gonic/gin"
 	"net/http"
 
@@ -18,8 +19,8 @@ func UploadPlatformIconHandler(ctx *gin.Context) {
 	platform := ctx.PostForm("platform")
 	if platform == "" {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "平台名称不能为空",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
@@ -27,26 +28,25 @@ func UploadPlatformIconHandler(ctx *gin.Context) {
 	file, err := ctx.FormFile("file")
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
 
-	// 使用公共服务上传图标（完整流程）
 	iconsDir := "data/platform_icons"
 	filename, err := commonservice.UploadIcon(platform, iconsDir, file)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: err.Error(),
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
+			Code: constant.INTERNAL_ERROR,
+			Info: "system internal error",
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, systemmodel.Response{
-		Code: http.StatusOK,
-		Info: "上传成功",
+		Code: constant.SUCCESSFUL_UPLOAD,
+		Info: "upload success",
 		Data: gin.H{
 			"icon": filename,
 		},
@@ -57,19 +57,18 @@ func UploadPlatformIconHandler(ctx *gin.Context) {
 func GetPlatformIconsListHandler(ctx *gin.Context) {
 	iconsDir := "data/platform_icons"
 
-	// 使用公共服务获取图标列表
 	icons, err := commonservice.GetIconsList(iconsDir)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-			Code: http.StatusInternalServerError,
-			Info: "获取图标列表失败",
+			Code: constant.INTERNAL_ERROR,
+			Info: "system internal error",
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, systemmodel.Response{
-		Code: http.StatusOK,
-		Info: "查询成功",
+		Code: constant.SUCCESSFUL_FIND,
+		Info: "find success",
 		Data: gin.H{
 			"icons": icons,
 		},
@@ -81,8 +80,8 @@ func UploadOSIconHandler(ctx *gin.Context) {
 	osName := ctx.PostForm("os")
 	if osName == "" {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "操作系统名称不能为空",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
@@ -90,26 +89,25 @@ func UploadOSIconHandler(ctx *gin.Context) {
 	file, err := ctx.FormFile("file")
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
 
-	// 使用公共服务上传图标（完整流程）
 	osIconsDir := "data/os_icons"
 	filename, err := commonservice.UploadIcon(osName, osIconsDir, file)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: err.Error(),
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
+			Code: constant.INTERNAL_ERROR,
+			Info: "system internal error",
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, systemmodel.Response{
-		Code: http.StatusOK,
-		Info: "上传成功",
+		Code: constant.SUCCESSFUL_UPLOAD,
+		Info: "upload success",
 		Data: gin.H{
 			"icon": filename,
 		},
@@ -120,19 +118,18 @@ func UploadOSIconHandler(ctx *gin.Context) {
 func GetOSIconsListHandler(ctx *gin.Context) {
 	osIconsDir := "data/os_icons"
 
-	// 使用公共服务获取图标列表
 	icons, err := commonservice.GetIconsList(osIconsDir)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-			Code: http.StatusInternalServerError,
-			Info: "获取图标列表失败",
+			Code: constant.INTERNAL_ERROR,
+			Info: "system internal error",
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, systemmodel.Response{
-		Code: http.StatusOK,
-		Info: "查询成功",
+		Code: constant.SUCCESSFUL_FIND,
+		Info: "find success",
 		Data: gin.H{
 			"icons": icons,
 		},
@@ -144,8 +141,8 @@ func UploadSiteIconHandler(ctx *gin.Context) {
 	siteName := ctx.PostForm("site")
 	if siteName == "" {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "站点名称不能为空",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
@@ -153,26 +150,25 @@ func UploadSiteIconHandler(ctx *gin.Context) {
 	file, err := ctx.FormFile("file")
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
 
-	// 使用公共服务上传图标（完整流程）
 	iconsDir := "data/site_icons"
 	filename, err := commonservice.UploadIcon(siteName, iconsDir, file)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: err.Error(),
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
+			Code: constant.INTERNAL_ERROR,
+			Info: "system internal error",
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, systemmodel.Response{
-		Code: http.StatusOK,
-		Info: "上传成功",
+		Code: constant.SUCCESSFUL_UPLOAD,
+		Info: "upload success",
 		Data: gin.H{
 			"icon": filename,
 		},
@@ -183,19 +179,18 @@ func UploadSiteIconHandler(ctx *gin.Context) {
 func GetSiteIconsListHandler(ctx *gin.Context) {
 	iconsDir := "data/site_icons"
 
-	// 使用公共服务获取图标列表
 	icons, err := commonservice.GetIconsList(iconsDir)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-			Code: http.StatusInternalServerError,
-			Info: "获取图标列表失败",
+			Code: constant.INTERNAL_ERROR,
+			Info: "system internal error",
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, systemmodel.Response{
-		Code: http.StatusOK,
-		Info: "查询成功",
+		Code: constant.SUCCESSFUL_FIND,
+		Info: "find success",
 		Data: gin.H{
 			"icons": icons,
 		},

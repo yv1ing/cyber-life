@@ -14,12 +14,12 @@ const CSVHandler = {
         });
 
         if (response.status === 401) {
-            Toast.error('登录已过期，请重新登录');
+            Toast.error(langManager.t('toast.loginExpired'));
             Auth.logout();
             throw new Error('Unauthorized');
         }
 
-        if (!response.ok) throw new Error('导出失败');
+        if (!response.ok) throw new Error(langManager.t('csv.exportFailed'));
 
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -58,19 +58,19 @@ const CSVHandler = {
             data = await response.json();
         } else {
             const text = await response.text();
-            data = { info: text || `请求失败 (${response.status})` };
+            data = { info: text || `${langManager.t('toast.requestFailed')} (${response.status})` };
         }
 
         // 处理未授权
         if (response.status === 401) {
-            Toast.error('登录已过期，请重新登录');
+            Toast.error(langManager.t('toast.loginExpired'));
             Auth.logout();
             throw new Error('Unauthorized');
         }
 
         // 处理其他错误
         if (!response.ok) {
-            throw new Error(data.info || data.message || data.error || '请求失败');
+            throw new Error(data.info || data.message || data.error || langManager.t('toast.requestFailed'));
         }
 
         return data;

@@ -1,7 +1,7 @@
 package common
 
 import (
-	"fmt"
+	"cyber-life/internal/constant"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
@@ -38,8 +38,8 @@ func CreateHostHandler(ctx *gin.Context) {
 	err := ctx.ShouldBindBodyWithJSON(&req)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
@@ -47,19 +47,19 @@ func CreateHostHandler(ctx *gin.Context) {
 	err = commonservice.CreateHost(req.Provider, req.ProviderURL, req.Hostname, req.Address, req.Ports, req.Username, req.Password, req.OS, req.Logo, req.CpuNum, req.RamSize, req.DiskSize)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-			Code: http.StatusInternalServerError,
-			Info: "系统内部错误",
+			Code: constant.INTERNAL_ERROR,
+			Info: "system internal error",
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, systemmodel.Response{
-		Code: http.StatusOK,
-		Info: "创建成功",
+		Code: constant.SUCCESSFUL_CREATE,
+		Info: "create success",
 	})
 }
 
-// DeleteHostHandler 删除主机记录（支持单个删除和批量删除）
+// DeleteHostHandler 删除主机记录
 func DeleteHostHandler(ctx *gin.Context) {
 	type reqType struct {
 		HostIDs []uint `json:"host_ids" binding:"required,min=1"`
@@ -69,8 +69,8 @@ func DeleteHostHandler(ctx *gin.Context) {
 	err := ctx.ShouldBindBodyWithJSON(&req)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
@@ -86,27 +86,26 @@ func DeleteHostHandler(ctx *gin.Context) {
 
 	if failedCount > 0 {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-			Code: http.StatusInternalServerError,
-			Info: "部分删除失败",
+			Code: constant.FAILED_TO_DELETE,
+			Info: "delete failed",
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, systemmodel.Response{
-		Code: http.StatusOK,
-		Info: "删除成功",
+		Code: constant.SUCCESSFUL_DELETE,
+		Info: "delete success",
 	})
 }
 
 // UpdateHostHandler 更新主机记录
 func UpdateHostHandler(ctx *gin.Context) {
-	// 先绑定到map以获取所有字段
 	var rawData map[string]interface{}
 	err := ctx.ShouldBindBodyWithJSON(&rawData)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
@@ -115,21 +114,18 @@ func UpdateHostHandler(ctx *gin.Context) {
 	hostIDFloat, ok := rawData["host_id"].(float64)
 	if !ok {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
 	hostID := uint(hostIDFloat)
-
-	// 移除host_id，剩余的就是要更新的字段
 	delete(rawData, "host_id")
 
-	// 只有当有字段需要更新时才调用service
 	if len(rawData) == 0 {
 		ctx.JSON(http.StatusOK, systemmodel.Response{
-			Code: http.StatusOK,
-			Info: "没有字段需要更新",
+			Code: constant.SUCCESSFUL_DELETE,
+			Info: "delete success",
 		})
 		return
 	}
@@ -137,15 +133,15 @@ func UpdateHostHandler(ctx *gin.Context) {
 	err = commonservice.UpdateHostFields(hostID, rawData)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-			Code: http.StatusInternalServerError,
-			Info: "系统内部错误",
+			Code: constant.INTERNAL_ERROR,
+			Info: "system internal error",
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, systemmodel.Response{
-		Code: http.StatusOK,
-		Info: "更新成功",
+		Code: constant.SUCCESSFUL_UPDATE,
+		Info: "update success",
 	})
 }
 
@@ -162,16 +158,16 @@ func FindHostsHandler(ctx *gin.Context) {
 	page, err = strconv.Atoi(ctx.DefaultQuery("page", "1"))
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
 	size, err = strconv.Atoi(ctx.DefaultQuery("size", "10"))
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
@@ -179,15 +175,15 @@ func FindHostsHandler(ctx *gin.Context) {
 	hosts, total, err := commonservice.FindHosts(keyword, page, size)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-			Code: http.StatusInternalServerError,
-			Info: "系统内部错误",
+			Code: constant.INTERNAL_ERROR,
+			Info: "system internal error",
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, systemmodel.Response{
-		Code: http.StatusOK,
-		Info: "查询成功",
+		Code: constant.SUCCESSFUL_FIND,
+		Info: "find success",
 		Data: gin.H{
 			"list":  hosts,
 			"total": total,
@@ -206,16 +202,16 @@ func FindHostsListHandler(ctx *gin.Context) {
 	page, err = strconv.Atoi(ctx.DefaultQuery("page", "1"))
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
 	size, err = strconv.Atoi(ctx.DefaultQuery("size", "10"))
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
@@ -223,15 +219,15 @@ func FindHostsListHandler(ctx *gin.Context) {
 	hosts, total, err := commonservice.FindHostsList(page, size)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-			Code: http.StatusInternalServerError,
-			Info: "系统内部错误",
+			Code: constant.INTERNAL_ERROR,
+			Info: "system internal error",
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, systemmodel.Response{
-		Code: http.StatusOK,
-		Info: "查询成功",
+		Code: constant.SUCCESSFUL_FIND,
+		Info: "find success",
 		Data: gin.H{
 			"list":  hosts,
 			"total": total,
@@ -244,8 +240,8 @@ func ExportHostsCSVHandler(ctx *gin.Context) {
 	filePath, err := commonservice.ExportHostsCSV()
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-			Code: http.StatusInternalServerError,
-			Info: "导出CSV失败",
+			Code: constant.FAILED_TO_EXPORT,
+			Info: "export failed",
 		})
 		return
 	}
@@ -265,8 +261,8 @@ func ImportHostsCSVHandler(ctx *gin.Context) {
 	file, err := ctx.FormFile("file")
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
@@ -274,8 +270,8 @@ func ImportHostsCSVHandler(ctx *gin.Context) {
 	ext := filepath.Ext(file.Filename)
 	if ext != ".csv" {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
-			Code: http.StatusBadRequest,
-			Info: "请求参数非法",
+			Code: constant.INVALID_REQUEST_PARAMS,
+			Info: "invalid request params",
 		})
 		return
 	}
@@ -283,8 +279,8 @@ func ImportHostsCSVHandler(ctx *gin.Context) {
 	tempDir := "temp"
 	if err := os.MkdirAll(tempDir, 0755); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-			Code: http.StatusInternalServerError,
-			Info: "系统内部错误",
+			Code: constant.INTERNAL_ERROR,
+			Info: "system internal error",
 		})
 		return
 	}
@@ -293,8 +289,8 @@ func ImportHostsCSVHandler(ctx *gin.Context) {
 	err = ctx.SaveUploadedFile(file, tempFilePath)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-			Code: http.StatusInternalServerError,
-			Info: "系统内部错误",
+			Code: constant.INTERNAL_ERROR,
+			Info: "system internal error",
 		})
 		return
 	}
@@ -304,26 +300,31 @@ func ImportHostsCSVHandler(ctx *gin.Context) {
 	result, err := commonservice.ImportHostsCSV(tempFilePath)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-			Code: http.StatusInternalServerError,
-			Info: "导入CSV失败",
+			Code: constant.FAILED_TO_IMPORT,
+			Info: "import failed",
 		})
 		return
 	}
 
-	// 构造详细的响应消息
-	var message string
 	if result.FailedCount > 0 {
-		message = fmt.Sprintf("导入完成：成功 %d 条，失败 %d 条", result.SuccessCount, result.FailedCount)
+		ctx.AbortWithStatusJSON(http.StatusOK, systemmodel.Response{
+			Code: constant.FAILED_TO_IMPORT,
+			Info: "import failed",
+			Data: gin.H{
+				"success_count": result.SuccessCount,
+				"failed_count":  result.FailedCount,
+			},
+		})
+		return
 	} else {
-		message = "导入CSV成功"
+		ctx.AbortWithStatusJSON(http.StatusOK, systemmodel.Response{
+			Code: constant.SUCCESSFUL_IMPORT,
+			Info: "import success",
+			Data: gin.H{
+				"success_count": result.SuccessCount,
+				"failed_count":  result.FailedCount,
+			},
+		})
+		return
 	}
-
-	ctx.JSON(http.StatusOK, systemmodel.Response{
-		Code: http.StatusOK,
-		Info: message,
-		Data: gin.H{
-			"success_count": result.SuccessCount,
-			"failed_count":  result.FailedCount,
-		},
-	})
 }

@@ -538,18 +538,18 @@ const LogoManager = {
 
             // 处理未授权
             if (response.status === 401) {
-                Toast.error('登录已过期，请重新登录');
+                Toast.error(langManager.t('toast.loginExpired'));
                 Auth.logout();
                 throw new Error('Unauthorized');
             }
 
-            if (data.code === 200) {
-                // 统一使用 data.icons
+            // 检查是否成功（使用业务码判断）
+            if (response.ok && data.data && data.data.icons) {
                 this.currentIcons = data.data.icons || [];
                 this.updateIconSelect();
             }
         } catch (error) {
-            console.error('加载图标列表失败:', error);
+            // 加载图标失败不影响用户使用，静默处理
         }
     },
 
@@ -641,7 +641,7 @@ const LogoManager = {
                 if (fieldConfig.dependsOn) {
                     const platformInput = document.getElementById(`field-${fieldConfig.dependsOn}`);
                     if (!platformInput || !platformInput.value.trim()) {
-                        alert(`请先输入${this.moduleConfig.displayName}名称`);
+                        Toast.warning(langManager.t('icon.enterNameFirst', { name: this.moduleConfig.displayName }));
                         return;
                     }
                 }
@@ -659,7 +659,7 @@ const LogoManager = {
                 const platform = platformInput ? platformInput.value.trim() : '';
 
                 if (fieldConfig.dependsOn && !platform) {
-                    alert(`请先输入${this.moduleConfig.displayName}名称`);
+                    Toast.warning(langManager.t('icon.enterNameFirst', { name: this.moduleConfig.displayName }));
                     fileInput.value = '';
                     return;
                 }
@@ -725,16 +725,17 @@ const LogoManager = {
 
             // 处理未授权
             if (response.status === 401) {
-                Toast.error('登录已过期，请重新登录');
+                Toast.error(langManager.t('toast.loginExpired'));
                 Auth.logout();
                 throw new Error('Unauthorized');
             }
 
             if (!response.ok) {
-                throw new Error(data.info || '上传失败');
+                throw new Error(data.info || langManager.t('icon.uploadFailed'));
             }
 
-            if (data.code === 200 && data.data.icon) {
+            // 检查是否成功
+            if (response.ok && data.data && data.data.icon) {
                 const iconFilename = data.data.icon;
 
                 // 更新预览
@@ -752,13 +753,12 @@ const LogoManager = {
                 // 重新加载图标列表
                 await this.loadIcons();
 
-                alert('图标上传成功');
+                Toast.success(langManager.t('icon.uploadSuccess'));
             } else {
-                alert(data.info || '上传失败');
+                Toast.error(data.info || langManager.t('icon.uploadFailed'));
             }
         } catch (error) {
-            console.error('上传图标失败:', error);
-            alert(error.message || '上传失败');
+            Toast.error(error.message || langManager.t('icon.uploadFailed'));
         }
     }
 };

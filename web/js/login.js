@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('password').value;
 
         if (!username || !password) {
-            Toast.error(langManager.t('login.emptyFields') || '请填写账号和密码');
+            Toast.error(langManager.t('login.fillAll'));
             return;
         }
 
@@ -50,14 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
         loginBtn.innerHTML = `<span class="loading"></span> ${langManager.t('login.loggingIn')}`;
 
         try {
-            const response = await UserAPI.login(username, password);
+            // 登录请求 - 成功时显示提示，错误会自动处理
+            const response = await UserAPI.login(username, password, { showSuccessToast: true });
 
             // 保存 token 和用户信息
             if (response.data && response.data.jwt_token) {
                 Storage.set('jwt_token', response.data.jwt_token);
                 Storage.set('user', { username });
-
-                Toast.success(langManager.t('login.success'));
 
                 // 延迟跳转，让用户看到成功提示
                 setTimeout(() => {
@@ -67,23 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(langManager.t('login.formatError'));
             }
         } catch (error) {
-            console.error('登录失败:', error);
-
-            // 获取错误消息
-            let errorMessage = langManager.t('login.error');
-            if (error && error.message) {
-                errorMessage = error.message;
-            }
-
-            // 确保 Toast 存在再调用
-            if (typeof Toast !== 'undefined' && Toast.error) {
-                Toast.error(errorMessage);
-            } else {
-                // 后备方案：使用 alert
-                alert(errorMessage);
-                console.error('Toast 未定义，使用 alert 显示错误');
-            }
-
+            // 错误已经在 HTTP 层自动处理并显示
             loginBtn.disabled = false;
             loginBtn.textContent = originalText;
         }

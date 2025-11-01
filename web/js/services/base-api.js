@@ -8,23 +8,26 @@ class BaseAPI {
     /**
      * 创建记录
      * @param {Object} data - 记录数据
+     * @param {Object} options - HTTP请求选项
      * @returns {Promise<Object>}
      */
-    create(data) {
-        return HTTP.post(`${this.baseUrl}/create`, data);
+    create(data, options = {}) {
+        return HTTP.post(`${this.baseUrl}/create`, data, options);
     }
 
     /**
      * 删除记录
      * @param {number|Array<number>} ids - 单个ID或ID数组
+     * @param {Object} options - HTTP请求选项
      * @returns {Promise<Object>}
      */
-    delete(ids) {
+    delete(ids, options = {}) {
         const idArray = Array.isArray(ids) ? ids : [ids];
         const idField = `${this.resource.slice(0, -1)}_ids`; // accounts -> account_ids
         return HTTP.request(`${this.baseUrl}/delete`, {
             method: 'DELETE',
-            body: JSON.stringify({ [idField]: idArray })
+            body: JSON.stringify({ [idField]: idArray }),
+            ...options
         });
     }
 
@@ -32,14 +35,15 @@ class BaseAPI {
      * 更新记录
      * @param {number} id - 记录ID
      * @param {Object} data - 更新数据
+     * @param {Object} options - HTTP请求选项
      * @returns {Promise<Object>}
      */
-    update(id, data) {
+    update(id, data, options = {}) {
         const idField = `${this.resource.slice(0, -1)}_id`; // accounts -> account_id
         return HTTP.put(`${this.baseUrl}/update`, {
             [idField]: parseInt(id),
             ...data
-        });
+        }, options);
     }
 
     /**
@@ -47,20 +51,22 @@ class BaseAPI {
      * @param {string} keyword - 搜索关键词
      * @param {number} page - 页码
      * @param {number} pageSize - 每页大小
+     * @param {Object} options - HTTP请求选项
      * @returns {Promise<Object>}
      */
-    find(keyword = '', page = 1, pageSize = 10) {
-        return HTTP.get(`${this.baseUrl}/find`, { keyword, page, size: pageSize });
+    find(keyword = '', page = 1, pageSize = 10, options = {}) {
+        return HTTP.get(`${this.baseUrl}/find`, { keyword, page, size: pageSize }, options);
     }
 
     /**
      * 列表查询
      * @param {number} page - 页码
      * @param {number} pageSize - 每页大小
+     * @param {Object} options - HTTP请求选项
      * @returns {Promise<Object>}
      */
-    list(page = 1, pageSize = 10) {
-        return HTTP.get(`${this.baseUrl}/list`, { page, size: pageSize });
+    list(page = 1, pageSize = 10, options = {}) {
+        return HTTP.get(`${this.baseUrl}/list`, { page, size: pageSize }, options);
     }
 
     /**

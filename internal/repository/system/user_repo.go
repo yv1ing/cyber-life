@@ -40,7 +40,7 @@ func FindUserByID(userID uint) (*systemmodel.User, error) {
 	err := repository.Repo.DB.First(&user, userID).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("记录不存在")
+			return nil, errors.New("record not found")
 		}
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func FindUserByUsername(username string) (*systemmodel.User, error) {
 	err := repository.Repo.DB.Where("username = ?", username).First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("记录不存在")
+			return nil, errors.New("record not found")
 		}
 		return nil, err
 	}

@@ -27,13 +27,11 @@ class CSVManager {
      */
     async _handleExport() {
         try {
-            Toast.info('正在导出CSV文件...');
             const config = PageConfig[this.dataManager.currentPage];
             await config.api.exportCSV();
-            Toast.success('导出成功');
+            Toast.success(langManager.t('csv.exportSuccess'));
         } catch (error) {
-            Toast.error('导出失败: ' + (error.message || '未知错误'));
-            console.error(error);
+            Toast.error(langManager.t('csv.exportFailed') + ': ' + (error.message || ''));
         }
     }
 
@@ -51,18 +49,17 @@ class CSVManager {
 
         // 验证文件类型
         if (!file.name.endsWith('.csv')) {
-            Toast.error('请选择CSV文件');
+            Toast.error(langManager.t('csv.selectCSV'));
             return;
         }
 
         // 验证文件大小
         if (file.size > 10 * 1024 * 1024) {
-            Toast.error('文件大小不能超过10MB');
+            Toast.error(langManager.t('csv.fileTooLarge'));
             return;
         }
 
         try {
-            Toast.info('正在导入CSV文件...');
             const config = PageConfig[this.dataManager.currentPage];
             const response = await config.api.importCSV(file);
 
@@ -71,19 +68,21 @@ class CSVManager {
                 const failedCount = response.data.failed_count || 0;
 
                 if (failedCount > 0) {
-                    Toast.warning(`导入完成：成功 ${successCount} 条，失败 ${failedCount} 条`, 5000);
+                    Toast.warning(langManager.t('csv.importPartial', {
+                        success: successCount,
+                        failed: failedCount
+                    }), 5000);
                 } else {
-                    Toast.success(`成功导入 ${successCount} 条记录`);
+                    Toast.success(langManager.t('csv.importSuccess', { count: successCount }));
                 }
             } else {
-                Toast.success('导入完成');
+                Toast.success(langManager.t('csv.importComplete'));
             }
 
             this.dataManager.loadData(this.dataManager.currentPageNum, this.dataManager.currentKeyword);
 
         } catch (error) {
-            Toast.error('导入失败: ' + (error.message || '未知错误'));
-            console.error(error);
+            Toast.error(langManager.t('csv.importFailed') + ': ' + (error.message || ''));
         }
     }
 

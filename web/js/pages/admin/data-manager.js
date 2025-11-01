@@ -32,7 +32,7 @@ class DataManager {
 
         const config = PageConfig[this.currentPage];
         if (!config) {
-            Toast.error('页面配置不存在');
+            Toast.error(langManager.t('toast.pageConfigNotFound'));
             return;
         }
 
@@ -86,7 +86,6 @@ class DataManager {
             this._updateBatchDeleteButton();
 
         } catch (error) {
-            console.error('加载数据失败:', error);
             contentBody.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-icon icon">${Icons.error}</div>
@@ -142,7 +141,7 @@ class DataManager {
      */
     async batchDelete() {
         if (this.selectedIds.size === 0) {
-            Toast.warning('请先选择要删除的项');
+            Toast.warning(langManager.t('toast.pleaseSelectItems'));
             return;
         }
 
@@ -151,17 +150,16 @@ class DataManager {
 
         Modal.confirm(
             langManager.t('common.confirm'),
-            `确定要删除选中的 ${count} 条记录吗？此操作不可恢复。`,
+            langManager.t('common.batchDeleteConfirm', { count: count }),
             async () => {
                 try {
                     const idsArray = Array.from(this.selectedIds);
-                    await config.api.delete(idsArray);
-                    Toast.success(`成功删除 ${count} 条记录`);
+                    // API调用会自动显示成功或错误提示
+                    await config.api.delete(idsArray, { showSuccessToast: true });
                     this.selectedIds.clear();
                     this.loadData(this.currentPageNum, this.currentKeyword);
                 } catch (error) {
-                    Toast.error(error.message || '批量删除失败');
-                    console.error(error);
+                    // 错误已在HTTP层自动处理
                 }
             }
         );
@@ -180,12 +178,11 @@ class DataManager {
             langManager.t('accounts.deleteConfirm'),
             async () => {
                 try {
-                    await config.api.delete(id);
-                    Toast.success(langManager.t('accounts.deleteSuccess'));
+                    // API调用会自动显示成功或错误提示
+                    await config.api.delete(id, { showSuccessToast: true });
                     this.loadData(this.currentPageNum, this.currentKeyword);
                 } catch (error) {
-                    Toast.error(error.message || langManager.t('toast.deleteFailed'));
-                    console.error(error);
+                    // 错误已在HTTP层自动处理
                 }
             }
         );

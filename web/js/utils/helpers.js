@@ -44,7 +44,7 @@ const Helpers = {
         try {
             if (navigator.clipboard) {
                 await navigator.clipboard.writeText(text);
-                Toast.success('已复制到剪贴板');
+                Toast.success(langManager.t('toast.copied'));
             } else {
                 const textarea = document.createElement('textarea');
                 textarea.value = text;
@@ -54,11 +54,10 @@ const Helpers = {
                 textarea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textarea);
-                Toast.success('已复制到剪贴板');
+                Toast.success(langManager.t('toast.copied'));
             }
         } catch (err) {
-            Toast.error('复制失败');
-            console.error('复制失败:', err);
+            Toast.error(langManager.t('toast.copyFailed'));
         }
     },
 

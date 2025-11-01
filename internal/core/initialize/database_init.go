@@ -70,7 +70,7 @@ func InitDatabase() (*gorm.DB, error) {
 		}
 		break
 	default:
-		return nil, errors.New("数据库类型非法")
+		return nil, errors.New("invalid database type")
 	}
 
 	// 创建数据表

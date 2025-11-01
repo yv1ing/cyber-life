@@ -34,23 +34,24 @@ func UploadIcon(iconName, targetDir string, file *multipart.FileHeader) (string,
 	// 验证文件扩展名
 	ext := filepath.Ext(file.Filename)
 	if !supportedImageExts[ext] {
-		return "", fmt.Errorf("只支持jpg、png格式的图片")
+		return "", fmt.Errorf("only supports images in jpg and png formats")
 	}
 
 	// 验证文件大小
 	if file.Size > maxIconSize {
-		return "", fmt.Errorf("文件大小不能超过5MB")
+		return "", fmt.Errorf("the file size must not exceed 5mb")
 	}
 
 	// 清理文件名，防止路径遍历攻击
 	safeName := sanitizeFilename(iconName)
 	if safeName == "" {
-		return "", fmt.Errorf("图标名称非法")
+		return "", fmt.Errorf("invalid icon name")
 	}
 
 	// 创建目标目录
-	if err := os.MkdirAll(targetDir, 0755); err != nil {
-		return "", fmt.Errorf("创建目录失败: %w", err)
+	err := os.MkdirAll(targetDir, 0755)
+	if err != nil {
+		return "", err
 	}
 
 	// 构建完整文件路径
@@ -60,20 +61,21 @@ func UploadIcon(iconName, targetDir string, file *multipart.FileHeader) (string,
 	// 打开上传的文件
 	src, err := file.Open()
 	if err != nil {
-		return "", fmt.Errorf("打开上传文件失败: %w", err)
+		return "", err
 	}
 	defer src.Close()
 
 	// 创建目标文件
 	dst, err := os.Create(filePath)
 	if err != nil {
-		return "", fmt.Errorf("创建目标文件失败: %w", err)
+		return "", err
 	}
 	defer dst.Close()
 
 	// 复制文件内容
-	if _, err = io.Copy(dst, src); err != nil {
-		return "", fmt.Errorf("保存文件失败: %w", err)
+	_, err = io.Copy(dst, src)
+	if err != nil {
+		return "", err
 	}
 
 	return filename, nil
@@ -81,13 +83,14 @@ func UploadIcon(iconName, targetDir string, file *multipart.FileHeader) (string,
 
 // GetIconsList 获取指定目录下的图标列表
 func GetIconsList(iconsDir string) ([]string, error) {
-	if err := os.MkdirAll(iconsDir, 0755); err != nil {
-		return nil, fmt.Errorf("创建目录失败: %w", err)
+	err := os.MkdirAll(iconsDir, 0755)
+	if err != nil {
+		return nil, err
 	}
 
 	files, err := os.ReadDir(iconsDir)
 	if err != nil {
-		return nil, fmt.Errorf("读取目录失败: %w", err)
+		return nil, err
 	}
 
 	var icons []string

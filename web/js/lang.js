@@ -15,6 +15,7 @@ const translations = {
         'common.save': '保存',
         'common.delete': '删除',
         'common.batchDelete': '批量删除',
+        'common.batchDeleteConfirm': '确定要删除选中的 {count} 条记录吗？此操作不可恢复。',
         'common.edit': '编辑',
         'common.create': '新建',
         'common.search': '搜索',
@@ -173,6 +174,9 @@ const translations = {
         'toast.copied': '已复制到剪贴板',
         'toast.copyFailed': '复制失败',
         'toast.featureNotImplemented': '该功能暂未实现',
+        'toast.noDataChanged': '没有数据发生改变',
+        'toast.pageConfigNotFound': '页面配置不存在',
+        'toast.pleaseSelectItems': '请先选择要删除的项',
 
         // 表单验证
         'validation.required': '此字段为必填项',
@@ -180,7 +184,53 @@ const translations = {
 
         // 空状态
         'empty.noData': '暂无数据',
-        'empty.clickCreate': '点击上方"新建"按钮添加数据'
+        'empty.clickCreate': '点击上方"新建"按钮添加数据',
+
+        // API响应消息 - 成功
+        'api.success.successfulImport': '导入成功',
+        'api.success.successfulExport': '导出成功',
+        'api.success.successfulLogin': '登录成功',
+        'api.success.successfulLogout': '登出成功',
+        'api.success.successfulCreate': '创建成功',
+        'api.success.successfulDelete': '删除成功',
+        'api.success.successfulUpdate': '更新成功',
+        'api.success.successfulFind': '查询成功',
+        'api.success.successfulUpload': '上传成功',
+
+        // API响应消息 - 错误
+        'api.error.internalError': '系统内部错误',
+        'api.error.failedToImport': '导入失败',
+        'api.error.failedToExport': '导出失败',
+        'api.error.invalidRequestHeader': '无效的请求头',
+        'api.error.invalidRequestParams': '无效的请求参数',
+        'api.error.expiredToken': '登录令牌已过期',
+        'api.error.invalidToken': '无效的登录令牌',
+        'api.error.failedToLogin': '登录失败，请检查账号和密码',
+        'api.error.failedToLogout': '登出失败',
+        'api.error.failedToCreate': '创建失败',
+        'api.error.failedToDelete': '删除失败',
+        'api.error.failedToUpdate': '更新失败',
+        'api.error.failedToFind': '查询失败',
+        'api.error.failedToUpload': '上传失败',
+        'api.error.recordNotFound': '记录不存在',
+        'api.error.usernameAlreadyExists': '用户名已存在',
+
+        // CSV导入导出
+        'csv.exporting': '正在导出CSV文件...',
+        'csv.exportSuccess': '导出成功',
+        'csv.exportFailed': '导出失败',
+        'csv.importing': '正在导入CSV文件...',
+        'csv.importSuccess': '成功导入 {count} 条记录',
+        'csv.importPartial': '导入完成：成功 {success} 条，失败 {failed} 条',
+        'csv.importComplete': '导入完成',
+        'csv.importFailed': '导入失败',
+        'csv.selectCSV': '请选择CSV文件',
+        'csv.fileTooLarge': '文件大小不能超过10MB',
+
+        // 图标上传
+        'icon.uploadSuccess': '图标上传成功',
+        'icon.uploadFailed': '上传失败',
+        'icon.enterNameFirst': '请先输入{name}名称'
     },
     en: {
         // System
@@ -197,6 +247,7 @@ const translations = {
         'common.save': 'Save',
         'common.delete': 'Delete',
         'common.batchDelete': 'Batch Delete',
+        'common.batchDeleteConfirm': 'Are you sure you want to delete the selected {count} records? This action cannot be undone.',
         'common.edit': 'Edit',
         'common.create': 'Create',
         'common.search': 'Search',
@@ -355,6 +406,9 @@ const translations = {
         'toast.copied': 'Copied to clipboard',
         'toast.copyFailed': 'Copy failed',
         'toast.featureNotImplemented': 'This feature is not yet implemented',
+        'toast.noDataChanged': 'No data has changed',
+        'toast.pageConfigNotFound': 'Page configuration not found',
+        'toast.pleaseSelectItems': 'Please select items to delete first',
 
         // Form Validation
         'validation.required': 'This field is required',
@@ -362,7 +416,53 @@ const translations = {
 
         // Empty State
         'empty.noData': 'No Data',
-        'empty.clickCreate': 'Click "Create" button above to add data'
+        'empty.clickCreate': 'Click "Create" button above to add data',
+
+        // API Response Messages - Success
+        'api.success.successfulImport': 'Import successful',
+        'api.success.successfulExport': 'Export successful',
+        'api.success.successfulLogin': 'Login successful',
+        'api.success.successfulLogout': 'Logout successful',
+        'api.success.successfulCreate': 'Create successful',
+        'api.success.successfulDelete': 'Delete successful',
+        'api.success.successfulUpdate': 'Update successful',
+        'api.success.successfulFind': 'Query successful',
+        'api.success.successfulUpload': 'Upload successful',
+
+        // API Response Messages - Error
+        'api.error.internalError': 'Internal system error',
+        'api.error.failedToImport': 'Import failed',
+        'api.error.failedToExport': 'Export failed',
+        'api.error.invalidRequestHeader': 'Invalid request header',
+        'api.error.invalidRequestParams': 'Invalid request parameters',
+        'api.error.expiredToken': 'Login token has expired',
+        'api.error.invalidToken': 'Invalid login token',
+        'api.error.failedToLogin': 'Login failed, please check your account and password',
+        'api.error.failedToLogout': 'Logout failed',
+        'api.error.failedToCreate': 'Create failed',
+        'api.error.failedToDelete': 'Delete failed',
+        'api.error.failedToUpdate': 'Update failed',
+        'api.error.failedToFind': 'Query failed',
+        'api.error.failedToUpload': 'Upload failed',
+        'api.error.recordNotFound': 'Record not found',
+        'api.error.usernameAlreadyExists': 'Username already exists',
+
+        // CSV Import/Export
+        'csv.exporting': 'Exporting CSV file...',
+        'csv.exportSuccess': 'Export successful',
+        'csv.exportFailed': 'Export failed',
+        'csv.importing': 'Importing CSV file...',
+        'csv.importSuccess': 'Successfully imported {count} records',
+        'csv.importPartial': 'Import completed: {success} succeeded, {failed} failed',
+        'csv.importComplete': 'Import completed',
+        'csv.importFailed': 'Import failed',
+        'csv.selectCSV': 'Please select a CSV file',
+        'csv.fileTooLarge': 'File size cannot exceed 10MB',
+
+        // Icon Upload
+        'icon.uploadSuccess': 'Icon uploaded successfully',
+        'icon.uploadFailed': 'Upload failed',
+        'icon.enterNameFirst': 'Please enter {name} name first'
     }
 };
 

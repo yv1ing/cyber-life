@@ -52,5 +52,5 @@ func ParseAccessToken(tokenStr, secretKey string) (*AccessClaims, error) {
 		return claims, nil
 	}
 
-	return nil, errors.New("token非法")
+	return nil, errors.New("invalid token")
 }

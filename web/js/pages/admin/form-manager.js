@@ -132,24 +132,24 @@ class AdminFormManager {
                 const changedFields = this._getChangedFields(data, this.originalData);
 
                 if (!changedFields) {
-                    Toast.info('没有数据发生改变');
+                    Toast.info(langManager.t('toast.noDataChanged'));
                     this.editModal.close();
                     return;
                 }
 
-                await config.api.update(id, changedFields);
+                // API调用会自动显示成功或错误提示
+                await config.api.update(id, changedFields, { showSuccessToast: true });
             } else {
                 // 创建模式：发送所有字段
-                await config.api.create(data);
+                // API调用会自动显示成功或错误提示
+                await config.api.create(data, { showSuccessToast: true });
             }
 
-            Toast.success(langManager.t('accounts.saveSuccess'));
             this.editModal.close();
             this.dataManager.loadData(this.dataManager.currentPageNum, this.dataManager.currentKeyword);
 
         } catch (error) {
-            Toast.error(error.message || langManager.t('toast.saveFailed'));
-            console.error(error);
+            // 错误已在HTTP层自动处理
         } finally {
             saveBtn.disabled = false;
             saveBtn.innerHTML = originalText;

@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"cyber-life/internal/constant"
 	"cyber-life/internal/core/config"
 	"cyber-life/pkg/auth"
 	"errors"
@@ -54,8 +55,8 @@ func JwtAuthMiddleware(whitelist []string) gin.HandlerFunc {
 		tokenStr := extractBearerToken(ctx)
 		if tokenStr == "" {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, systemmodel.Response{
-				Code: http.StatusUnauthorized,
-				Info: "请求头不合法",
+				Code: constant.INVALID_REQUEST_HEADER,
+				Info: "invalid request header",
 			})
 			return
 		}
@@ -64,13 +65,13 @@ func JwtAuthMiddleware(whitelist []string) gin.HandlerFunc {
 		if err != nil {
 			if errors.Is(err, jwt.ErrTokenExpired) {
 				ctx.AbortWithStatusJSON(http.StatusUnauthorized, systemmodel.Response{
-					Code: http.StatusUnauthorized,
-					Info: "Token已过期",
+					Code: constant.EXPIRED_TOKEN,
+					Info: "token has expired",
 				})
 			} else {
 				ctx.AbortWithStatusJSON(http.StatusUnauthorized, systemmodel.Response{
-					Code: http.StatusUnauthorized,
-					Info: "Token不合法",
+					Code: constant.INVALID_TOKEN,
+					Info: "token is invalid",
 				})
 			}
 			return
@@ -78,16 +79,24 @@ func JwtAuthMiddleware(whitelist []string) gin.HandlerFunc {
 
 		user, err := systemservice.FindUserByUsername(claims.Username)
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
-				Code: http.StatusInternalServerError,
-				Info: "系统内部错误",
-			})
-			return
+			if err.Error() == "record not found" {
+				ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
+					Code: constant.INVALID_TOKEN,
+					Info: "token is invalid",
+				})
+				return
+			} else {
+				ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
+					Code: constant.INTERNAL_ERROR,
+					Info: "system internal error",
+				})
+				return
+			}
 		}
 		if claims.JwtSign != user.JwtSign {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, systemmodel.Response{
-				Code: http.StatusUnauthorized,
-				Info: "Token已过期",
+				Code: constant.EXPIRED_TOKEN,
+				Info: "token has expired",
 			})
 			return
 		}

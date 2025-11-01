@@ -18,7 +18,7 @@ func main() {
 	// 初始化系统全局配置
 	err = initialize.InitGlobalConfig("config.toml")
 	if err != nil {
-		log.Fatal("加载配置文件失败：", err)
+		log.Fatal("an error occurred while loading the configuration file: ", err)
 	}
 
 	// 初始化系统全局日志

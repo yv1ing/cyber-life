@@ -162,7 +162,7 @@ func ImportHostsCSV(filePath string) (*commonmodel.ImportResult, error) {
 	}
 
 	if len(records) < 2 {
-		return nil, fmt.Errorf("CSV文件为空或格式不正确")
+		return nil, fmt.Errorf("invalid cvs file format")
 	}
 
 	importedCount := 0
@@ -270,4 +270,3 @@ func ImportHostsCSV(filePath string) (*commonmodel.ImportResult, error) {
 		FailedCount:  failedCount,
 	}, nil
 }
-

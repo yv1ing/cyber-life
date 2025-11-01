@@ -166,7 +166,7 @@ function initNavigation() {
 async function loadPage(page) {
     const config = PageConfig[page];
     if (!config) {
-        Toast.error('页面配置不存在');
+        Toast.error(langManager.t('toast.pageConfigNotFound'));
         return;
     }
 
@@ -241,7 +241,7 @@ async function openProfileModal() {
             Toast.error(langManager.t('profile.getFailed'));
         }
     } catch (error) {
-        Toast.error(error.message || langManager.t('profile.getFailed'));
+        // 错误已在HTTP层自动处理
     }
 }
 
@@ -269,8 +269,8 @@ async function handleProfileSave() {
             password: password || ''
         };
 
-        await UserAPI.update(userId, userData);
-        Toast.success(langManager.t('profile.saveSuccess'));
+        // API调用会自动显示成功或错误提示
+        await UserAPI.update(userId, userData, { showSuccessToast: true });
 
         // 更新本地存储
         const user = Auth.getCurrentUser();
@@ -283,17 +283,17 @@ async function handleProfileSave() {
 
         profileModal.close();
     } catch (error) {
-        Toast.error(error.message || langManager.t('toast.saveFailed'));
-        console.error(error);
+        // 错误已在HTTP层自动处理
     }
 }
 
 // 登出
 async function handleLogout() {
     try {
-        await UserAPI.logout();
+        // API调用会自动显示成功或错误提示
+        await UserAPI.logout({ showSuccessToast: true });
     } catch (error) {
-        console.error('登出失败:', error);
+        // 错误已在HTTP层自动处理
     } finally {
         Auth.logout();
     }
