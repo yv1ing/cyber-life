@@ -1,9 +1,2 @@
-// 密钥API - 继承BaseAPI
-class SecretAPIClass extends BaseAPI {
-    constructor() {
-        super('secrets');
-    }
-}
-
-// 创建单例实例
-const SecretAPI = new SecretAPIClass();
+// 密钥API
+const SecretAPI = new BaseAPI('secrets');

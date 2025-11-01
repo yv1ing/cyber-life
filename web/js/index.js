@@ -4,9 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('search-icon').innerHTML = Icons.search;
     document.getElementById('admin-icon').innerHTML = Icons.adminPanel;
 
-    // 更新 Logo 文本（固定为英文）
-    updateLogoText();
-
     // 语言切换
     const langToggle = document.getElementById('lang-toggle');
     if (langToggle) {
@@ -158,10 +155,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
-// 更新 Logo 文本
-function updateLogoText() {
-    const logoText = document.getElementById('logo-text');
-    // 主标题始终保持英文 Cyber Life
-    logoText.innerHTML = '<span class="highlight">Cyber</span> Life';
-}

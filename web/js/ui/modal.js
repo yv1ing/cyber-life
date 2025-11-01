@@ -58,13 +58,22 @@ class Modal {
                     <p>${message}</p>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" id="modal-cancel">取消</button>
-                    <button class="btn btn-primary" id="modal-confirm">确认</button>
+                    <button class="btn btn-secondary" id="modal-cancel" data-i18n="common.cancel">取消</button>
+                    <button class="btn btn-primary" id="modal-confirm" data-i18n="common.confirm">确认</button>
                 </div>
             </div>
         `;
 
         document.body.appendChild(overlay);
+
+        // 应用国际化翻译
+        const cancelBtn = overlay.querySelector('#modal-cancel');
+        const confirmBtn = overlay.querySelector('#modal-confirm');
+        if (typeof langManager !== 'undefined') {
+            cancelBtn.textContent = langManager.t('common.cancel');
+            confirmBtn.textContent = langManager.t('common.confirm');
+        }
+
         setTimeout(() => overlay.classList.add('show'), 10);
 
         const close = () => {
@@ -72,8 +81,8 @@ class Modal {
             setTimeout(() => overlay.remove(), 300);
         };
 
-        overlay.querySelector('#modal-cancel').addEventListener('click', close);
-        overlay.querySelector('#modal-confirm').addEventListener('click', () => {
+        cancelBtn.addEventListener('click', close);
+        confirmBtn.addEventListener('click', () => {
             onConfirm();
             close();
         });

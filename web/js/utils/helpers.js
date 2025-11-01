@@ -19,57 +19,6 @@ const Helpers = {
     },
 
     /**
-     * 节流函数
-     * @param {Function} func - 要节流的函数
-     * @param {number} limit - 限制时间（毫秒）
-     * @returns {Function} 节流后的函数
-     */
-    throttle(func, limit = 300) {
-        let inThrottle;
-        return function executedFunction(...args) {
-            if (!inThrottle) {
-                func(...args);
-                inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
-            }
-        };
-    },
-
-    /**
-     * 复制到剪贴板
-     * @param {string} text - 要复制的文本
-     * @returns {Promise<void>}
-     */
-    async copyToClipboard(text) {
-        try {
-            if (navigator.clipboard) {
-                await navigator.clipboard.writeText(text);
-                Toast.success(langManager.t('toast.copied'));
-            } else {
-                const textarea = document.createElement('textarea');
-                textarea.value = text;
-                textarea.style.position = 'fixed';
-                textarea.style.opacity = '0';
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                Toast.success(langManager.t('toast.copied'));
-            }
-        } catch (err) {
-            Toast.error(langManager.t('toast.copyFailed'));
-        }
-    },
-
-    /**
-     * 生成唯一 ID
-     * @returns {string} 唯一ID
-     */
-    generateId() {
-        return Date.now().toString(36) + Math.random().toString(36).substring(2);
-    },
-
-    /**
      * 安全的 HTML 转义
      * @param {string} text - 要转义的文本
      * @returns {string} 转义后的文本
@@ -81,9 +30,6 @@ const Helpers = {
     }
 };
 
-// 为了向后兼容，导出全局函数
+// 为了向后兼容，导出常用的全局函数别名
 const debounce = Helpers.debounce;
-const throttle = Helpers.throttle;
-const copyToClipboard = Helpers.copyToClipboard;
-const generateId = Helpers.generateId;
 const escapeHtml = Helpers.escapeHtml;
