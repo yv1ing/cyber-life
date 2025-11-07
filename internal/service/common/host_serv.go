@@ -19,20 +19,21 @@ import (
 // @Desc:	主机记录服务
 
 // CreateHost 创建主机记录
-func CreateHost(provider, providerURL, hostname, address string, ports map[int]string, username, password, os, logo string, cpuNum, ramSize, diskSize int) error {
+func CreateHost(provider, providerURL, hostname, address string, ports map[int]string, username, password, os, logo string, cpuNum, ramSize, diskSize int, expirationTime int64) error {
 	host := &commonmodel.Host{
-		Provider:    provider,
-		ProviderURL: providerURL,
-		Hostname:    hostname,
-		Address:     address,
-		Ports:       ports,
-		Username:    username,
-		Password:    password,
-		OS:          os,
-		Logo:        logo,
-		CpuNum:      cpuNum,
-		RamSize:     ramSize,
-		DiskSize:    diskSize,
+		Provider:       provider,
+		ProviderURL:    providerURL,
+		Hostname:       hostname,
+		Address:        address,
+		Ports:          ports,
+		Username:       username,
+		Password:       password,
+		OS:             os,
+		Logo:           logo,
+		CpuNum:         cpuNum,
+		RamSize:        ramSize,
+		DiskSize:       diskSize,
+		ExpirationTime: expirationTime,
 	}
 
 	return commonrepository.CreateHost(host)
@@ -50,20 +51,21 @@ func DeleteHost(hostID uint, hardDelete bool) error {
 }
 
 // UpdateHost 更新主机记录
-func UpdateHost(hostID uint, provider, providerURL, hostname, address string, ports map[int]string, username, password, os, logo string, cpuNum, ramSize, diskSize int) error {
+func UpdateHost(hostID uint, provider, providerURL, hostname, address string, ports map[int]string, username, password, os, logo string, cpuNum, ramSize, diskSize int, expirationTime int64) error {
 	host := &commonmodel.Host{
-		Provider:    provider,
-		ProviderURL: providerURL,
-		Hostname:    hostname,
-		Address:     address,
-		Ports:       ports,
-		Username:    username,
-		Password:    password,
-		OS:          os,
-		Logo:        logo,
-		CpuNum:      cpuNum,
-		RamSize:     ramSize,
-		DiskSize:    diskSize,
+		Provider:       provider,
+		ProviderURL:    providerURL,
+		Hostname:       hostname,
+		Address:        address,
+		Ports:          ports,
+		Username:       username,
+		Password:       password,
+		OS:             os,
+		Logo:           logo,
+		CpuNum:         cpuNum,
+		RamSize:        ramSize,
+		DiskSize:       diskSize,
+		ExpirationTime: expirationTime,
 	}
 	host.ID = hostID
 
@@ -103,7 +105,7 @@ func ExportHostsCSV() (string, error) {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	headers := []string{"ID", "提供商", "提供商链接", "主机名", "地址", "端口映射", "用户名", "密码", "操作系统", "Logo", "CPU核心数", "内存大小(MB)", "磁盘大小(MB)", "创建时间", "更新时间"}
+	headers := []string{"ID", "提供商", "提供商链接", "主机名", "地址", "端口映射", "用户名", "密码", "操作系统", "Logo", "CPU核心数", "内存大小(MB)", "磁盘大小(MB)", "到期时间", "创建时间", "更新时间"}
 	err = writer.Write(headers)
 	if err != nil {
 		return "", err
@@ -121,6 +123,12 @@ func ExportHostsCSV() (string, error) {
 			portsJSON = []byte("{}")
 		}
 
+		// 格式化到期时间
+		expirationTimeStr := ""
+		if host.ExpirationTime > 0 {
+			expirationTimeStr = time.Unix(host.ExpirationTime, 0).Format("2006-01-02 15:04:05")
+		}
+
 		record := []string{
 			strconv.FormatUint(uint64(host.ID), 10),
 			host.Provider,
@@ -135,6 +143,7 @@ func ExportHostsCSV() (string, error) {
 			strconv.Itoa(host.CpuNum),
 			strconv.Itoa(host.RamSize),
 			strconv.Itoa(host.DiskSize),
+			expirationTimeStr,
 			host.CreatedAt.Format("2006-01-02 15:04:05"),
 			host.UpdatedAt.Format("2006-01-02 15:04:05"),
 		}
@@ -168,7 +177,7 @@ func ImportHostsCSV(filePath string) (*commonmodel.ImportResult, error) {
 	importedCount := 0
 	failedCount := 0
 	for _, record := range records[1:] {
-		// CSV格式: 提供商,提供商链接,主机名,地址,端口映射,用户名,密码,操作系统,Logo,CPU核心数,内存大小,磁盘大小（ID和时间字段会被忽略）
+		// CSV格式: 提供商,提供商链接,主机名,地址,端口映射,用户名,密码,操作系统,Logo,CPU核心数,内存大小,磁盘大小,到期时间（ID和时间字段会被忽略）
 		if len(record) < 7 {
 			failedCount++
 			continue
@@ -186,9 +195,10 @@ func ImportHostsCSV(filePath string) (*commonmodel.ImportResult, error) {
 		cpuNum := 0
 		ramSize := 0
 		diskSize := 0
+		expirationTime := int64(0)
 
-		if len(record) >= 15 {
-			// 完整格式：ID, 提供商, 提供商链接, 主机名, 地址, 端口映射, 用户名, 密码, 操作系统, Logo, CPU核心数, 内存大小, 磁盘大小, 创建时间, 更新时间
+		if len(record) >= 16 {
+			// 完整格式：ID, 提供商, 提供商链接, 主机名, 地址, 端口映射, 用户名, 密码, 操作系统, Logo, CPU核心数, 内存大小, 磁盘大小, 到期时间, 创建时间, 更新时间
 			provider = record[1]
 			providerURL = record[2]
 			hostname = record[3]
@@ -211,8 +221,14 @@ func ImportHostsCSV(filePath string) (*commonmodel.ImportResult, error) {
 			if len(record) > 12 {
 				diskSize, _ = strconv.Atoi(record[12])
 			}
+			if len(record) > 13 && record[13] != "" {
+				// 解析日期时间字符串为时间戳
+				if t, err := time.Parse("2006-01-02 15:04:05", record[13]); err == nil {
+					expirationTime = t.Unix()
+				}
+			}
 		} else {
-			// 简化格式：提供商, 提供商链接, 主机名, 地址, 端口映射, 用户名, 密码, 操作系统, Logo, CPU核心数, 内存大小, 磁盘大小
+			// 简化格式：提供商, 提供商链接, 主机名, 地址, 端口映射, 用户名, 密码, 操作系统, Logo, CPU核心数, 内存大小, 磁盘大小, 到期时间
 			provider = record[0]
 			providerURL = record[1]
 			hostname = record[2]
@@ -235,6 +251,12 @@ func ImportHostsCSV(filePath string) (*commonmodel.ImportResult, error) {
 			if len(record) > 11 {
 				diskSize, _ = strconv.Atoi(record[11])
 			}
+			if len(record) > 12 && record[12] != "" {
+				// 解析日期时间字符串为时间戳
+				if t, err := time.Parse("2006-01-02 15:04:05", record[12]); err == nil {
+					expirationTime = t.Unix()
+				}
+			}
 		}
 
 		// 解析端口映射 JSON
@@ -256,7 +278,7 @@ func ImportHostsCSV(filePath string) (*commonmodel.ImportResult, error) {
 		}
 
 		// 创建主机记录
-		err = CreateHost(provider, providerURL, hostname, address, ports, username, password, os, logo, cpuNum, ramSize, diskSize)
+		err = CreateHost(provider, providerURL, hostname, address, ports, username, password, os, logo, cpuNum, ramSize, diskSize, expirationTime)
 		if err != nil {
 			failedCount++
 			continue

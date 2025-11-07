@@ -62,7 +62,9 @@ const PageConfig = {
                 { key: 'cpu_num', label: 'hosts.cpuCapacity', type: 'capacity', unit: 'cores', placeholder: 'hosts.cpuPlaceholder', required: false },
                 { key: 'ram_size', label: 'hosts.ramCapacity', type: 'capacity', unit: 'storage', placeholder: 'hosts.ramPlaceholder', required: false },
                 { key: 'disk_size', label: 'hosts.diskCapacity', type: 'capacity', unit: 'storage', placeholder: 'hosts.diskPlaceholder', required: false }
-            ]}
+            ]},
+            // 到期时间（单独一行）
+            { key: 'expiration_time', label: 'hosts.expirationTime', type: 'datetime', required: false }
         ],
         columns: [
             { key: 'ID', label: 'common.id', width: '80px' },
@@ -76,6 +78,7 @@ const PageConfig = {
             { key: 'cpu_num', label: 'hosts.cpuNum', width: '80px' },
             { key: 'ram_size', label: 'hosts.ramSize', width: '100px', format: 'storage' },
             { key: 'disk_size', label: 'hosts.diskSize', width: '100px', format: 'storage' },
+            { key: 'expiration_time', label: 'hosts.expirationTime', width: '160px', format: 'datetime' },
             { key: 'CreatedAt', label: 'hosts.createdAt', width: '160px', format: 'datetime' },
             { key: 'UpdatedAt', label: 'hosts.updatedAt', width: '160px', format: 'datetime' }
         ]

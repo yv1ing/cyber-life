@@ -20,18 +20,19 @@ import (
 // CreateHostHandler 创建主机记录
 func CreateHostHandler(ctx *gin.Context) {
 	type reqType struct {
-		Provider    string         `json:"provider" binding:"required"`
-		ProviderURL string         `json:"provider_url" binding:"required"`
-		Hostname    string         `json:"hostname" binding:"required"`
-		Address     string         `json:"address" binding:"required"`
-		Ports       map[int]string `json:"ports" binding:"required"`
-		Username    string         `json:"username" binding:"required"`
-		Password    string         `json:"password" binding:"required"`
-		OS          string         `json:"os"`
-		Logo        string         `json:"logo"`
-		CpuNum      int            `json:"cpu_num"`
-		RamSize     int            `json:"ram_size"`
-		DiskSize    int            `json:"disk_size"`
+		Provider       string         `json:"provider" binding:"required"`
+		ProviderURL    string         `json:"provider_url" binding:"required"`
+		Hostname       string         `json:"hostname" binding:"required"`
+		Address        string         `json:"address" binding:"required"`
+		Ports          map[int]string `json:"ports" binding:"required"`
+		Username       string         `json:"username" binding:"required"`
+		Password       string         `json:"password" binding:"required"`
+		OS             string         `json:"os"`
+		Logo           string         `json:"logo"`
+		CpuNum         int            `json:"cpu_num"`
+		RamSize        int            `json:"ram_size"`
+		DiskSize       int            `json:"disk_size"`
+		ExpirationTime int64          `json:"expiration_time"`
 	}
 
 	var req reqType
@@ -44,7 +45,7 @@ func CreateHostHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = commonservice.CreateHost(req.Provider, req.ProviderURL, req.Hostname, req.Address, req.Ports, req.Username, req.Password, req.OS, req.Logo, req.CpuNum, req.RamSize, req.DiskSize)
+	err = commonservice.CreateHost(req.Provider, req.ProviderURL, req.Hostname, req.Address, req.Ports, req.Username, req.Password, req.OS, req.Logo, req.CpuNum, req.RamSize, req.DiskSize, req.ExpirationTime)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: constant.INTERNAL_ERROR,

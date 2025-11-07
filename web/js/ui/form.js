@@ -24,6 +24,11 @@ class FormGenerator {
             return this._generateLogoField(field, value);
         }
 
+        // 处理日期时间类型
+        if (field.type === 'datetime') {
+            return this._generateDateTimeField(field, value);
+        }
+
         // 处理 JSON 类型字段
         if (field.type === 'json' && value && typeof value === 'object') {
             value = JSON.stringify(value, null, 2);
@@ -129,6 +134,36 @@ class FormGenerator {
         `;
     }
 
+    static _generateDateTimeField(field, value) {
+        // 如果value是秒级时间戳，转换为 datetime-local 格式 (YYYY-MM-DDThh:mm)
+        let dateValue = '';
+        if (value && typeof value === 'number' && value > 0) {
+            const date = new Date(value * 1000); // 秒转毫秒
+            // 转换为本地时间的 datetime-local 格式
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            dateValue = `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+
+        return `
+            <div class="input-group">
+                <label class="input-label" for="field-${field.key}">
+                    ${langManager.t(field.label)}${field.required ? ' *' : ''}
+                </label>
+                <input
+                    type="datetime-local"
+                    id="field-${field.key}"
+                    class="input-field"
+                    value="${dateValue}"
+                    ${field.required ? 'required' : ''}
+                />
+            </div>
+        `;
+    }
+
     static _generateRegularField(field, value) {
         if (field.type === 'password') {
             return this._generatePasswordField(field, value);
@@ -225,6 +260,19 @@ class FormGenerator {
                 const capacityData = this._collectCapacityData(field);
                 if (capacityData !== null) {
                     data[field.key] = capacityData;
+                } else {
+                    data[field.key] = 0;
+                }
+                return;
+            }
+
+            // 处理日期时间类型
+            if (field.type === 'datetime') {
+                const fieldElement = document.getElementById(`field-${field.key}`);
+                if (fieldElement && fieldElement.value) {
+                    // 将 datetime-local 的值转换为秒级时间戳
+                    const dateValue = new Date(fieldElement.value);
+                    data[field.key] = Math.floor(dateValue.getTime() / 1000);
                 } else {
                     data[field.key] = 0;
                 }
