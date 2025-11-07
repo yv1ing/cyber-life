@@ -85,12 +85,44 @@ function initIcons() {
     document.getElementById('nav-icon-sites').innerHTML = Icons.web;
 }
 
+// 更新用户头像显示
+function updateUserAvatar(username, avatarUrl) {
+    const avatarImg = document.getElementById('user-avatar-img');
+    const userInitial = document.getElementById('user-initial-admin');
+
+    if (avatarUrl && avatarUrl.trim() !== '') {
+        // 如果有头像链接，显示图片
+        avatarImg.src = avatarUrl;
+        avatarImg.style.display = 'block';
+        userInitial.style.display = 'none';
+    } else {
+        // 如果没有头像链接，显示首字母
+        avatarImg.style.display = 'none';
+        userInitial.style.display = 'flex';
+        userInitial.textContent = username.charAt(0).toUpperCase();
+    }
+}
+
 // 初始化用户信息
-function initUserInfo() {
+async function initUserInfo() {
     const user = Auth.getCurrentUser();
     if (user && user.username) {
         document.getElementById('user-name').textContent = user.username;
-        document.getElementById('user-initial-admin').textContent = user.username.charAt(0).toUpperCase();
+
+        // 尝试获取完整的用户信息以获取头像
+        try {
+            const response = await UserAPI.findByUsername(user.username);
+            if (response && response.data && response.data.users && response.data.users.length > 0) {
+                const userData = response.data.users[0];
+                updateUserAvatar(user.username, userData.avatar);
+            } else {
+                // 如果获取失败，使用默认的首字母显示
+                updateUserAvatar(user.username, '');
+            }
+        } catch (error) {
+            // 如果获取失败，使用默认的首字母显示
+            updateUserAvatar(user.username, '');
+        }
     }
 
     // 用户下拉菜单
@@ -279,7 +311,19 @@ async function handleProfileSave() {
 
         // 更新页面显示
         document.getElementById('user-name').textContent = username;
-        document.getElementById('user-initial-admin').textContent = username.charAt(0).toUpperCase();
+
+        // 重新获取用户信息以获取最新的头像
+        try {
+            const response = await UserAPI.findByUsername(username);
+            if (response && response.data && response.data.users && response.data.users.length > 0) {
+                const updatedUserData = response.data.users[0];
+                updateUserAvatar(username, updatedUserData.avatar);
+            } else {
+                updateUserAvatar(username, '');
+            }
+        } catch (error) {
+            updateUserAvatar(username, '');
+        }
 
         profileModal.close();
     } catch (error) {

@@ -9,7 +9,7 @@ Password    =   "123456"
 Name        =   "喻灵"
 Email       =   "me@yvling.cn"
 Phone       =   "13333333333"
-Avatar      =   "https://avatars.githubusercontent.com/u/191813682"
+Avatar      =   "https://avatars.githubusercontent.com/u/46731322"
 
 [Database]
 Type        =   "sqlite"                                    # 数据库类型，可选sqlite/mysql
