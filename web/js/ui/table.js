@@ -70,8 +70,12 @@ class TableRenderer {
     static _renderRow(item, config) {
         const rowId = item.ID || item.id || this._generateId();
 
+        // 检查是否有到期时间且即将到期（不足3天）
+        const isExpiringSoon = this._checkExpirationWarning(item);
+        const rowClass = isExpiringSoon ? 'expiring-soon' : '';
+
         return `
-            <tr data-item-id="${rowId}">
+            <tr data-item-id="${rowId}" class="${rowClass}">
                 <td>
                     <input type="checkbox" class="row-checkbox table-checkbox" data-id="${rowId}" />
                 </td>
@@ -93,6 +97,24 @@ class TableRenderer {
         `;
     }
 
+    /**
+     * 检查是否即将到期（不足3天）
+     * @param {Object} item - 数据项
+     * @returns {boolean} 是否即将到期
+     */
+    static _checkExpirationWarning(item) {
+        if (!item.expiration_time || item.expiration_time === 0) {
+            return false;
+        }
+
+        const now = Date.now();
+        const expirationDate = item.expiration_time * 1000; // 秒转毫秒
+        const threeDays = 3 * 24 * 60 * 60 * 1000; // 3天的毫秒数
+
+        // 如果到期时间距离现在不足3天，返回true
+        return expirationDate - now <= threeDays && expirationDate > now;
+    }
+
     static _formatCellValue(value, format, rowId, item, col) {
         if (value === null || value === undefined || value === '') return '-';
 
@@ -100,6 +122,10 @@ class TableRenderer {
         switch (format) {
             case 'datetime':
                 formattedValue = DateUtils.formatDateTime(value);
+                // 如果是到期时间字段，添加警告提示
+                if (col.key === 'expiration_time' && value > 0) {
+                    formattedValue = this._formatExpirationTime(value, formattedValue);
+                }
                 break;
             case 'date':
                 formattedValue = value ? value.split('T')[0] : '-';
@@ -126,6 +152,47 @@ class TableRenderer {
         }
 
         return formattedValue;
+    }
+
+    /**
+     * 格式化到期时间，添加警告提示
+     * @param {number} timestamp - 秒级时间戳
+     * @param {string} formattedDate - 已格式化的日期字符串
+     * @returns {string} 带警告的HTML
+     */
+    static _formatExpirationTime(timestamp, formattedDate) {
+        const now = Date.now();
+        const expirationDate = timestamp * 1000; // 秒转毫秒
+        const diffMs = expirationDate - now;
+        const diffDays = Math.floor(diffMs / (24 * 60 * 60 * 1000));
+
+        // 如果已过期
+        if (diffMs < 0) {
+            const expiredDays = Math.abs(diffDays);
+            return `
+                <div class="expiration-warning expired" title="已过期 ${expiredDays} 天">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>${formattedDate}</span>
+                    <span class="warning-text">已过期</span>
+                </div>
+            `;
+        }
+
+        // 如果不足3天
+        if (diffDays < 3) {
+            const hours = Math.floor(diffMs / (60 * 60 * 1000));
+            const remainingText = diffDays === 0 ? `${hours}小时` : `${diffDays}天`;
+            return `
+                <div class="expiration-warning soon" title="还有 ${remainingText} 到期">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>${formattedDate}</span>
+                    <span class="warning-text">剩余${remainingText}</span>
+                </div>
+            `;
+        }
+
+        // 正常显示
+        return `<span>${formattedDate}</span>`;
     }
 
     static _formatPassword(value, rowId, copyable = false) {
