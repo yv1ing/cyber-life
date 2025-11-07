@@ -163,6 +163,8 @@ const translations = {
         'profile.emailPlaceholder': '请输入邮箱',
         'profile.phone': '电话',
         'profile.phonePlaceholder': '请输入电话',
+        'profile.avatar': '头像链接',
+        'profile.avatarPlaceholder': '请输入头像链接URL',
         'profile.saveSuccess': '保存成功',
         'profile.getFailed': '获取用户信息失败',
 
@@ -395,6 +397,8 @@ const translations = {
         'profile.emailPlaceholder': 'Enter your email',
         'profile.phone': 'Phone',
         'profile.phonePlaceholder': 'Enter your phone',
+        'profile.avatar': 'Avatar URL',
+        'profile.avatarPlaceholder': 'Enter avatar URL',
         'profile.saveSuccess': 'Saved successfully',
         'profile.getFailed': 'Failed to get user info',
 

@@ -268,6 +268,7 @@ async function openProfileModal() {
             document.getElementById('profile-name').value = userData.name || '';
             document.getElementById('profile-email').value = userData.email || '';
             document.getElementById('profile-phone').value = userData.phone || '';
+            document.getElementById('profile-avatar').value = userData.avatar || '';
             document.getElementById('profile-password').value = '';
         } else {
             Toast.error(langManager.t('profile.getFailed'));
@@ -285,6 +286,7 @@ async function handleProfileSave() {
         const name = document.getElementById('profile-name').value.trim();
         const email = document.getElementById('profile-email').value.trim();
         const phone = document.getElementById('profile-phone').value.trim();
+        const avatar = document.getElementById('profile-avatar').value.trim();
         const password = document.getElementById('profile-password').value.trim();
 
         if (!username) {
@@ -297,7 +299,7 @@ async function handleProfileSave() {
             name: name,
             email: email,
             phone: phone,
-            avatar: '',
+            avatar: avatar,
             password: password || ''
         };
 
