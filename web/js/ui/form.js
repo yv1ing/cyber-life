@@ -169,8 +169,10 @@ class FormGenerator {
             return this._generatePasswordField(field, value);
         }
 
+        const widthClass = field.width ? ` input-group-${field.width}` : '';
+
         return `
-            <div class="input-group">
+            <div class="input-group${widthClass}">
                 <label class="input-label" for="field-${field.key}">
                     ${langManager.t(field.label)}${field.required ? ' *' : ''}
                 </label>
@@ -196,8 +198,10 @@ class FormGenerator {
     }
 
     static _generatePasswordField(field, value) {
+        const widthClass = field.width ? ` input-group-${field.width}` : '';
+
         return `
-            <div class="input-group">
+            <div class="input-group${widthClass}">
                 <label class="input-label" for="field-${field.key}">
                     ${langManager.t(field.label)}${field.required ? ' *' : ''}
                 </label>

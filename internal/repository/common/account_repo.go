@@ -57,9 +57,9 @@ func FindAccounts(keyword string, page, size int) ([]commonmodel.Account, int64,
 		return nil, 0, err
 	}
 
-	// 分页查询
+	// 分页查询，按类型排序
 	offset := (page - 1) * size
-	err = query.Offset(offset).Limit(size).Find(&accounts).Error
+	err = query.Order("type ASC, id DESC").Offset(offset).Limit(size).Find(&accounts).Error
 	if err != nil {
 		return nil, 0, err
 	}
@@ -87,7 +87,7 @@ func FindAccountsList(page, size int) ([]commonmodel.Account, int64, error) {
 	}
 
 	offset := (page - 1) * size
-	err = query.Offset(offset).Limit(size).Find(&accounts).Error
+	err = query.Order("type ASC, id DESC").Offset(offset).Limit(size).Find(&accounts).Error
 	if err != nil {
 		return nil, 0, err
 	}

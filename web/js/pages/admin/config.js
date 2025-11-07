@@ -5,7 +5,8 @@ const PageConfig = {
         icon: Icons.account,
         api: AccountAPI,
         fields: [
-            { key: 'platform_group', type: 'group', fields: [
+            { key: 'type_platform_group', type: 'group', fields: [
+                { key: 'type', label: 'accounts.type', type: 'text', required: true, width: 'narrow' },
                 { key: 'platform', label: 'accounts.platform', type: 'text', required: true },
                 { key: 'platform_url', label: 'accounts.platformURL', type: 'url', required: true }
             ]},
@@ -21,6 +22,7 @@ const PageConfig = {
             { key: 'remark', label: 'accounts.remark', type: 'textarea', required: false }
         ],
         columns: [
+            { key: 'type', label: 'accounts.type', width: '100px' },
             { key: 'platform', label: 'accounts.platform', width: '120px', format: 'platformLink', urlKey: 'platform_url', logoKey: 'logo' },
             { key: 'username', label: 'accounts.username', width: '150px', copyable: true },
             { key: 'password', label: 'accounts.password', width: '200px', format: 'password', copyable: true },

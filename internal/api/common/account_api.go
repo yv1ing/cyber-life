@@ -20,6 +20,7 @@ import (
 // CreateAccountHandler 创建账号记录
 func CreateAccountHandler(ctx *gin.Context) {
 	type reqType struct {
+		Type          string `json:"type" binding:"required"`
 		Platform      string `json:"platform" binding:"required"`
 		PlatformURL   string `json:"platform_url" binding:"required"`
 		Username      string `json:"username" binding:"required"`
@@ -40,7 +41,7 @@ func CreateAccountHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = commonservice.CreateAccount(req.Platform, req.PlatformURL, req.Username, req.Password, req.SecurityEmail, req.SecurityPhone, req.Remark, req.Logo)
+	err = commonservice.CreateAccount(req.Type, req.Platform, req.PlatformURL, req.Username, req.Password, req.SecurityEmail, req.SecurityPhone, req.Remark, req.Logo)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, systemmodel.Response{
 			Code: constant.INTERNAL_ERROR,

@@ -10,6 +10,7 @@ import "gorm.io/gorm"
 type Account struct {
 	gorm.Model
 
+	Type          string `json:"type" gorm:"index" binding:"required"`
 	Platform      string `json:"platform" gorm:"index" binding:"required"`
 	PlatformURL   string `json:"platform_url" gorm:"index" binding:"required"`
 	Username      string `json:"username" gorm:"index" binding:"required"`

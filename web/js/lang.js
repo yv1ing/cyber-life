@@ -75,6 +75,7 @@ const translations = {
 
         // 账号记录
         'accounts.title': '账号',
+        'accounts.type': '账号类型',
         'accounts.platform': '平台名称',
         'accounts.platformURL': '平台链接',
         'accounts.logo': '平台图标',
@@ -312,6 +313,7 @@ const translations = {
 
         // Accounts
         'accounts.title': 'Account',
+        'accounts.type': 'Account Type',
         'accounts.platform': 'Platform Name',
         'accounts.platformURL': 'Platform URL',
         'accounts.logo': 'Platform Logo',

@@ -816,6 +816,12 @@
     flex: 1 1 auto;
 }
 
+/* 字段宽度控制 */
+.form-row .input-group-narrow {
+    flex: 0 0 150px;
+    min-width: 150px;
+}
+
 /* ==================== 编辑模态框宽度 ==================== */
 #edit-modal-overlay .modal {
     width: 600px;
