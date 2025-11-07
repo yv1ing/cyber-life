@@ -10,6 +10,7 @@ type globalConfig struct {
 	SecretKey  string
 	ListenAddr string
 	ListenPort int
+	User       userConfig
 	Database   databaseConfig
 }
 

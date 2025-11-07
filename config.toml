@@ -3,6 +3,14 @@ SecretKey   =   "cyber_life_yv1ing_s3cret"
 ListenAddr  =   "0.0.0.0"
 ListenPort  =   8888
 
+[User]
+Username    =   "yv1ing"
+Password    =   "123456"
+Name        =   "喻灵"
+Email       =   "me@yvling.cn"
+Phone       =   "13333333333"
+Avatar      =   "https://avatars.githubusercontent.com/u/191813682"
+
 [Database]
 Type        =   "sqlite"                                    # 数据库类型，可选sqlite/mysql
 Addr        =   "127.0.0.1"

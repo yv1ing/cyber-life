@@ -1,6 +1,10 @@
 package initialize
 
-import systemservice "cyber-life/internal/service/system"
+import (
+	"cyber-life/internal/core/config"
+
+	systemservice "cyber-life/internal/service/system"
+)
 
 // @Author: yv1ing
 // @Email:  me@yvling.cn
@@ -8,12 +12,12 @@ import systemservice "cyber-life/internal/service/system"
 // @Desc:	初始化系统用户
 
 func InitSystemUser() error {
-	username := "yv1ing"
-	password := "123456"
-	name := "喻灵"
-	email := "me@yvling.cn"
-	phone := "13333333333"
-	avatar := "https://avatars.githubusercontent.com/u/191813682"
-
-	return systemservice.CreateUser(username, password, name, email, phone, avatar)
+	return systemservice.CreateUser(
+		config.Config.User.Username,
+		config.Config.User.Password,
+		config.Config.User.Name,
+		config.Config.User.Email,
+		config.Config.User.Phone,
+		config.Config.User.Avatar,
+	)
 }
