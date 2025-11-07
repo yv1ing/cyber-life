@@ -14,7 +14,7 @@ type Host struct {
 	ProviderURL    string         `json:"provider_url" gorm:"index" binding:"required"`
 	Hostname       string         `json:"hostname" gorm:"index" binding:"required"`
 	Address        string         `json:"address" gorm:"index" binding:"required"`
-	Ports          map[int]string `json:"ports" gorm:"serializer:json" binding:"required"`
+	Ports          map[string]string `json:"ports" gorm:"serializer:json" binding:"required"`
 	Username       string         `json:"username" gorm:"index" binding:"required"`
 	Password       string         `json:"password" binding:"required"`
 	OS             string         `json:"os"`              // 操作系统

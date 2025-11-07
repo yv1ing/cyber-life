@@ -21,15 +21,12 @@ const PageConfig = {
             { key: 'remark', label: 'accounts.remark', type: 'textarea', required: false }
         ],
         columns: [
-            { key: 'ID', label: 'common.id', width: '80px' },
             { key: 'platform', label: 'accounts.platform', width: '120px', format: 'platformLink', urlKey: 'platform_url', logoKey: 'logo' },
             { key: 'username', label: 'accounts.username', width: '150px', copyable: true },
             { key: 'password', label: 'accounts.password', width: '200px', format: 'password', copyable: true },
             { key: 'security_email', label: 'accounts.securityEmail', width: '180px', copyable: true },
             { key: 'security_phone', label: 'accounts.securityPhone', width: '130px', copyable: true },
-            { key: 'remark', label: 'accounts.remark' },
-            { key: 'CreatedAt', label: 'accounts.createdAt', width: '160px', format: 'datetime' },
-            { key: 'UpdatedAt', label: 'accounts.updatedAt', width: '160px', format: 'datetime' }
+            { key: 'remark', label: 'accounts.remark' }
         ]
     },
     hosts: {
@@ -67,20 +64,15 @@ const PageConfig = {
             { key: 'expiration_time', label: 'hosts.expirationTime', type: 'datetime', required: false }
         ],
         columns: [
-            { key: 'ID', label: 'common.id', width: '80px' },
             { key: 'provider', label: 'hosts.provider', width: '120px', format: 'platformLink', urlKey: 'provider_url' },
             { key: 'hostname', label: 'hosts.hostname', width: '150px' },
             { key: 'address', label: 'hosts.address', width: '150px', copyable: true },
-            { key: 'ports', label: 'hosts.ports', width: '150px', format: 'json' },
+            { key: 'ports', label: 'hosts.ports', width: '180px', format: 'portMapping' },
             { key: 'username', label: 'hosts.username', width: '120px', copyable: true },
             { key: 'password', label: 'hosts.password', width: '150px', format: 'password', copyable: true },
             { key: 'os', label: 'hosts.os', width: '120px', format: 'platformLink', logoKey: 'logo', logoPath: '/os-icons' },
-            { key: 'cpu_num', label: 'hosts.cpuNum', width: '80px' },
-            { key: 'ram_size', label: 'hosts.ramSize', width: '100px', format: 'storage' },
-            { key: 'disk_size', label: 'hosts.diskSize', width: '100px', format: 'storage' },
-            { key: 'expiration_time', label: 'hosts.expirationTime', width: '160px', format: 'datetime' },
-            { key: 'CreatedAt', label: 'hosts.createdAt', width: '160px', format: 'datetime' },
-            { key: 'UpdatedAt', label: 'hosts.updatedAt', width: '160px', format: 'datetime' }
+            { key: 'hardware_specs', label: 'hosts.hardwareSpecs', width: '120px', format: 'hardwareSpecs', cpuKey: 'cpu_num', ramKey: 'ram_size', diskKey: 'disk_size' },
+            { key: 'expiration_time', label: 'hosts.expirationTime', width: '160px', format: 'datetime' }
         ]
     },
     secrets: {
@@ -98,13 +90,10 @@ const PageConfig = {
             { key: 'remark', label: 'secrets.remark', type: 'textarea', required: false }
         ],
         columns: [
-            { key: 'ID', label: 'common.id', width: '80px' },
             { key: 'platform', label: 'secrets.platform', width: '150px', format: 'platformLink', urlKey: 'platform_url', logoKey: 'logo' },
             { key: 'key_id', label: 'secrets.keyID', width: '200px', copyable: true },
             { key: 'key_secret', label: 'secrets.keySecret', width: '250px', format: 'password', copyable: true },
-            { key: 'remark', label: 'secrets.remark' },
-            { key: 'CreatedAt', label: 'secrets.createdAt', width: '160px', format: 'datetime' },
-            { key: 'UpdatedAt', label: 'secrets.updatedAt', width: '160px', format: 'datetime' }
+            { key: 'remark', label: 'secrets.remark' }
         ]
     },
     sites: {
@@ -117,11 +106,8 @@ const PageConfig = {
             { key: 'logo', label: 'sites.logo', type: 'logo', required: false, dependsOn: 'name', uploadType: 'site' }
         ],
         columns: [
-            { key: 'ID', label: 'common.id', width: '80px' },
             { key: 'name', label: 'sites.name', width: '200px', format: 'platformLink', urlKey: 'url', logoKey: 'logo', logoPath: '/site-icons' },
-            { key: 'url', label: 'sites.url', copyable: true },
-            { key: 'CreatedAt', label: 'sites.createdAt', width: '160px', format: 'datetime' },
-            { key: 'UpdatedAt', label: 'sites.updatedAt', width: '160px', format: 'datetime' }
+            { key: 'url', label: 'sites.url', copyable: true }
         ]
     }
 };

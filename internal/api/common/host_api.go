@@ -2,6 +2,7 @@ package common
 
 import (
 	"cyber-life/internal/constant"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
@@ -20,19 +21,19 @@ import (
 // CreateHostHandler 创建主机记录
 func CreateHostHandler(ctx *gin.Context) {
 	type reqType struct {
-		Provider       string         `json:"provider" binding:"required"`
-		ProviderURL    string         `json:"provider_url" binding:"required"`
-		Hostname       string         `json:"hostname" binding:"required"`
-		Address        string         `json:"address" binding:"required"`
-		Ports          map[int]string `json:"ports" binding:"required"`
-		Username       string         `json:"username" binding:"required"`
-		Password       string         `json:"password" binding:"required"`
-		OS             string         `json:"os"`
-		Logo           string         `json:"logo"`
-		CpuNum         int            `json:"cpu_num"`
-		RamSize        int            `json:"ram_size"`
-		DiskSize       int            `json:"disk_size"`
-		ExpirationTime int64          `json:"expiration_time"`
+		Provider       string            `json:"provider" binding:"required"`
+		ProviderURL    string            `json:"provider_url" binding:"required"`
+		Hostname       string            `json:"hostname" binding:"required"`
+		Address        string            `json:"address" binding:"required"`
+		Ports          map[string]string `json:"ports" binding:"required"`
+		Username       string            `json:"username" binding:"required"`
+		Password       string            `json:"password" binding:"required"`
+		OS             string            `json:"os"`
+		Logo           string            `json:"logo"`
+		CpuNum         int               `json:"cpu_num"`
+		RamSize        int               `json:"ram_size"`
+		DiskSize       int               `json:"disk_size"`
+		ExpirationTime int64             `json:"expiration_time"`
 	}
 
 	var req reqType
@@ -129,6 +130,26 @@ func UpdateHostHandler(ctx *gin.Context) {
 			Info: "delete success",
 		})
 		return
+	}
+
+	if portsInterface, exists := rawData["ports"]; exists {
+		if portsMap, ok := portsInterface.(map[string]interface{}); ok {
+			convertedPorts := make(map[string]string)
+			for k, v := range portsMap {
+				if strValue, ok := v.(string); ok {
+					convertedPorts[k] = strValue
+				}
+			}
+			portsJSON, err := json.Marshal(convertedPorts)
+			if err != nil {
+				ctx.AbortWithStatusJSON(http.StatusBadRequest, systemmodel.Response{
+					Code: constant.INVALID_REQUEST_PARAMS,
+					Info: "invalid ports format",
+				})
+				return
+			}
+			rawData["ports"] = string(portsJSON)
+		}
 	}
 
 	err = commonservice.UpdateHostFields(hostID, rawData)

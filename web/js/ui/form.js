@@ -484,7 +484,7 @@ const PortManager = {
             const portService = item.querySelector('.port-service').value.trim();
 
             if (portNumber && portService) {
-                ports[parseInt(portNumber)] = portService;
+                ports[portNumber] = portService;
             }
         });
 

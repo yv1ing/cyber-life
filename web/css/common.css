@@ -395,36 +395,6 @@ a:hover {
     gap: var(--spacing-sm);
 }
 
-/* 工具提示 */
-.tooltip {
-    position: relative;
-    display: inline-block;
-}
-
-.tooltip .tooltip-text {
-    visibility: hidden;
-    background-color: var(--surface-3);
-    color: var(--on-surface);
-    text-align: center;
-    padding: var(--spacing-xs) var(--spacing-md);
-    border-radius: var(--radius-xs);
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity var(--duration-short) var(--easing-standard);
-    white-space: nowrap;
-    box-shadow: var(--elevation-2);
-    font-size: var(--text-xs);
-}
-
-.tooltip:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-}
-
 /* 加载动画 */
 .loading {
     display: inline-block;

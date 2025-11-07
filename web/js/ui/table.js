@@ -116,6 +116,16 @@ class TableRenderer {
     }
 
     static _formatCellValue(value, format, rowId, item, col) {
+        // 对于 hardwareSpecs 格式，value 可能不存在，需要特殊处理
+        if (format === 'hardwareSpecs') {
+            return this._formatHardwareSpecs(item, col);
+        }
+
+        // 对于 portMapping 格式，需要从对象解析端口信息
+        if (format === 'portMapping') {
+            return this._formatPortMapping(value);
+        }
+
         if (value === null || value === undefined || value === '') return '-';
 
         let formattedValue;
@@ -252,6 +262,85 @@ class TableRenderer {
             return entries.map(([k, v]) => `${k}:${v}`).join(', ');
         }
         return Helpers.escapeHtml(String(value));
+    }
+
+    /**
+     * 格式化硬件配置（CPU、内存、磁盘）为垂直排列的标签
+     * @param {Object} item - 数据项
+     * @param {Object} col - 列配置
+     * @returns {string} 格式化后的 HTML
+     */
+    static _formatHardwareSpecs(item, col) {
+        const cpuNum = item[col.cpuKey];
+        const ramSize = item[col.ramKey];
+        const diskSize = item[col.diskKey];
+
+        const tags = [];
+
+        // CPU 标签
+        if (cpuNum !== null && cpuNum !== undefined && cpuNum !== '') {
+            const coresText = langManager.t('hosts.cpuCores');
+            tags.push(`<span class="hardware-tag cpu-tag"><i class="fas fa-microchip"></i>${cpuNum} ${coresText}</span>`);
+        }
+
+        // 内存标签
+        if (ramSize !== null && ramSize !== undefined && ramSize !== '' && ramSize !== 0) {
+            const formattedRam = Formatters.formatStorage(ramSize);
+            tags.push(`<span class="hardware-tag ram-tag"><i class="fas fa-memory"></i>${formattedRam}</span>`);
+        }
+
+        // 磁盘标签
+        if (diskSize !== null && diskSize !== undefined && diskSize !== '' && diskSize !== 0) {
+            const formattedDisk = Formatters.formatStorage(diskSize);
+            tags.push(`<span class="hardware-tag disk-tag"><i class="fas fa-hdd"></i>${formattedDisk}</span>`);
+        }
+
+        if (tags.length === 0) {
+            return '-';
+        }
+
+        return `<div class="hardware-specs">${tags.join('')}</div>`;
+    }
+
+    /**
+     * 格式化端口映射为垂直排列的标签
+     * @param {Object|string} value - 端口映射对象或 JSON 字符串
+     * @returns {string} 格式化后的 HTML
+     */
+    static _formatPortMapping(value) {
+        if (!value || value === null || value === undefined || value === '') {
+            return '-';
+        }
+
+        let ports = value;
+
+        // 如果是字符串，尝试解析为对象
+        if (typeof value === 'string') {
+            try {
+                ports = JSON.parse(value);
+            } catch (e) {
+                return '-';
+            }
+        }
+
+        // 如果不是对象，返回空
+        if (typeof ports !== 'object' || ports === null) {
+            return '-';
+        }
+
+        const entries = Object.entries(ports);
+        if (entries.length === 0) {
+            return '-';
+        }
+
+        // 为每个端口创建标签
+        const tags = entries.map(([port, service]) => {
+            const escapedPort = Helpers.escapeHtml(String(port));
+            const escapedService = Helpers.escapeHtml(String(service));
+            return `<span class="port-tag"><i class="fas fa-network-wired"></i>${escapedPort} - ${escapedService}</span>`;
+        });
+
+        return `<div class="port-mapping">${tags.join('')}</div>`;
     }
 
     static _renderPagination(currentPage, totalPages, total, pageSize, onPageChange) {

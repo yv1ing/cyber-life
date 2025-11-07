@@ -19,7 +19,7 @@ import (
 // @Desc:	主机记录服务
 
 // CreateHost 创建主机记录
-func CreateHost(provider, providerURL, hostname, address string, ports map[int]string, username, password, os, logo string, cpuNum, ramSize, diskSize int, expirationTime int64) error {
+func CreateHost(provider, providerURL, hostname, address string, ports map[string]string, username, password, os, logo string, cpuNum, ramSize, diskSize int, expirationTime int64) error {
 	host := &commonmodel.Host{
 		Provider:       provider,
 		ProviderURL:    providerURL,
@@ -51,7 +51,7 @@ func DeleteHost(hostID uint, hardDelete bool) error {
 }
 
 // UpdateHost 更新主机记录
-func UpdateHost(hostID uint, provider, providerURL, hostname, address string, ports map[int]string, username, password, os, logo string, cpuNum, ramSize, diskSize int, expirationTime int64) error {
+func UpdateHost(hostID uint, provider, providerURL, hostname, address string, ports map[string]string, username, password, os, logo string, cpuNum, ramSize, diskSize int, expirationTime int64) error {
 	host := &commonmodel.Host{
 		Provider:       provider,
 		ProviderURL:    providerURL,
@@ -260,7 +260,7 @@ func ImportHostsCSV(filePath string) (*commonmodel.ImportResult, error) {
 		}
 
 		// 解析端口映射 JSON
-		var ports map[int]string
+		var ports map[string]string
 		if portsStr != "" {
 			err := json.Unmarshal([]byte(portsStr), &ports)
 			if err != nil {
@@ -268,7 +268,7 @@ func ImportHostsCSV(filePath string) (*commonmodel.ImportResult, error) {
 				continue
 			}
 		} else {
-			ports = make(map[int]string)
+			ports = make(map[string]string)
 		}
 
 		// 验证必填字段

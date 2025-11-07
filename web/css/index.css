@@ -207,13 +207,14 @@
 .shortcuts-section {
     width: 100%;
     max-width: 900px;
-    margin-top: 32px;
+    margin: 32px auto 0;
     animation: fadeInUp 0.8s ease-out 0.4s backwards;
     display: none;
 }
 
 .shortcuts-section.show {
-    display: block;
+    display: flex;
+    justify-content: center;
 }
 
 .shortcuts-container {
@@ -221,6 +222,8 @@
     background-color: var(--surface);
     border-radius: var(--radius-md);
     padding: var(--spacing-lg);
+    display: flex;
+    justify-content: center;
 }
 
 .shortcuts-scroll-wrapper {
@@ -231,6 +234,8 @@
     -ms-overflow-style: none;
     scroll-behavior: smooth;
     scroll-snap-type: y mandatory;
+    display: flex;
+    justify-content: center;
 }
 
 .shortcuts-scroll-wrapper::-webkit-scrollbar {
@@ -238,11 +243,11 @@
 }
 
 .shortcuts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
-    grid-auto-rows: 80px;
+    display: flex;
+    flex-wrap: wrap;
     gap: var(--spacing-sm);
     padding: 0;
+    justify-content: center;
     align-content: start;
 }
 
