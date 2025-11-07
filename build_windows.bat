@@ -3,7 +3,7 @@
 set GOOS=windows
 set GOARCH=amd64
 
-go build -o app.exe .\main.go
+go build -o cyber.exe .\main.go
 
-echo compile finished: app.exe
+echo compile finished: cyber.exe
 pause

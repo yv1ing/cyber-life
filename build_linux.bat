@@ -3,7 +3,7 @@
 set GOOS=linux
 set GOARCH=amd64
 
-go build -o app .\main.go
+go build -o cyber .\main.go
 
-echo compile finished: app
+echo compile finished: cyber
 pause
